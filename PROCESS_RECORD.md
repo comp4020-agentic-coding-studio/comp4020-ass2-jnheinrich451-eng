@@ -349,3 +349,62 @@ The instruction assumed a lecture entry that does not exist: bringing the repo
 to SPINE.md deleted every lecture, and SPINE.md defines none. I created a
 minimal week 2 lecture so the deck is reachable at all and spec line 3 can be
 met, and flagged it as a spine decision rather than folding it in silently.
+
+## 2026-09-04 06:51 — The figure that refused to say what the brief expected
+
+**Prompt:**
+
+> write the four figure scripts described in build/CONTENT-deck.md under ### 2
+> The Frechet Distance ... fid-vs-invN.py must also print the N at which the
+> A/B ordering flips, or state that it did not flip. Then restructure the
+> week-02 deck ... Report each slide at 390×844.
+
+**Result:**
+Four scripts under `figures/`, one shared `_style.py` for the transparent-SVG
+export and a palette that has to survive both the site's cream and the deck's
+black. The deck restructured around them: centered heading-size equations,
+fragments on 6–8, spoken sentences moved into notes, and a footer set once as
+`--deck-footer` and drawn on `.slides` rather than repeated on twelve slides.
+
+The deck also moved off its own lecture entry and onto the session, which is
+the course's actual teaching unit. The session template validates the
+`/decks/<slug>/` shape itself, because `sessions` is a loose schema and will
+not enforce what `lectures` does.
+
+**Verified:**
+Every slide measured at 390×844 and against the 1280×720 canvas: all twelve fit
+exactly, worst case 2 lines against a limit of 4. Build clean, 26 pages, no
+a11y violations, no deck structural violations. The figure checked on the
+rendered slide rather than in the file, which is where the footer and the
+colours on black could be confirmed.
+
+**Commit:** [`3c9eb4b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3c9eb4b)
+
+**What happened:**
+`fid-vs-invN.py` produced a figure that was wrong while looking finished. I
+fitted the 1/N line through all seven sample sizes, three of which sit below
+d = 2048, where the sample covariance is rank-deficient and the 1/N law has
+not started. The fit was clean, the plot looked right, and the intercepts came
+out at 180.6 and 188.8 against true values of 5.12 and 4.88 — wrong by a factor
+of 35. Nothing about the picture said so. What caught it was checking the
+intercept against a number I already knew from `bench-truth.py`, which is the
+only reason the two scripts print their values at all. Fitting only N > d
+gives 5.145 and 4.882, errors of +0.025 and +0.003, and that restricted fit is
+FID∞ three weeks before week 5 names it.
+
+The result itself contradicts the brief. `CONTENT.md` predicts the ordering
+inverting below N ≈ 5,000 and righting itself above; it does neither. It is
+wrong at every N measured, because an isotropic bench in d = 2048 puts equal
+variance in all 2048 directions and the bias reaches +42 where the true gap is
+0.24. Reported rather than tuned into agreement: CONTENT.md's own line is that
+if it does not invert, the constants change and not the story, and choosing
+those constants is the author's call.
+
+Two smaller things. I misread scaled geometry twice more — first calling the
+figures too small at ~100px when `getBoundingClientRect` was reporting canvas
+px scaled by 0.305, so they were really ~400px. The lesson from the last deck
+turn did not transfer because I wrote a new script instead of reusing the one
+that had already been corrected. And the ImageNotFound the author hit in the
+browser was `savefig` truncating its target before rewriting it; `save()` now
+writes to a temp file and `os.replace()`s it, so a watching dev server sees
+either the old figure or the new one.
