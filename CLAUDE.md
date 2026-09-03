@@ -145,6 +145,38 @@ always look connected.
 - **When the right call is ambiguous, ask.** Don't resolve a question about the
   course's argument by picking the plausible option.
 
+## Building locally
+
+`pnpm build` needs `SLOP_NO_SEARCH=1` on this machine, and only on this machine:
+
+```sh
+SLOP_NO_SEARCH=1 pnpm build
+```
+
+The theme shells out with `execFile("npx", ["pagefind", ...])` in its
+`astro:build:done` hook, which cannot run on Windows under Node 26 — bare `npx`
+resolves to an extensionless shell script (ENOENT) and `npx.cmd` is refused
+because Node will not spawn `.cmd` without a shell (EINVAL). The throw also
+kills `courseGraph`'s hook, which is registered after it, so `dist/api/` never
+gets written and the spec tests that read it cannot run at all.
+
+The env gate in `astro.config.ts` is the **one deliberate divergence** from the
+fixed platform. CI is ubuntu and never sets the variable, so the deployed site
+still ships a search index. Do not set it in CI, and do not remove the gate.
+
+Two things this uncovered, both of which had been invisible because the crash
+aborted the build before they ran:
+
+- **Every `.mdx` page under `src/pages/` needs explicit `layout:` frontmatter.**
+  The theme installs its default-layout injector as a remark plugin on
+  `markdown.processor`, and `@astrojs/mdx` does not run that processor, so an
+  `.mdx` page renders with no `<html lang>`, no `<title>` and no landmarks —
+  three axe violations each. `.md` pages are fine. Any new `.mdx` page in
+  `src/pages/` must carry `layout: <relative path>/layouts/PageLayout.astro`.
+- **A spec test must be named `*.test.ts`.** Vitest's default include is
+  `**/*.{test,spec}.?(c|m)[jt]s?(x)`, and there is no vitest config overriding
+  it, so a file called `test.ts` is silently collected by nothing.
+
 ## These rules become checks
 
 The brief asks for checks in `spec/` "protecting the promises your course makes

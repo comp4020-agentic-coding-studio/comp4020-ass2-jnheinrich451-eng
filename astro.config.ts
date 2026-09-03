@@ -25,6 +25,17 @@ export default defineConfig({
       brandCss: "astro-theme-slop/slop.css",
       imageFormat: "avif",
       llmsTxt: true,
+      // Local escape hatch, and the only divergence from the fixed platform.
+      // The theme's astro:build:done hook shells out with
+      // execFile("npx", ["pagefind", ...]), which cannot run on Windows under
+      // Node 26: bare `npx` resolves to an extensionless shell script
+      // (ENOENT), and `npx.cmd` is refused because Node will not spawn .cmd
+      // without a shell (EINVAL). The throw also takes out courseGraph's
+      // build:done hook, which runs after this one, so dist/api/ is never
+      // emitted and the spec tests that read it cannot run at all.
+      // CI is ubuntu and never sets this, so the deployed site is unchanged
+      // and still ships a search index. Set SLOP_NO_SEARCH=1 locally only.
+      search: process.env.SLOP_NO_SEARCH !== "1",
       // The theme owns the markdown plugin chain, so astromotion's slide
       // plugins (slide breaks, classes, backgrounds, notes, QR codes) are
       // handed to it rather than registered separately. Each one gates on
