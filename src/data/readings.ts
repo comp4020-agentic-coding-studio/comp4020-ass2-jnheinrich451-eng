@@ -16,13 +16,70 @@ export const readings = {
     verified: "2026-09-03",
   },
   "binkowski-2018": {
-    authors: "Binkowski, M. et al.",
+    authors: "Bińkowski, M. et al.",
     title: "Demystifying MMD GANs",
     venue: "ICLR",
     year: 2018,
     url: "https://openreview.net/pdf?id=r1lUOzWCW",
     verified: "2026-09-03",
   },
+  "parmar-2022": {
+    authors: "Parmar, G., Zhang, R. and Zhu, J.-Y",
+    title: "On Aliased Resizing and Surprising Subtleties in GAN Evaluation",
+    venue: "CVPR",
+    year: 2022,
+    url: "https://openaccess.thecvf.com/content/CVPR2022/papers/Parmar_On_Aliased_Resizing_and_Surprising_Subtleties_in_GAN_Evaluation_CVPR_2022_paper.pdf",
+    verified: "2026-09-03",
+  },
+  "kynkaanniemi-2019": {
+    authors: "Kynkäänniemi, T. et al.",
+    title: "Improved Precision and Recall Metric for Assessing Generative Models",
+    venue: "NeurIPS",
+    year: 2019,
+    url: "https://proceedings.neurips.cc/paper_files/paper/2019/file/0234c510bc6d908b28c70ff313743079-Paper.pdf",
+    verified: "2026-09-03",
+  },
+  "naeem-2020": {
+    authors: "Naeem, M. F. et al",
+    title: "Reliable Fidelity and Diversity Metrics for Generative Models",
+    venue: "ICML",
+    year: 2020,
+    url: "https://arxiv.org/pdf/2002.09797",
+    verified: "2026-09-03",
+  },
+  "unterthiner-2019": {
+    authors: "Unterthiner, T. et al.",
+    title: "FVD: A NEW METRIC FOR VIDEO GENERATION",
+    venue: "ICLR workshop",
+    year: 2019,
+    url: "https://openreview.net/pdf?id=rylgEULtdN",
+    verified: "2026-09-03",
+  },
+  "stein-2023": {
+    authors: "Stein, G. et al.",
+    title: "Exposing Flaws of Generative Model Evaluation Metrics and Their Unfair Treatment of Diffusion Models",
+    venue: "NIPS",
+    year: 2023,
+    url: "https://proceedings.neurips.cc/paper_files/paper/2023/file/0bc795afae289ed465a65a3b4b1f4eb7-Paper-Conference.pdf",
+    verified: "2026-09-03",
+  },
+  "kynkaanniemi-2023": {
+    authors: "Kynkäänniemi, T. et al.",
+    title: "The Role of ImageNet Classes in Fréchet Inception Distance",
+    venue: "ICLR",
+    year: 2023,
+    url: "https://openreview.net/pdf?id=4oXTQ6m_ws8",
+    verified: "2026-09-03",
+  },
+  "jayasumana-2024": {
+    authors: "Jayasumana, S. et al.",
+    title: "Rethinking FID: Towards a Better Evaluation Metric for Image Generation",
+    venue: "CVPR",
+    year: 2024,
+    url: "https://openaccess.thecvf.com/content/CVPR2024/papers/Jayasumana_Rethinking_FID_Towards_a_Better_Evaluation_Metric_for_Image_Generation_CVPR_2024_paper.pdf",
+    verified: "2026-09-03",
+  }
+
 } as const;
 
 export type ReadingKey = keyof typeof readings;

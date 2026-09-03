@@ -5,6 +5,9 @@ description:
   fixing N does not repair the comparison
 week: 5
 date: 2026-08-31
+arc: B
+required_reading: chong-forsyth-2020
+further_reading: [binkowski-2018, heusel-2017]
 spec:
   - you can say why the estimator sits above the true value, from the
     expansion rather than from intuition

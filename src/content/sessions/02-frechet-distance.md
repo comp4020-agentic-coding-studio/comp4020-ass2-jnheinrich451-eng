@@ -5,11 +5,17 @@ description:
   assumption it smuggles in
 week: 2
 date: 2026-08-10
+arc: A
+required_reading: heusel-2017
+further_reading: [binkowski-2018]
 spec:
-  - you can derive the two-Gaussian closed form and say which step needs the
-    matrix square root
-  - you can state what the form assumes about the two distributions, and name
-    one case where that assumption plainly fails
+  - you can derive the closed form from the definition without notes
+  - you can say which step requires the Gaussian assumption and what
+    breaks without it
+  - you have computed the distance on the bench by hand for a two
+    dimensional projection and matched the library
+related:
+  - 01-the-number
 ---
 
 Placeholder. This session introduces the distance itself, before any of it

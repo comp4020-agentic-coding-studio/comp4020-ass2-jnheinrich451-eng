@@ -1,24 +1,26 @@
 ---
-title: "A1: Reproduce the number"
+title: "Assignment 1: Reproduce the number"
 description:
-  Take a published FID figure and reproduce it, then account for every
-  decimal place you could not
-week: 6
-due: 2026-09-07T12:00:00+10:00
-weight: 25
+  Take a published FID from a real paper. Reproduce it. Explain the gap.
+  Marked on the explanation, not on the size of the gap.
+week: 5
+due: 2026-09-04T12:00:00+10:00
+weight: 20
 marking:
   mode: weighted
   criteria:
-    - name: The reproduction and its instrument
-      weight: 40
-    - name: Accounting for the gap
-      weight: 60
+    - name: The reproduction attempt, pinned and repeatable
+      weight: 30
+    - name: Explanation of the discrepancy
+      weight: 50
+    - name: N-honesty of the comparison
+      weight: 20
 spec:
-  - a published FID figure, named with its source, reproduced through your own
-    implementation
-  - every difference between your number and the published one is either closed
-    or accounted for by name
-  - your reported figure states its sample size, reference set and coding layer
+  - the paper, the number and its page are cited
+  - the reproduction can be re-run by the marker from what is submitted
+  - every difference between your setup and the paper's is named
+related:
+  - a2-break-the-number
 ---
 
 Placeholder. This is the first assessment: pick a published FID figure, rebuild
