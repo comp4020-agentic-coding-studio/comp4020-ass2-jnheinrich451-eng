@@ -240,3 +240,57 @@ the author's judgement rather than written into the spine.
 I also offered to add `stein-2023` to `readings.ts` and it was already there;
 the offer was made without checking. Fixed its venue from NIPS to NeurIPS,
 which the file's own 2019 entry already spells correctly.
+
+## 2026-09-04 04:36 — Weeks 1 and 2, and a screenshot that lied about the phone
+
+**Prompt:**
+
+> Draft bodies for sessions/NN and sessions/MM ... In the session template,
+> render three things from frontmatter. A metadata strip above the title ...
+> A reading block after the body ... Check both viewports.
+
+**Result:**
+Week 1 as an audit of a published results table, week 2 as a derivation, 477
+and 464 words. Naming each shape before writing is what kept them apart: week
+5 is already a demonstration on the bench, so a third week opening with "take
+the bench and score it" would have read as a template even with different
+facts in it.
+
+The template work is where the placement problem was. "Above the title" is not
+available to a component rendered in the layout's default slot, because
+`ContentLayout` emits `<h1>` first. Rather than fork the layout, I read the
+theme's CSS: `.at-main` is a grid with `grid-template-columns: subgrid` and
+auto-placed children, and `order` governs auto-placement, so `order: -1` lifts
+the strip into the first row with the layout mode untouched. Forking the
+layout would have meant reimplementing the hero and lead handling to move one
+line of markup.
+
+`Readings` throws on a key with no entry, naming it. That makes a citation
+pointing at nothing the same class of error as a dangling `related:` ref,
+which the build already refuses.
+
+**Verified:**
+Both viewports through the DevTools protocol with real device metrics, not by
+eye: `scrollWidth` equals `clientWidth` at 390x844 and at 1920x1080, with zero
+elements extending past the client width. Strip above the h1 at both (top 153
+against 269 and 251), one line at 1920 and two at 390 with the arc below,
+Roboto Mono, `tabular-nums` computed. The missing-key guard tested by pointing
+week 1 at `heusel-2018` and confirming the build failed with that key in the
+message, then restoring.
+
+**Commit:** [`fed617d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/fed617d)
+
+**What happened:**
+I read a screenshot as a defect it was not. A `--window-size=390,844` capture
+showed the body text sliced off at the right margin, which looks exactly like
+a `white-space: nowrap` strip forcing the page wider than the viewport — and I
+had just written one. The check that settled it was shooting a page I had not
+touched: `/assessments/` was cropped identically, so the cause could not be my
+CSS. Measuring through CDP then showed no overflow at all. The lesson is the
+same one as the stale dev server two turns ago: a rendering I did not produce
+under controlled conditions is not evidence. The CDP script is kept in the
+scratchpad and is now how viewports get checked.
+
+Also caught in the rendered page rather than the diff: `Heusel, M. et al..`,
+a doubled full stop from appending a separator to an author field that already
+carried one. It reads fine in the source.
