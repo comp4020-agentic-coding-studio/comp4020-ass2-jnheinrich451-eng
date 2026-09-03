@@ -408,3 +408,51 @@ that had already been corrected. And the ImageNotFound the author hit in the
 browser was `savefig` truncating its target before rewriting it; `save()` now
 writes to a temp file and `os.replace()`s it, so a watching dev server sees
 either the old figure or the new one.
+
+## 2026-09-04 07:14 — Weeks 3 and 4, and a hedge that stops at the frontmatter
+
+**Prompt:**
+
+> Draft the bodies of sessions/03-the-instrument and sessions/04-getting-it-right
+> ... Week 3 coins "the instrument" and it must be introduced as a term, in
+> bold, once. Week 4: write "several public implementations", not "four".
+
+**Result:**
+440 and 412 words. Naming the shape before writing is doing real work now that
+four weeks exist: week 3 argues from provenance and week 4 from readings that
+end in a rule, so neither collapses into week 5's demonstration or into week
+1's audit. Week 3's opening had to avoid being a definition, which is awkward
+for a session whose subject is a definition; opening on loading the network
+and asking what it was trained for keeps it an action.
+
+Every paper claim is attributive rather than asserted — "Bińkowski and
+colleagues note", "Kynkäänniemi and colleagues report", "Parmar and colleagues
+report". That is the hedge the prompt asks for, and it also means a claim can
+be tightened against the PDF later by changing one clause instead of rewriting
+the sentence around it.
+
+**Verified:**
+Constraints checked mechanically rather than by rereading: `git diff --numstat`
+plus a grep for frontmatter keys confirms zero frontmatter lines changed in
+either file; the bold term appears exactly once; zero em dashes in either body;
+both end on the exercise. pnpm check: 0 errors, 26 pages, no a11y violations,
+6 tests pass and the 4 failures are the six remaining pending bodies.
+
+**Commit:** [`4a0d57b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/4a0d57b)
+
+**What happened:**
+I wrote "several public FID implementations" where the instruction said
+"several public implementations". The hedge was satisfied in substance and the
+wording was not, which my own grep for the exact phrase caught by returning
+zero. Worth noticing because the check that found it was one I ran to prove
+compliance, not one I expected to fail.
+
+The hedge also does not reach where it most needs to. Week 4's frontmatter
+description still reads "four public implementations, four different numbers"
+— the exact claim the prompt asked to avoid, sitting in the text that renders
+under the title and ships in the API, while the body underneath says
+"several". Frontmatter was out of scope for this turn, so it is reported
+rather than fixed.
+
+Weeks 3 and 4 declare no reading keys in SPINE.md, so three papers are named
+in prose and the reading block the template renders is empty on both pages.
