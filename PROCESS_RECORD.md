@@ -190,3 +190,53 @@ twelve empty strings, and its own filter discards falsy openers. It went red
 the moment the loader worked. A check can be both passing and worthless, and
 the only way I found that one was reading the API's actual shape rather than
 trusting the colour.
+
+## 2026-09-04 05:05 — Both [verify] claims checked, and one of them was wrong in a way that mattered
+
+**Prompt:**
+
+> there is a new instruction CONTENT.md, please verify the [verify] parts
+> according to the assets papers!
+
+**Result:**
+Two markers, both on Stein et al. 2023, both resolved against the PDF in
+`assets/` rather than from memory.
+
+Week 10's guess was right: DINOv2-ViT-L/14, metric written FD_DINOv2,
+leaderboard in Appendix E, with B/14 recommended during development at roughly
+a quarter of the compute.
+
+Week 9's was right in its label and misleading in its phrasing. "Two-
+alternative forced choice on realism" reads as a pairwise comparison. The
+actual design shows one image per trial, from a model or from the training
+set, and asks real or fake; models rank by human error rate. The two
+alternatives are the responses, not two stimuli. A student handed the original
+line would have designed the wrong study in week 9's exercise, and the label
+was accurate enough that nothing downstream would have caught it.
+
+**Verified:**
+The Read tool refused the PDF as password-protected. `pypdf` opened it with
+`is_encrypted: False`, so the protection was a tooling artefact rather than a
+fact about the file — worth checking before accepting a tool's account of a
+document. Extracted all 53 pages to text, indexed the method terms by page,
+and read §3 in full for the design and Appendix D.2/D.3 for the encoder
+recommendation, quoting rather than paraphrasing where the wording carries the
+claim.
+
+**Commit:** [`0e76430`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/0e76430)
+
+**What happened:**
+Reading the whole paper rather than the two sentences under the markers turned
+up something neither marker asked about. In Appendix D.3 the authors
+"recommend using FD as-is given that its use is already widespread": they
+change the instrument and keep the distance, on the grounds that a bias
+behaving similarly across generated datasets cannot affect model rankings.
+That is exactly the assumption week 5 spends its session denying, via Chong
+and Forsyth's per-model slopes, and the authors concede both hypotheses are
+unproven. It reframes week 11 — the strongest case for keeping the score comes
+from the paper that exposed its flaws, not from inertia. Reported and left to
+the author's judgement rather than written into the spine.
+
+I also offered to add `stein-2023` to `readings.ts` and it was already there;
+the offer was made without checking. Fixed its venue from NIPS to NeurIPS,
+which the file's own 2019 entry already spells correctly.
