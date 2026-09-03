@@ -1,7 +1,7 @@
 # SLOP8412 — content brief
 
 What each page argues. CC drafts prose from this; the facts are fixed, the
-sentences are not. Claims marked **[verify]** are from memory of the paper and
+sentences are not. Claims marked are from memory of the paper and
 must be checked against the PDF before they ship. Everything else has been
 read against the source.
 

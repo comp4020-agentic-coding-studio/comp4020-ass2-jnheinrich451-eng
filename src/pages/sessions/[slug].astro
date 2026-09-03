@@ -4,8 +4,9 @@ import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
 import SpecList from "astro-course-university/components/SpecList.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import EntryMeta from "../../components/EntryMeta.astro";
+import Readings from "../../components/Readings.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
-import { formatCourseDate } from "../../lib/dates";
 import { graphCollections, sessionLabels, siteConfig } from "../../site-config";
 
 export async function getStaticPaths() {
@@ -15,6 +16,12 @@ export async function getStaticPaths() {
 
 const { session } = Astro.props;
 const { Content } = await render(session);
+
+// `arc`, `required_reading` and `further_reading` are loose keys: the schema
+// passes them through without declaring them, so they don't exist on the
+// generated types and are read from an untyped view of the same data.
+const loose = session.data as Record<string, unknown>;
+const arc = typeof loose.arc === "string" ? loose.arc : undefined;
 ---
 
 <ContentLayout
@@ -22,8 +29,9 @@ const { Content } = await render(session);
   description={session.data.description}
   {...siteConfig}
 >
-  <p><strong>{formatCourseDate(session.data.date)}</strong></p>
+  <EntryMeta week={session.data.week} date={session.data.date} arc={arc} />
   <Content />
+  <Readings required={loose.required_reading} further={loose.further_reading} />
   <SpecList spec={session.data.spec}>
     What you bring to the session. Written so a reader can tell whether it has
     been met without asking you.

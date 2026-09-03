@@ -1,0 +1,85 @@
+---
+/**
+ * The metadata strip that sits above a session's title: course code,
+ * zero-padded week, date, and arc. Every field is read from the course
+ * record or the entry's frontmatter, so none of it is written twice.
+ *
+ * On placement: the layout renders <h1> before its default slot, so a
+ * strip rendered in that slot lands *after* the title in the DOM.
+ * `.at-main` is a grid whose children are auto-placed (see the theme's
+ * components.css), and `order` governs auto-placement, so `order: -1`
+ * lifts the strip into the first row without touching the layout mode
+ * the theme's subgrid depends on. The rule has to be global because
+ * `.at-main` belongs to the layout, not to this component.
+ */
+import { courseMeta } from "../course-config";
+import { formatCourseDate } from "../lib/dates";
+
+interface Props {
+  week: number;
+  date: Date;
+  arc?: string;
+}
+
+const { week, date, arc } = Astro.props;
+---
+
+<p class="entry-meta">
+  <span class="entry-meta__fixed">
+    <span>{courseMeta.code}</span>
+    <span>Week {String(week).padStart(2, "0")}</span>
+    <span>{formatCourseDate(date)}</span>
+  </span>
+  {arc && <span class="entry-meta__arc">Arc {arc}</span>}
+</p>
+
+<style is:global>
+  .at-main > .entry-meta {
+    order: -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--at-spacing-sm);
+    margin-block: 0 var(--at-spacing-sm);
+    font-family: var(--at-font-mono);
+    /* Digits share a width, so week and date columns don't shift between
+       one session and the next. */
+    font-variant-numeric: tabular-nums;
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--at-text-muted, var(--at-tertiary));
+  }
+
+  /* The three fixed fields are one unit and never break across lines. */
+  .entry-meta__fixed {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: var(--at-spacing-sm);
+    white-space: nowrap;
+  }
+
+  .entry-meta__fixed > span + span::before,
+  .entry-meta__arc::before {
+    content: "\00b7";
+    margin-inline-end: var(--at-spacing-sm);
+  }
+
+  /* Below 640px the arc takes a line of its own rather than letting the
+     strip break somewhere inside the code, the week or the date. */
+  @media (max-width: 640px) {
+    .at-main > .entry-meta {
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+    }
+
+    .entry-meta__arc {
+      flex-basis: 100%;
+    }
+
+    .entry-meta__arc::before {
+      content: none;
+    }
+  }
+</style>

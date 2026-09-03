@@ -1,0 +1,134 @@
+---
+/**
+ * A session's reading list, resolved from its frontmatter against
+ * `src/data/readings.ts`. `required_reading` carries one key and
+ * `further_reading` an array of them; both are loose frontmatter, so they
+ * arrive untyped and are normalised here rather than at the call site.
+ *
+ * Nothing about a paper is written in a session file. A key that resolves
+ * to no entry throws at build time and names the key: a citation pointing
+ * at nothing is the same class of error as a dangling `related:` ref, and
+ * the build is the right place for it to surface rather than a page that
+ * renders a silent gap.
+ */
+import { readings } from "../data/readings";
+
+interface Reading {
+  authors: string;
+  title: string;
+  venue: string;
+  year: number;
+  url: string;
+  verified: string;
+}
+
+interface Props {
+  required?: unknown;
+  further?: unknown;
+}
+
+const { required, further } = Astro.props;
+
+const table = new Map<string, Reading>(Object.entries(readings));
+
+/** One key, a list of keys, or nothing, all flattened to a list. */
+const keysOf = (value: unknown): string[] =>
+  value == null ? [] : Array.isArray(value) ? value.map(String) : [String(value)];
+
+const resolve = (key: string): Reading => {
+  const entry = table.get(key);
+  if (!entry) {
+    throw new Error(
+      `unknown reading key "${key}" — every required_reading and further_reading key must have an entry in src/data/readings.ts`,
+    );
+  }
+  return entry;
+};
+
+/** Some author fields already end in a full stop ("Heusel, M. et al."), so
+ *  the separator is added rather than assumed. */
+const cite = (r: Reading): string =>
+  `${r.authors.replace(/\.$/, "")}. ${r.venue} ${r.year}.`;
+
+const requiredReadings = keysOf(required).map(resolve);
+const furtherReadings = keysOf(further).map(resolve);
+---
+
+{
+  (requiredReadings.length > 0 || furtherReadings.length > 0) && (
+    <section class="readings" aria-labelledby="reading-heading">
+      <h2 id="reading-heading">Reading</h2>
+
+      {requiredReadings.length > 0 && (
+        <div class="readings__group readings__group--required">
+          <p class="readings__label">Required</p>
+          <ul>
+            {requiredReadings.map((r) => (
+              <li>
+                <a href={r.url}>{r.title}</a>
+                <span class="readings__cite">
+                  {cite(r)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {furtherReadings.length > 0 && (
+        <div class="readings__group">
+          <p class="readings__label">Further</p>
+          <ul>
+            {furtherReadings.map((r) => (
+              <li>
+                <a href={r.url}>{r.title}</a>
+                <span class="readings__cite">
+                  {cite(r)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  )
+}
+
+<style>
+  .readings__group + .readings__group {
+    margin-block-start: var(--at-spacing-lg);
+  }
+
+  /* Required is set apart by a rule and by weight; further reading keeps
+     the same shape one step quieter, so the two read as one list with a
+     priority rather than as two unrelated blocks. */
+  .readings__group--required {
+    border-inline-start: 2px solid var(--at-primary);
+    padding-inline-start: var(--at-spacing-md);
+  }
+
+  .readings__label {
+    margin-block: 0 var(--at-spacing-sm);
+    font-family: var(--at-font-mono);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .readings__group--required .readings__label {
+    color: var(--at-primary);
+  }
+
+  .readings ul {
+    margin-block: 0;
+  }
+
+  .readings li + li {
+    margin-block-start: var(--at-spacing-sm);
+  }
+
+  .readings__cite {
+    display: block;
+    font-size: var(--at-font-size-sm);
+  }
+</style>
