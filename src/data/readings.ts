@@ -58,7 +58,7 @@ export const readings = {
   "stein-2023": {
     authors: "Stein, G. et al.",
     title: "Exposing Flaws of Generative Model Evaluation Metrics and Their Unfair Treatment of Diffusion Models",
-    venue: "NIPS",
+    venue: "NeurIPS",
     year: 2023,
     url: "https://proceedings.neurips.cc/paper_files/paper/2023/file/0bc795afae289ed465a65a3b4b1f4eb7-Paper-Conference.pdf",
     verified: "2026-09-03",
