@@ -19,7 +19,7 @@ Conventions
 | `parmar-2022` | Parmar, Zhang & Zhu, *On Aliased Resizing and Surprising Subtleties in GAN Evaluation*, CVPR 2022 | wk 4 |
 | `kynkaanniemi-2019` | Kynkäänniemi et al., *Improved Precision and Recall Metric for Assessing Generative Models*, NeurIPS 2019 | wk 7 |
 | `naeem-2020` | Naeem et al., *Reliable Fidelity and Diversity Metrics for Generative Models*, ICML 2020 | wk 7 |
-| `unterthiner-2019` | Unterthiner et al., *Towards Accurate Generative Models of Video*, arXiv 2019 | wk 8 |
+| `unterthiner-2019` | Unterthiner et al., *Towards Accurate Generative Models of Video*, ICLR workshop 2019 | wk 8 |
 | `stein-2023` | Stein et al., *Exposing Flaws of Generative Model Evaluation Metrics and Their Unfair Treatment of Diffusion Models*, NeurIPS 2023 | wk 9, 10 |
 | `kynkaanniemi-2023` | Kynkäänniemi et al., *The Role of ImageNet Classes in Fréchet Inception Distance*, ICLR 2023 | wk 3, 11 |
 | `jayasumana-2024` | Jayasumana et al., *Rethinking FID: Towards a Better Evaluation Metric for Image Generation*, CVPR 2024 | wk 12 |
