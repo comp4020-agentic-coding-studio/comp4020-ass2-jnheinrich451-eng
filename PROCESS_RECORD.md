@@ -148,3 +148,45 @@ have — `related` and `description` are top-level on an index node, not in
 forever and "duplicate openers" passes vacuously forever. The checks that
 protect the course's promises were themselves unverified against the thing
 they read. Reported, not fixed, per the instruction.
+
+## 2026-09-04 04:10 — A guard against the checks passing vacuously
+
+**Prompt:**
+
+> Fix it: read related/description from the node, and load each session's body
+> from dist/api/sessions/<slug>.json. Add one guard test: 05-the-bias has a
+> body over 400 words. If the loader is wrong, that guard fails instead of
+> everything passing vacuously.
+
+**Result:**
+`related` and `description` now read off the node rather than `meta`, and
+bodies load from the per-entry JSON, addressed by the node's own id —
+`sessions/05-the-bias` is already the path `dist/api/sessions/05-the-bias.json`,
+so no slug parsing is needed.
+
+The guard is the part worth keeping. Four assertions in this file read prose,
+and a loader that silently returns `undefined` splits them: the word-count and
+recurrence checks fail forever, which is loud, but "never opens two sessions
+with the same sentence" *passes* forever, which is silent. A green suite that
+checked nothing is worse than a red one. The guard asserts the one body that
+exists reads over 400 words, so the failure surfaces at the loader rather than
+as four unrelated symptoms.
+
+**Verified:**
+Not by the guard turning green on its own — that only proves week 5 parses.
+The evidence is that every prose failure moved in the direction a working
+loader predicts: the stub check reads 4 words where it read 0, the bench
+check finds 1 session where it found 0, and the duplicate-opener check has
+stopped passing and now names nine identical `<!-- body pending -->` markers.
+Reading nothing cannot produce those numbers. 10 tests, 6 pass; the 4 failures
+are the unwritten bodies and nothing else.
+
+**Commit:** [`224688b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/224688b)
+
+**What happened:**
+Nothing was flagged, but the duplicate-opener check had been green in the
+previous run and was green for the wrong reason — `undefined` bodies gave it
+twelve empty strings, and its own filter discards falsy openers. It went red
+the moment the loader worked. A check can be both passing and worthless, and
+the only way I found that one was reading the API's actual shape rather than
+trusting the colour.
