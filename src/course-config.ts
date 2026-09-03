@@ -46,17 +46,18 @@ export const slopCourseMetaSchema = z
 // The code's last three digits were assigned to this repo when it was
 // provisioned, and no other course in the cohort has them. Change the first
 // digit to your course's level (and `level` to match); keep the other three.
-// STARTER_CONTENT: replace this course record, then remove this comment.
 export const courseMeta = slopCourseMetaSchema.parse({
-  code: "SLOP1412",
-  title: "Course Title Goes Here",
-  session: "Semester 1",
-  year: 2027,
-  level: 1,
-  startDate: "2027-02-22",
-  endDate: "2027-05-28",
+  code: "SLOP8412",
+  title: "Advanced Fréchet Inception Distance",
+  session: "Semester 2",
+  year: 2026,
+  level: 8,
+  startDate: "2026-08-03",
+  endDate: "2026-10-30",
   description:
-    "One concise paragraph explaining what this course is, who it is for, " +
-    "and why somebody would choose to spend a semester taking it.",
-  tags: ["replace me"],
+    "A semester spent auditing one number. FID governs what counts as progress " +
+    "in generative modelling, and it is biased, sample-size dependent, and " +
+    "routinely compared across incompatible conditions. We rebuild it, break " +
+    "it, and decide what it can honestly be asked to say.",
+  tags: ["generative models", "evaluation", "metrics"],
 }) satisfies CourseMetaInput;
