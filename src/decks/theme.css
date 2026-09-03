@@ -11,3 +11,26 @@
  * slide class you reach for (`_class: quote`), a code-heavy layout, a
  * background. */
 @import url("astro-theme-university/styles/deck.css");
+
+/* A running foot on every slide.
+ *
+ * astromotion has no footer of its own, and repeating markup on twelve
+ * slides is twelve chances to let one drift. The text is a custom property
+ * instead, set once per deck, and drawn on the canvas so it scales with
+ * everything else rather than sitting at a fixed size on the phone.
+ *
+ * It hangs off `.slides` rather than each `section`: sections are absolutely
+ * positioned and only the current one is laid out, so a per-section rule
+ * would need the footer measured on a box Reveal is still animating. */
+.reveal .slides::after {
+  content: var(--deck-footer, "");
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-family: var(--at-font-mono, ui-monospace, monospace);
+  font-size: 0.42em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  pointer-events: none;
+}

@@ -75,6 +75,19 @@ moment.
   (both reduce to scalars times 2048). Match the library at large N. Note that
   the library is above both.
 
+#### Deck figures (src/decks/week-02.deck.mdx)
+
+Each figure is a script in `figures/`, exports SVG with a transparent
+background, uses colours legible on both the site cream and the deck black,
+and prints every plotted value to stdout. No figure is copied from a paper.
+
+| Script | Shows | Slide |
+|---|---|---|
+| `figures/couplings.py` | Two 1-D Gaussians (μ = 0 and μ = 2, σ = 1) drawn as densities. Three couplings between them shown as connecting lines: an independent coupling, a poor monotone one, and the optimal (monotone, rank-preserving) one. The expected squared cost of each printed and labelled. | 3–4: what "inf over couplings" means |
+| `figures/moments-only.py` | R = N(0, I) and C (the week 6 bimodal candidate, a = 0.9) as histograms along e₁, N = 20,000 each. Both have mean 0 and variance 1. Annotate the two moments and the FID of 0. | 5: what the Gaussian assumption throws away |
+| `figures/bench-truth.py` | A, B, R as 1-σ ellipses in the (e₁, e₂) projection, with the two true distances annotated: FID(A,R) = 5.12, FID(B,R) = 4.88. Use the closed form, not samples. | 10–11: the worked numbers, seen |
+| `figures/fid-vs-invN.py` | FID(A,R) and FID(B,R) estimated at N ∈ {500, 1000, 2000, 5000, 10000, 20000, 50000}, ten trials each, plotted against 1/N. Linear fit through each series. True values as dashed horizontals. Mark the crossing where the estimated ordering flips, or print that it did not. Caption names Chong & Forsyth Figure 2 as the figure's ancestor. Reused on the week 5 page as Figure 5.1. | 12: "every number you compute is above these" |
+
 ### 3 · The instrument
 
 - Coin the term: **the instrument** is Inception-v3, the network whose
