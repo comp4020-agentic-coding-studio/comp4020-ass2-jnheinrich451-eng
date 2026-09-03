@@ -110,3 +110,41 @@ starter placeholders still carrying 2027 dates — `assignment-1`,
 `final-project`, `lectures/week-01` and `week-02` all fall outside the
 2026-08-03 to 2026-10-30 teaching period. That is the shipped check doing its
 job on content not yet written, not a defect.
+
+## 2026-09-04 03:30 — The spine lands, and the coherence checks meet the API's actual shape
+
+**Prompt:**
+
+> Read build/SPINE.md. Bring the repo into agreement with it and nothing else
+> ... Run pnpm check. Report every failing test with its message. Do not fix
+> any of them.
+
+**Result:**
+Twelve sessions and four assessments now carry the spine's frontmatter
+verbatim; ten sessions and three assessments are new with pending-body
+markers, 02 was aligned to the spine's full block (its header says "align to
+this", which outranks the narrower "add the listed keys"), 05 gained its three
+keys untouched otherwise, and a1 kept its body under replaced frontmatter.
+Six starter entries deleted — emptying the lectures collection entirely, which
+the build accepts. The user had already renamed the coherence suite to
+spec/course-promises.test.ts, verified eight new readings with dates and PDFs,
+and written the spine itself.
+
+**Verified:**
+pnpm check run in full and captured: typecheck 0 errors, build Complete! with
+dist/api/ emitted (16 nodes), data-integrity passes for the first time — every
+date now inside 2026-08-03..2026-10-30. course-promises: 4 pass, 5 fail. Then
+read dist/api/index.json and a per-node JSON to classify the failures rather
+than take them at face value.
+
+**Commit:** [`c942868`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c942868)
+
+**What happened:**
+Committed red, deliberately: two failures are the pending bodies doing their
+job. But three of the five are the test reading a shape the API does not
+have — `related` and `description` are top-level on an index node, not in
+`meta`, and `body` is not in the index at all (per-node JSON only: week 5's
+589-word body reads as 0 words from the index). So "no stub weeks" would fail
+forever and "duplicate openers" passes vacuously forever. The checks that
+protect the course's promises were themselves unverified against the thing
+they read. Reported, not fixed, per the instruction.
