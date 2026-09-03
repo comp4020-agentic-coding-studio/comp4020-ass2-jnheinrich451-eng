@@ -1,0 +1,132 @@
+---
+title: The Fréchet distance
+description: Deriving the closed form for two Gaussians, one step per slide
+---
+
+{/* _class: impact */}
+
+# Two Gaussians. One number.
+
+```notes
+- twelve slides, one step each; say that before starting
+- the page carries the same argument, but a page cannot make them wait
+  between steps
+```
+
+---
+
+## What we want
+
+A distance between two **distributions**, not between two samples.
+
+Nothing pairs a generated image with a particular real one, so the quantity has
+to be defined on the distributions themselves.
+
+---
+
+## The definition
+
+Wasserstein-2, as an optimisation:
+
+W₂²(P, Q) = inf 𝔼‖X − Y‖²
+
+taken over every joint distribution of (X, Y) whose marginals are P and Q.
+
+---
+
+## Why that is hard
+
+Π(P, Q) is the set of all such joint distributions. It is infinite dimensional.
+
+There is no formula to evaluate. In general you solve a transport problem.
+
+```notes
+- a figure would earn its place here: the set of couplings, with two fixed
+  marginals pinned to the axes
+```
+
+---
+
+## The move
+
+Take P and Q Gaussian, and restrict the coupling to be jointly Gaussian too.
+
+The objective now depends on nothing but the two means and the cross-covariance
+between them. The search collapses to one matrix.
+
+```notes
+- linger here; this is the only step that costs anything
+- everything after it is algebra that would hold for any pair of distributions
+- ask: what have we assumed about the features? nothing yet. week 3.
+```
+
+---
+
+## The mean term
+
+𝔼‖X − Y‖² splits into a mean part and a centred part.
+
+The mean part is fixed by the marginals alone, so no coupling can improve it:
+
+‖μ₁ − μ₂‖²
+
+---
+
+## The covariance term
+
+The centred part touches the coupling only through the cross-covariance.
+Optimising over that one matrix leaves:
+
+Tr(Σ₁ + Σ₂ − 2(Σ₁Σ₂)<sup>½</sup>)
+
+---
+
+## The cross term, twice
+
+(Σ₁Σ₂)<sup>½</sup> in the papers.
+
+(Σ₁<sup>½</sup> Σ₂ Σ₁<sup>½</sup>)<sup>½</sup> in careful implementations.
+
+Different matrices, equal trace. The second is symmetric, and that is the one a
+numerical routine can be trusted with. Week 4 is where it matters.
+
+---
+
+{/* _class: quote */}
+
+> d² = ‖μ₁ − μ₂‖² + Tr(Σ₁ + Σ₂ − 2(Σ₁Σ₂)<sup>½</sup>)
+
+---
+
+## The bench: A
+
+A = N(0.05·**1**, I) against R = N(0, I).
+
+Same covariance, so the trace term is Tr(2I − 2I) = 0.
+
+2048 × 0.05² = **5.12**
+
+---
+
+## The bench: B
+
+B = N(0, 1.1·I) against R = N(0, I).
+
+Same mean, so the first term is 0.
+
+2048 × (2.1 − 2√1.1) ≈ **4.88**
+
+B is the better candidate, by a little.
+
+---
+
+{/* _class: centered */}
+
+Every number you compute this semester is above these two.
+
+Week 5 says why.
+
+```notes
+- do not explain it; the point is that they remember the shape of the claim
+  when week 5 arrives
+```
