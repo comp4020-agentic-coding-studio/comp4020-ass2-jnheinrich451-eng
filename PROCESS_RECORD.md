@@ -59,3 +59,54 @@ is never emitted and both spec tests — which read `dist/api/index.json` —
 cannot run locally at all. Left unfixed rather than patched: the fix would
 touch either `astro.config.ts` or `node_modules`, and neither is mine to
 change on my own judgement.
+
+## 2026-09-03 22:10 — The crash was hiding twelve a11y violations
+
+**Prompt:**
+
+> then pnpm build exits with 1, if it can be fixed? And if you can give me the
+> link of local server?
+
+**Result:**
+Gated the theme's pagefind step behind `SLOP_NO_SEARCH` in `astro.config.ts`
+rather than turning search off outright. A flat `search: false` fixes the exit
+code and silently ships a deployed site with no search index, because CI runs
+the same integration; the gate is unset in CI, so only this machine skips it.
+This is the one deliberate divergence from the fixed platform and it is
+written down in `CLAUDE.md` next to the reason.
+
+The interesting part was downstream. With the build finally getting past that
+hook, the axe pass ran for the first time in this repo's life and found twelve
+violations: `/assessments`, `/lectures`, `/people` and `/policies` each
+rendering with no `<html lang>`, no `<title>` and no landmarks. The theme
+installs its default-layout injector as a remark plugin on
+`markdown.processor`, and `@astrojs/mdx` does not run that processor — so
+every `.mdx` page under `src/pages/` gets no layout, while `.md` pages do.
+Fixed with explicit `layout:` frontmatter on all four.
+
+That is not a Windows problem. It would have failed CI for anyone, and it was
+invisible only because the repo has never been public and the pagefind crash
+aborted the build before the a11y check on this machine.
+
+**Verified:**
+`dist/404.html` (a `.md` page) had `<html lang="en">` while
+`dist/assessments/index.html` (`.mdx`) had no `<html>` attributes at all —
+that pair is what identified the markdown/MDX split rather than a Windows path
+bug, which the backslashes in axe's own output had suggested. Patched one page
+first and watched the count go 12 → 9 before touching the other three, then
+took the build to `Complete!` with `dist/api/` emitted (12 nodes, 7 edges).
+
+**Commit:** [`901d147`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/901d147)
+
+**What happened:**
+First diagnosis was wrong and the evidence corrected it. Axe reported the
+pages as `/assessments\:` with a trailing backslash, which read as a Windows
+path-separator bug leaking into the checker — a satisfying story that would
+have meant nothing needed fixing. Reading the built HTML killed it: the files
+really were missing `lang` and `title`. The backslash was cosmetic.
+
+Still failing, and correctly: `spec/data-integrity.test.ts` rejects the
+starter placeholders still carrying 2027 dates — `assignment-1`,
+`final-project`, `lectures/week-01` and `week-02` all fall outside the
+2026-08-03 to 2026-10-30 teaching period. That is the shipped check doing its
+job on content not yet written, not a defect.
