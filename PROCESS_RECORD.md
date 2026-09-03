@@ -294,3 +294,58 @@ scratchpad and is now how viewports get checked.
 Also caught in the rendered page rather than the diff: `Heusel, M. et al..`,
 a doubled full stop from appending a separator to an author field that already
 carried one. It reads fine in the source.
+
+## 2026-09-04 05:22 — The week 2 deck, and a measurement that was wrong twice
+
+**Prompt:**
+
+> Write src/decks/week-02.deck.mdx from the outline in my message ... First
+> check whether the README documents maths rendering and tell me ... open the
+> deck at 1920×1080 and 390×844, and report any slide where text wraps to more
+> than four lines or an equation overflows.
+
+**Result:**
+Twelve slides, one derivation step each. astromotion documents no maths
+rendering, and neither it nor the theme has KaTeX, MathJax or remark-math
+anywhere, so equations are Unicode and the two slides that would genuinely
+need a figure — the coupling space, and the restriction to jointly Gaussian
+couplings — say so in their speaker notes rather than pretending prose covers
+it.
+
+The README also turned up `astromotion-check`, a purpose-built per-slide
+overflow checker, and the fact that decided the viewport question: Reveal
+scales a fixed 1280×720 canvas. Wrapping is therefore a property of the canvas
+and not of the viewport, which I measured at both sizes rather than asserted.
+
+**Verified:**
+Per-slide measurement through CDP at 390×844 and 1920×1080: identical line
+counts at both, worst case 2 lines against a limit of 4, and no element past
+the canvas edge on any slide. The deck link checked in the built HTML rather
+than assumed — `/decks/week-02/` with "Open the slides" on the lecture page.
+A missing-key style trap does not apply here, but the build's own deck check
+reports no structural violations.
+
+**Commit:** [`e912a2b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/e912a2b)
+
+**What happened:**
+The first measurement run was wrong and the second was wrong differently. I
+divided each block's `getBoundingClientRect().height` by its computed
+`line-height`, but Reveal applies a CSS transform to the canvas, so the rect is
+scaled and the line-height is not. At 1920 the scale is about 1.5 and the
+numbers looked plausible; at 390 the scale is about 0.3 and every slide
+reported 0 or 1 lines, which is what exposed it. Plausible-looking output at
+one viewport would have shipped unexamined if I had not run the second.
+`offsetHeight` is layout px and ignores the transform, and with that the two
+viewports agree exactly, which is itself the evidence the canvas claim is
+true.
+
+Two other things the rendered page caught that the source could not. `^½`
+renders in Public Sans as a glyph that reads as logical-and, so
+`(Σ₁Σ₂)^½` looks like a boolean expression; the deck now uses `<sup>`. The
+same caret is still in the week 2 session body, flagged and left alone since
+that file was reviewed in an earlier turn.
+
+The instruction assumed a lecture entry that does not exist: bringing the repo
+to SPINE.md deleted every lecture, and SPINE.md defines none. I created a
+minimal week 2 lecture so the deck is reachable at all and spec line 3 can be
+met, and flagged it as a spine decision rather than folding it in silently.
