@@ -1153,3 +1153,45 @@ description reads "One reference set, four public implementations, four
 different numbers", and its body says "several", because the hedge went into
 the prose and never reached the frontmatter. That sentence is now on the front
 page of the site, in a list built to be the course's shop window.
+
+## 2026-09-05 02:48 — The deck moves back, for the reason it should have moved the first time
+
+**Prompt:**
+
+> please remove the slide 02 deck from Session week 2 to Lecture week 2, I once
+> ordered you to move to session, however, with the understanding about spec, I
+> think the lecture should contain the slide!
+
+**Result:**
+Reversed. `lectures/week-02` now carries `slides`, the lectures index has an
+entry on it, and the collection the programs and courses page reads is no
+longer empty.
+
+The session template's slides handling came out with it, and that is the part
+worth recording. It only existed because `sessions` does not declare `slides`,
+so I had validated the `/decks/<slug>/` shape by hand at the render boundary
+and thrown on a bad value. The lectures schema enforces that shape itself. Two
+paths for one thing, one of them checked by a throw in a template, is worse
+than one path checked where the data is declared. Removing the key also put
+the session back in agreement with SPINE.md, which never carried it.
+
+**Verified:**
+The deck link present in the built lecture page and absent from the built
+session page, both checked in the HTML rather than assumed from the
+frontmatter. Build 27 pages, no accessibility violations, deck structurally
+clean, suite 13 of 13.
+
+**Commit:** [`fb3c10c`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/fb3c10c)
+
+**What happened:**
+I put the deck on the session two weeks ago because the author asked for it,
+and I flagged at the time that the spec says "at least one lecture carries a
+real deck, linked from its page" and that an empty lectures collection could
+not meet it. The flag was right and did not change anything, because it sat at
+the end of a report while the instruction sat at the top of the next prompt.
+
+What actually moved it was deleting the template paragraph from
+`/lectures/`. That left the page rendering a title, a description and nothing,
+which made the gap visible instead of described. A defect you can see beats a
+defect you have been told about, and it took three weeks and an unrelated
+cleanup for this one to become the former.
