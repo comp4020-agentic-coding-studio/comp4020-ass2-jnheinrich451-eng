@@ -143,3 +143,29 @@ describe("a rule is stated in one place", () => {
     }
   });
 });
+
+describe("the course's vocabulary", () => {
+  it("uses the course's coined terms consistently", () => {
+    // Criterion names are prose a student reads on the page, so they belong to
+    // the vocabulary even though they arrive through `meta` rather than through
+    // the body. Reading only description and body left this assertion unable to
+    // fail on the single instance of the phrase in the repo.
+    const criteria = (n: Node): string =>
+      (n.meta?.marking?.criteria ?? []).map((c: { name: string }) => c.name).join(" ");
+    const everything = [...sessions, ...assessments]
+      .map((n) => `${n.description ?? ""} ${criteria(n)} ${body(n)}`)
+      .join("\n");
+    // the two-layer distinction is always estimator / quantity
+    expect(everything).not.toMatch(/estimator or the instrument/i);
+    // "the instrument" is coined in week 3 and never before it
+    for (const s of sessions.filter((s) => week(s) < 3)) {
+      expect(body(s), `${s.id} uses "the instrument" before week 3 coins it`).not.toMatch(
+        /\bthe instrument\b/i,
+      );
+    }
+    // "N-honest" is coined in week 5 and never before it
+    for (const s of sessions.filter((s) => week(s) < 5)) {
+      expect(body(s), `${s.id} uses "N-honest" before week 5 coins it`).not.toMatch(/N-honest/);
+    }
+  });
+});

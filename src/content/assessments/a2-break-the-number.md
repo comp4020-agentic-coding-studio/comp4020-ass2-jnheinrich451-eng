@@ -12,7 +12,7 @@ marking:
   criteria:
     - name: The construction
       weight: 40
-    - name: The mechanism, stated in terms of the estimator or the instrument
+    - name: The mechanism, stated in terms of the estimator or the quantity
       weight: 40
     - name: The write-up
       weight: 20
