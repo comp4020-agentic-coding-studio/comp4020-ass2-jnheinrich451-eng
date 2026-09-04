@@ -160,3 +160,32 @@
   font-size: 0.62em;
   margin-block: 0.5em;
 }
+
+/* Figures and equations are drawn at their own natural size, which on a fixed
+ * 720px canvas is a slide that fits at 98% on one machine and clips on the
+ * next. Cap them so a slide has room left over rather than exactly enough. */
+.reveal .slides section img {
+  max-height: 300px;
+  width: auto;
+  object-fit: contain;
+}
+
+.reveal .eq {
+  max-height: 64px;
+  width: auto;
+}
+
+.reveal .eq--wide {
+  max-height: 86px;
+  width: auto;
+}
+
+.reveal .eq--inline {
+  max-height: 40px;
+}
+
+/* The boxed result is the one equation allowed to be the loudest thing on
+   its slide, but not at the cost of pushing itself off the canvas. */
+.reveal .boxed .eq {
+  max-height: 78px;
+}

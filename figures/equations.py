@@ -27,6 +27,13 @@ import matplotlib.pyplot as plt
 
 from _style import GOLD, save
 
+# _style keeps SVG text as text so figure labels inherit the page font. That is
+# wrong for equations: mathtext draws blackboard-bold and script letters from
+# fonts a browser does not have, and with fonttype "none" they arrive as a
+# <text> element the browser renders as tofu boxes. Outlining every glyph makes
+# the equation independent of what is installed anywhere.
+plt.rcParams["svg.fonttype"] = "path"
+
 # These equations are deck-only assets, and the deck's ground is near-black, so
 # they use the deck's warm off-white rather than the mid ink the other figures
 # use to survive both grounds. An equation that has to be squinted at is worse
