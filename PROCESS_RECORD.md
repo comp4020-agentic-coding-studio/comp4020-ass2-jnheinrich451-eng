@@ -1059,3 +1059,48 @@ alt exists and cannot see that it is false.
 `figures/__pycache__` had been committed several turns ago and I had not
 noticed. Untracked, with a `.gitignore` covering it and the two new derived
 directories.
+
+## 2026-09-05 00:13 — Two people, written to the template rather than to the brief
+
+**Prompt:**
+
+> And for peoples! [Helen Sandoval, Tomasz Wierzba] ... and if you can tell me
+> about where should I paste avatar later? The directory.
+
+**Result:**
+Both entries written, prose as given. The work was in the frontmatter, and
+reading the two templates first is what kept it from being wrong.
+
+The brief gives the roles as "Convenor and lecturer" and "Tutor and bench
+maintainer". Setting `role` to those strings validates, because this repo's
+`content.config.ts` declares role as a free string. Both templates then switch
+on `convenor|tutor|guest|other` to choose a display label and a sort position,
+so the Role row would have rendered as nothing and the sort would have put
+both people last. The enum value goes in `role`, and the fuller descriptor
+into `description`, which is the text the card shows anyway.
+
+`contact` is set on both because the person template emits its `<dt>` and
+`<dd>` unconditionally, so an entry without one produces an empty definition
+term. Nothing would have failed; the page would just have had a blank row.
+
+**Verified:**
+Read the built HTML rather than trusting the frontmatter: Convenor and Tutor
+labels present, both affiliations present, the email rendered, no empty `<dd>`,
+and the index listing both with the convenor first. Build clean at 26 pages,
+no accessibility violations, suite 13 of 13.
+
+**Commit:** [`1d73ba4`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/1d73ba4)
+
+**What happened:**
+Nothing was flagged. Worth recording that the local schema and the local
+templates disagree about what `role` is: the schema was loosened to a free
+string at some point, and the two components that consume it were not. That is
+the same defect class as the spec lines that no longer match their briefs, and
+as A2's criterion naming the wrong pair of layers. A loosened validator does
+not remove a constraint, it only moves it out of sight, and the place it moves
+to is a silently missing row on a rendered page.
+
+The portrait lines are committed commented out, with the exact filename each
+entry expects. `photoAlt` is required by a superRefine whenever `photo` is
+set, so a portrait dropped in without alt text fails the build rather than the
+review, and the comment is where that is said.
