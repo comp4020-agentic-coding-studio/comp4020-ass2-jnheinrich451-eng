@@ -863,3 +863,56 @@ criteria table beside Part B is told to pick between two different pairs of
 things. Frontmatter was out of scope for this turn, so it is reported rather
 than fixed, but it is the same class of defect the agreement test now catches
 for rules and does not catch for vocabulary.
+
+## 2026-09-04 23:15 — A pin that could not fail
+
+**Prompt:**
+
+> Add the vocabulary test I'm pasting; run it before any other edit and tell me
+> whether the pin line fails.
+
+**Result:**
+It did not fail, and the reason is the finding. `estimator or the instrument`
+sits in `meta.marking.criteria`, and the pasted test reads `n.description` and
+`n.body`. The phrase was live in the API and rendering on the A2 page, and the
+assertion written to catch it returned green on the first run against unedited
+content.
+
+Proved rather than argued: printed the A2 node showing the phrase absent from
+description and body and present in the criteria names. Then widened the pin
+to include criterion names, which are prose a student reads even though they
+arrive through `meta`, and demonstrated the difference by reverting the data
+fix under the new test. Red without it, green with it.
+
+The rest followed: A2's criterion brought into line with SPINE, both home-page
+sections replaced with the CONTENT.md copy, the last two assessment bodies
+drafted with policies links where the lateness lines would have gone, and both
+starter people deleted with their portraits.
+
+**Verified:**
+pnpm check 13 of 13, build clean at 24 pages with no accessibility violations
+after the two people pages went. check:evidence run and read line by line
+rather than by exit code.
+
+**Commit:** [`390f6be`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/390f6be)
+
+**What happened:**
+This is the second time in three turns that a check has been green for the
+wrong reason, and the pattern is now clear enough to name. A check is written
+against a mental model of where the data lives. When that model is wrong the
+check does not error, it passes, and a passing check is read as evidence that
+the thing it names is true. The duplicate-opener test passed vacuously because
+bodies were undefined; this one passed vacuously because criterion names are
+not body text.
+
+Both were caught the same way: by asking what the check would have to see in
+order to fail, and then checking that it can see it. That question is cheap
+and I did not ask it the first time. It is now the thing I do before trusting
+any assertion I add here.
+
+The instruction was "the only evidence failure should be key imagery", and it
+is not quite that. Three imagery failures remain, as expected: `card.png`,
+`hero-home.avif`, and the `STARTER_CONTENT` marker in `index.astro` that
+belongs to the hero artwork rather than to the copy I replaced. But
+`PROCESS.md` is still the starter template with its two invented citations,
+and that is the author's own account to write rather than mine.
