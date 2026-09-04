@@ -506,3 +506,48 @@ A regex of mine also cried wolf: `[a-z]+-\d{4}` cannot match the second hyphen
 in `chong-forsyth-2020`, so a verification script reported an unresolved key
 that was fine. The build is the check that matters for this, since
 `Readings.astro` throws on an unresolved key and names it, and it is green.
+
+## 2026-09-04 21:18 — Weeks 6 and 7, and two checks that started moving
+
+**Prompt:**
+
+> Draft the bodies of sessions/06-blind-spots and sessions/07-dropping-the-gaussian
+> ... Week 6 has no required reading; the argument is candidate C and its FID of
+> exactly zero. Week 7 must explain WHY KID's estimator is unbiased where FID's
+> is not, in two sentences a student could repeat.
+
+**Result:**
+390 and 416 words. Week 6 is a construction and week 7 a comparison, and the
+distinction that took the most care is the one week 6 exists to teach: week 5
+is the estimator failing, right quantity and wrong number, while week 6 is the
+quantity failing, right number and wrong thing measured. Writing that
+explicitly rather than leaving it implied is what A2 later grades on.
+
+The two sentences on KID were the constraint worth designing around. They sit
+under their own heading so a student revising can find them, and they avoid
+naming U-statistics: an average of unbiased terms is unbiased, and the
+expectation of a nonlinear function is not the function of the expectation.
+That is repeatable without notes, which was the actual requirement.
+
+Week 6 cites nothing, as instructed. Candidate C's exact zero is the argument,
+and a subsample of R scoring zero as well is what turns it from a curiosity
+into a class of failure.
+
+**Verified:**
+Frontmatter untouched, measured as zero changed lines matching the frontmatter
+keys. Zero em dashes in either body. Both end on the exercise. The checks
+themselves moved in the predicted direction, which is the useful signal: the
+bench went from five weeks to seven, N-honest from zero later weeks to two,
+and the stub failure walked from week 6 to week 8.
+
+**Commit:** [`8078328`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/8078328)
+
+**What happened:**
+Nothing was flagged, but one thing is worth recording about the checks. Both
+accumulation tests are still red, and both are now red by a margin of one:
+N-honest needs three later weeks and has two, the bench needs eight and has
+seven. Weeks 8 to 12 will clear them without any special effort, which means
+neither test is currently telling me anything I would not otherwise know. They
+were written to catch drift across twelve finished weeks, and they only start
+being informative once the twelve exist. A check that cannot fail informatively
+until the end of the work is worth keeping, but it is not backpressure yet.
