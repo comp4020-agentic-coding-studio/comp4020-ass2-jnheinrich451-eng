@@ -714,3 +714,55 @@ are written, so they went green by accumulation rather than by judgement. No
 check in this repo can currently tell a week that carries the argument forward
 from a week that merely contains the right words, which is the thing the
 brief's response criterion is actually about.
+
+## 2026-09-04 22:53 — A1 written as a sheet, not as a description of one
+
+**Prompt:**
+
+> we build the A1-spec, which imitates a real assignment! ... [numbered
+> conditions, Part A 30, Part B 50, Part C 20, in person week 6]
+
+**Result:**
+449 words. The instruction that mattered was "imitates a real assignment",
+which is a claim about form rather than content. A real sheet states its
+conditions before its tasks, puts points in the headings, names artefacts with
+their limits, and says what to bring to the defence. A description of an
+assignment explains all of that in paragraphs. The difference is whether a
+student can act from it without reading twice.
+
+The three parts carry the weights already in the frontmatter's marking block,
+and the page says so explicitly, so the criteria table the template renders
+below reads as the same three parts rather than as a second scheme sitting
+beside them.
+
+Two lines from CONTENT.md were folded in where they belong rather than
+appended: matching the reference set, N and instrument weights where possible
+went into Part A, with the note that where you cannot match, that is Part B's
+material rather than a failure; and the "assumptions are visible" line went
+into Part B, which is the part it describes.
+
+**Verified:**
+Frontmatter compared block-for-block against HEAD, identical. Zero em dashes.
+Both the three parts and the three marking criteria confirmed present in the
+built HTML, since the risk with duplicated weights is that only one of them
+renders. Suite still 10 of 10, build clean.
+
+**Commit:** [`68b9501`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/68b9501)
+
+**What happened:**
+The brief contradicts the course's own policies page, and I wrote it as given
+rather than smoothing it. The policies draft says late work is marked as
+submitted with the lateness recorded against the entry; this brief says late
+submissions are not accepted and the entry is recorded as absent. Both cannot
+hold, and a marker who reads the policies page and then an assessment page
+will hit it. It is the author's call which survives, so it is reported rather
+than reconciled by me.
+
+CONTENT.md's A1 entry also still specifies a notebook plus a two-page report,
+where the brief asks for a four-page PDF and an archive. The brief is newer
+and explicit, so it won, but CONTENT.md is now stale on that line.
+
+Both are the same class of thing: this site is now large enough that a fact
+can be stated in three places, and nothing in `spec/` checks that they agree.
+The dangling-ref check catches a broken link between pages; nothing catches a
+broken agreement between them.
