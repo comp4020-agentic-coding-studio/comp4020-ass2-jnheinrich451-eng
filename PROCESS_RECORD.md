@@ -1347,3 +1347,40 @@ moving on, with nothing that deserves the word breakthrough. The record
 over-samples drama because drama is what gets recorded. Worth remembering
 when drawing any future account from this file: the entries are the
 exceptions, and the loop between them was the process.
+
+## 2026-09-05 06:51 — The papers leave the tree and stay in the history
+
+**Prompt:**
+
+> I am suggested, to put 10 papers with copy right into repo is inadequate?
+> And the link directs to the publish page, so we change an expression and
+> maybe gitignore this folder?
+
+**Result:**
+All ten PDFs untracked with local copies kept, `/assets/` ignored so a future
+download cannot drift back in, and PROCESS.md's anchor sentence changed from
+"kept the PDFs in the repo" to what is true now: each paper logged in
+`readings.ts` with a link to its published page and a verified date. Nothing
+else referenced the folder, checked before removing rather than after.
+
+**Verified:**
+489 words, seven citations resolving, check:evidence exit 0, suite 13 of 13.
+Local copies confirmed still on disk after the untrack.
+
+**Commit:** [`4dcd17e`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/4dcd17e)
+
+**What happened:**
+The decision worth recording is the one not taken. The PDFs remain in the git
+history, and scrubbing them out would mean rewriting every commit since they
+landed, which breaks all seven citations in PROCESS.md and every link in this
+file. The process evidence is 45 per cent of the mark and it is addressed by
+hash; a history rewrite to remove low-risk files would destroy the submission
+to sanitise it. Removing from the tip is the proportionate fix, and if the
+history itself is ever a problem, that is a convenor question and not a
+force-push.
+
+The concern itself was flagged by me three weeks ago when the first three
+PDFs appeared, and acted on now because someone advised the author directly.
+Same pattern as the lectures deck: a flag at the end of a report changes
+nothing until the problem is made visible or repeated by a person. The record
+keeps ending up teaching the same lesson from different directions.
