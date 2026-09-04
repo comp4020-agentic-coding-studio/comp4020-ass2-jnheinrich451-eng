@@ -26,45 +26,55 @@ related:
   - measurement-log
 ---
 
-Propose what a paper should report in place of the score, then evaluate your
-proposal by the standard this course spent twelve weeks applying to FID.
+Propose what a paper should report in place of the score. Then take the
+proposal apart yourself, using the standard this course spent twelve weeks
+applying to FID.
 
-Most proposals fail. That is expected, it is not a reason to propose nothing,
-and the mark is for saying where yours fails and how badly rather than for
-producing one that survives.
+Due end of week 12. Deadlines, extensions and the use of generative tools are
+course-wide and live on the [policies page](/policies/).
 
-Due end of week 12, with presentations in the same week. Deadlines, extensions
-and the use of generative tools are course-wide and live on the
-[policies page](/policies/).
+## Before you start
 
-## What you submit
+1. Individual work. 100 points, worth 45 per cent of the course.
+2. Three parts. Part A is 25 points, Part B 45, Part C 30. The marking
+   criteria on this page are those three parts.
+3. Most proposals fail. This is expected and is not marked against you. What
+   is marked is whether you found the failure before we did.
+4. Generative tools are governed by the [policies page](/policies/). Read it
+   before you start rather than before you submit.
+5. Submit one PDF of at most six pages plus references, and one archive that
+   scores the bench under your proposed metric, from a seed.
 
-Six pages, plus the bench scored under your metric alongside FID and FID∞,
-N-honestly, at a sample size you state.
+## Part A, the proposal [25]
 
-## What the report has to cover
+What a paper should report in place of the score. Define it precisely enough
+that Part B is possible.
 
-Take your proposal through the same four questions the course put to the
-score. Its estimator bias, and whether a fit in 1/N would find one. Its blind
-spots, and whether a candidate like C survives the change. Its correlation
-with human judgement, and who measured that. Its cost, and what it would take
-for a reviewer to accept a table without an FID row.
+It may be an existing proposal, and week 12 reads one, or it may be your own.
+If it is an existing one, cite it and say what you are adding.
 
-Where you cannot answer one of those, say so and say what answering it would
-require. An unanswered question named is worth more than an answered one
-fudged.
+## Part B, the evaluation [45]
 
-## How it is read
+Judge the proposal by the standard this course applied to FID, in order: its
+estimator bias, from week 5; its blind spots, from week 6; its correlation
+with human judgement, from week 10; and its cost to a paper that adopts it,
+from week 11.
 
-The proposal itself carries a quarter of the mark. Evaluating it by the
-course's own standard carries nearly half, because that is the skill the
-twelve weeks were for. Honesty about where it fails carries the rest.
+Score A, B and C on the bench under your metric, N-honestly, beside FID and
+FID∞.
 
-A proposal that fails on the week 11 argument and says so precisely will be
-marked above one that claims to have solved everything.
+Each of the four is addressed, or its absence is justified. A justified
+absence can earn full marks. An unmarked absence earns none.
 
-## Exercise
+## Part C, where it fails [30]
 
-End the report with the condition under which you would still report FID.
+Name the condition under which you would still report FID.
 
-If there is no such condition, say that instead, and defend it.
+If your answer is "never", Part B has missed something, and this part is where
+you find it. State how badly your proposal fails, and on which of the four.
+
+## In person
+
+Twelve minutes, week 12. Eight to present and four to defend Part C. Your
+archive is run beforehand, and if the bench scores do not reproduce, the
+presentation is about why.
