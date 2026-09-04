@@ -603,3 +603,60 @@ since a named example on the page would be the answer handed over.
 Both accumulation checks went green this turn, having been red by one last
 turn, exactly as predicted. That confirms what I recorded then: they were not
 providing backpressure, they were counting down.
+
+## 2026-09-04 22:05 — Weeks 10 and 12, and a compliance grep that lied twice
+
+**Prompt:**
+
+> Draft the bodies of sessions/10-correlation and sessions/12-what-you-would-report-instead.
+> Week 10 rests on Stein's finding that no tested metric strongly correlated
+> with human judgement; that sentence may be stated flat, it is verified.
+> Week 12 is the only week allowed a forward-looking paragraph, and it gets
+> exactly one.
+
+**Result:**
+408 and 459 words. Week 10 states Stein's finding flat, since it was verified
+against the PDF three turns ago, and everything else in the week is what
+follows from it. The part worth the care is setting their own recommendation
+against week 5: they keep FD as-is partly on the ground that a bias behaving
+similarly across datasets cannot move a ranking, and that is precisely what
+Chong and Forsyth's differing per-model slopes deny. They call it unproven, so
+the session leaves it open instead of scoring a point.
+
+Week 12 judges CMMD by the course's four criteria, then says before the
+presentations rather than after that most proposals will fail on the last one.
+Its single forward-looking paragraph sits under its own heading so the
+constraint is visible in the structure and not just honoured in the prose.
+
+Week 10 also refuses the bench, which no other week does: a correlation study
+needs people, and saying why the running artefact cannot stand in is part of
+the exercise.
+
+**Verified:**
+Frontmatter compared block-for-block against HEAD rather than eyeballed:
+identical in both. Zero em dashes. The Stein sentence located by normalising
+whitespace across the whole file. Week 12's forward-looking section printed in
+full and read, one paragraph.
+
+**Commit:** [`c864355`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c864355)
+
+**What happened:**
+Both compliance greps were wrong, in opposite directions, and neither failure
+was about the writing.
+
+The frontmatter check reported one changed line. The pattern was
+`^[-+](title|week|date|...)` and it had matched a body line that begins "week
+9. The bench cannot stand in for this one" — a false positive from a regex
+written to match keys but anchored loosely enough to match prose. The
+Stein-sentence check reported the required sentence missing, because the
+sentence is wrapped across two lines and grep works a line at a time. One
+check cried wolf and one declared a satisfied requirement unmet.
+
+The fix in both cases was to check the thing rather than a proxy for it:
+compare the parsed frontmatter blocks, and normalise whitespace before
+matching prose. Worth recording because these greps exist to make compliance
+mechanical, and a mechanical check that is wrong is more dangerous than no
+check, since its output looks like evidence.
+
+One body left, week 11, deliberately skipped. The suite is down to a single
+failure naming it.
