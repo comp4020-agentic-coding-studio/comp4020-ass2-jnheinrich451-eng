@@ -916,3 +916,43 @@ is not quite that. Three imagery failures remain, as expected: `card.png`,
 belongs to the hero artwork rather than to the copy I replaced. But
 `PROCESS.md` is still the starter template with its two invented citations,
 and that is the author's own account to write rather than mine.
+
+## 2026-09-04 23:24 — The final report, and a spec line that lists three of four
+
+**Prompt:**
+
+> we proceed on Final report ... [full brief, Part A 25, Part B 45, Part C 30]
+
+**Result:**
+385 words, in the shape A1 and A2 established. The brief again carried the
+lateness, grace-period and disclosure sentences, which is the third pasted
+brief in a row to do so, and they became links to /policies/ again. That is no
+longer a surprise catch; it is the expected behaviour of a structure holding
+against a habit, and the test would have failed the commit if I had let them
+through.
+
+**Verified:**
+Frontmatter compared block-for-block against HEAD, identical. Zero em dashes,
+two policies links, all four forbidden phrases absent including the vocabulary
+one pinned last turn. Parts and criteria both confirmed in the built HTML.
+pnpm check 13 of 13, build clean at 24 pages.
+
+**Commit:** [`6654ea0`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/6654ea0)
+
+**What happened:**
+A discrepancy between the brief and the frontmatter spec, in the direction
+that costs a student marks. Part B asks for four things: estimator bias from
+week 5, blind spots from week 6, human correlation from week 10, and cost to
+an adopting paper from week 11. The spec line renders below the brief on the
+same page and lists three of them. It omits cost.
+
+Cost is week 11's entire subject, it is the criterion the brief says most
+proposals fail on, and Part B is forty-five points. A student who reads the
+spec as the contract, which is what the theme's SpecList tells them it is,
+would treat the most likely failure mode as optional. Reported rather than
+fixed, since frontmatter is the author's.
+
+Worth noting the verification caught nothing wrong this time and still earned
+its place: the middle marking criterion did not match my grep of the built
+page, which looked like a rendering failure and was an apostrophe encoded as
+`&#39;`. Two turns ago I would have reported that as a defect.
