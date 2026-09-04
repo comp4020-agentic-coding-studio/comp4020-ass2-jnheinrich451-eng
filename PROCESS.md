@@ -2,60 +2,57 @@
 
 ## What I built
 
-SLOP8412, *Advanced Fréchet Inception Distance*: twelve weeks spent auditing
-one number. The course runs on a bench, a reference distribution and three
-candidates in 2048 dimensions chosen so that every score on them has a closed
-form, and re-scores it every week with that week's method. There is no separate
-curriculum document. The site is the course.
+SLOP8412, *Advanced Fréchet Inception Distance*: a twelve-week course that
+audits one number. It runs on a bench, one reference distribution and three
+candidates in 2048 dimensions where every score has a closed form, re-scored
+every week with that week's method. There is no separate curriculum document;
+the site carries the whole course.
 
 ## How I got here
 
-Assignment 1 came back at 86 for process, 84 for artefact and 77 for response.
-The gap was response, and the marker named it exactly: the connection between
-the two halves of my page was legible to me and invisible to a reader. So
-before writing a word of content I turned that into three rules in `CLAUDE.md`,
-which outrank fluency: argue rather than set a mood, earn anything symbolic or
-cut it, and make non-adjacent weeks depend on one another
+Assignment 1 lost most of its marks on response: the idea was in my head and
+not on the page. So the harness came first this time. Three rules went into
+`CLAUDE.md` before any content, and they outrank fluency: argue instead of
+setting a mood, earn anything symbolic or cut it, and make non-adjacent weeks
+need each other
 ([`3dde85d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3dde85d)).
 
-What I did not plan was that the course's own subject would start describing my
-process. FID is a number that is precise, repeatable and wrong. Three weeks in,
-so were my checks.
+My anchor was week 5. I read three papers first, Heusel, Chong and Forsyth,
+and Bińkowski, kept the PDFs in the repo, and wrote that page myself before
+anything else existed. It fixed the register, the bench, and the terms the
+later checks look for. Everything else was written against it: I put the
+structure in `build/SPINE.md` and the facts in `build/CONTENT.md`, and the
+agent brought the repo into agreement with those files instead of inventing
+content
+([`c942868`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c942868)).
 
-The clearest case was week 12's figure. I fitted the finite-sample bias against
-1/N across seven sample sizes and got a tidy line whose intercepts were 180.6
-and 188.8, against true values of 5.12 and 4.88. Wrong by a factor of 35, and
-nothing in the picture said so. Three of the seven points sat below d = 2048,
-where the sample covariance is rank-deficient and the 1/N law has not started;
-fitting only N > d returns 5.145 and 4.882
-([`3c9eb4b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3c9eb4b)).
-I caught it only because every figure script prints its values and a different
-script had already printed 5.12.
-
-The same shape kept turning up in `spec/`. A test asserting that no two weeks
-open with the same sentence was green because it read `body` from an API node
-that carries no `body`: twelve undefined values and nothing to compare. I fixed
-the loader and added a guard asserting that the one written week reads over 400
-words, so a broken loader now fails louder than the assertions it feeds
-([`224688b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/224688b)).
-Later a vocabulary pin could not reach the one stale phrase in the repo,
-because the phrase lives in `meta` and the test read descriptions and bodies. I
-widened it, then proved it by reverting the data and watching it go red
-([`390f6be`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/390f6be)).
-
-That is the rule I now work by, and it changed what I accept back from the
-agent: add the check, run it *before* the fix, and ask what it would have to see
-in order to fail. Two agreement tests were built that way and reported failing
-before anything was edited
+From there the build was plain, and I would rather describe it honestly than
+dress it up as breakthroughs. It was a loop. I gave instructions; the agent
+built them and checked them against the spec; discrepancies came back; I
+decided. Some decisions went into the instruction files, like the lateness
+rule two pages stated differently, which became one sentence on the policies
+page plus two agreement tests, run before the edit so we knew they could fail
 ([`0c29cbd`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/0c29cbd)).
+Some I tolerated on purpose: week 5 stays at 589 words against a 350 to 500
+range because it is the anchor, and its description says "four public
+implementations" while the body hedges to "several", which I decided is fine.
+The checking ran both ways too. The agent read my claims against the PDFs and
+found my memory of Stein's method was right as a label and wrong as a design,
+which would have sent students building the wrong study in week 9
+([`0e76430`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/0e76430)).
 
-It did not save me. My deck check compared a section's `scrollHeight` against
-720, on a section that is a fixed 720-pixel box, so it could never exceed the
-limit it was tested against. Two slides shipped at 98% of the canvas and clipped
-on a screen that was not mine, and my reader found it before I did
+Most of the bugs were one bug: a check that could not fail. A coherence test
+was green because it read a field the API does not carry
+([`224688b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/224688b)).
+A bias fit looked tidy and missed the true value by 35 times, because three
+sample sizes sat below the dimension
+([`3c9eb4b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3c9eb4b)).
+The rule we settled on was to add the check, run it before the fix, and ask
+what it has to see in order to fail. Even that was not enough: the deck check
+compared a fixed box against its own height, and I found the clipped slides on
+my own screen before any test did
 ([`1fc21a1`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/1fc21a1)).
 
-I would rather submit that than a tidy account. The course argues that a green
-number is not evidence. The thing I actually learned building it is that I trust
-my own checks for the same reason the field trusts FID: they are cheap, they are
-repeatable, and nobody looks past them.
+No single step of this was hard. The real work was keeping my instructions,
+the site, and the checks in agreement with each other, and that is mostly what
+the commit history shows.
