@@ -456,3 +456,53 @@ rather than fixed.
 
 Weeks 3 and 4 declare no reading keys in SPINE.md, so three papers are named
 in prose and the reading block the template renders is empty on both pages.
+
+## 2026-09-04 20:18 — A capital R that YAML was happy to accept
+
+**Prompt:**
+
+> pls update build/SPINE.md with the corrected week 4 description and the
+> reading keys in the table I'm pasting. Then bring every session file's
+> frontmatter into agreement with the spine — those two fields only, nothing
+> else.
+
+**Result:**
+The week 4 description and the table were already in SPINE by the time I read
+it. What was not: SPINE's own per-session yaml blocks carried reading keys for
+four of twelve sessions while the table specifies all twelve, so the file
+disagreed with itself and there was no single thing to bring the session files
+into agreement with. Parsing the table as the authority and rewriting both the
+blocks and the files from it makes that disagreement impossible rather than
+merely resolved this once.
+
+Wrote it as a script rather than twelve edits, so "those two fields only" is a
+property of the code: it strips the two keys and reinserts them after `arc:`,
+and every other line passes through untouched.
+
+**Verified:**
+Not by rereading the files. `git diff --stat` reports 13 changed lines across
+eight files with zero deletions, and every changed line matches
+`^[+-](required_reading|further_reading):`, so the "nothing else" claim is
+mechanical rather than a promise. A separate pass confirms all twelve files
+agree with the table row by row, and that the ten keys in use resolve in
+readings.ts with none unused.
+
+**Commit:** [`25c237e`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/25c237e)
+
+**What happened:**
+`08-video.md` carried `further_Reading:` with a capital R. YAML treats that as
+a different key entirely, so it validated, passed through the loose schema
+into the API's `meta`, rendered nowhere, and read like a working declaration
+in the source. My first sweep matched keys case-sensitively, skipped it, and
+added the correctly-cased key beside it, leaving the file with both.
+
+What caught it was the arithmetic, not the reading: the diff reported 14
+insertions where the reading keys accounted for 13. One unexplained line was
+enough to go looking, and a case-insensitive sweep over all twelve sessions
+found that one and no others. Counting what changed is a cheap check that does
+not depend on my having looked at the right file.
+
+A regex of mine also cried wolf: `[a-z]+-\d{4}` cannot match the second hyphen
+in `chong-forsyth-2020`, so a verification script reported an unresolved key
+that was fine. The build is the check that matters for this, since
+`Readings.astro` throws on an unresolved key and names it, and it is green.
