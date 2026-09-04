@@ -21,41 +21,30 @@ related:
   - final-report
 ---
 
-Twelve dated entries, one for each teaching week, kept as you go rather than
-assembled at the end.
+A record of what you measured, written as you went.
 
-Each entry records what was scored, against what, at what N, through which
-implementation, and the number that came back. From week 5 it records both FID
-and FID∞. An entry missing its N or its implementation is not a measurement,
-and will not be read as one.
-
+Due end of week 12, and assessed as a whole rather than entry by entry.
 Deadlines, extensions and the use of generative tools are course-wide and live
 on the [policies page](/policies/).
 
-## Format
+## What to keep
 
-One Markdown file, one heading per week. Tables are welcome and a paragraph is
-often enough. Length is not marked.
+1. Twelve entries, one per teaching week, dated.
+2. Every number carries its N, its reference set and its implementation. From
+   week 5, FID∞ beside FID.
+3. Submit one Markdown file. Tables are fine. Prose is optional.
 
 ## How it is read
 
-Completeness across the twelve weeks is half the mark. The other half is
-whether discrepancies were written down or tidied away.
+Completeness is half the mark.
 
-An entry reading "got 5.31, expected 5.12, do not yet know why" is worth more
-than one reading 5.12, because the first records a measurement and the second
-records an expectation. If you find the cause in week 8, add it to the week 8
-entry and leave the week 3 entry as it was. The log is a record of what you
-knew when, and correcting the past out of it destroys exactly the thing it is
-for.
+The other half is for discrepancies written down rather than tidied away.
+"5.31, expected 5.12, cause unknown" is a better entry than a match, because
+it records a measurement where the match records an expectation.
 
-## What a strong log looks like
+At least one entry should record a result you did not expect. If none did, say
+so. That is also a result.
 
-The strongest logs read as somebody finding out what their own numbers meant.
-They contain at least one entry where the writer was wrong, said so, and
-carried on.
-
-## Exercise
-
-There is no separate exercise. The log is the accumulated record of the twelve
-weekly ones, and week 1 is entry one.
+A correction belongs in the week you found it rather than in the week you were
+wrong. A log rewritten to be right stops being a record of what you knew when,
+which is the only thing it is for.
