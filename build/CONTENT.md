@@ -260,7 +260,8 @@ page). Rebuild enough of the pipeline to compute it: same reference set if
 obtainable, same N if stated, same instrument weights if you can find them.
 Report your number next to theirs. Then account for the gap: every difference
 between your setup and the paper's, named. Marked on the account, not the gap.
-Almost nobody closes it. Format: notebook or script plus a two-page report.
+Almost nobody closes it. Format: one PDF of at most four pages covering Parts
+A to C, plus an archive that re-runs Part A on a clean machine.
 Strong submissions state what they could not determine from the paper and
 what they assumed instead. Due end of week 5, because week 5 explains why the
 standard deviations you computed did not warn you.
@@ -306,8 +307,9 @@ this course never trains one. Not for anyone who needs the number to be fine.
 
 **Attendance.** Sessions are not recorded. The bench is re-scored in the room.
 
-**Late work.** Submissions past the deadline are marked as submitted but the
-lateness is recorded against the entry, at the sample size it arrived with.
+**Late work.** Every deadline carries a grace period of 12 hours. Late
+submissions are not accepted; after the grace period the entry is recorded as
+absent, at the sample size it arrived with.
 
 **Reporting.** Every number in every submission states its N, its reference
 set and its implementation. A number without these is not a result and will
@@ -316,9 +318,9 @@ not be read as one.
 **Precision.** Report scores to one decimal place. Week 5 explains why the
 second is not yours to claim.
 
-**Use of generative tools.** Permitted for code and for prose, and declared.
-Undeclared use is a reporting failure under the policy above, and is marked as
-one. Text produced by a model is subject to the same standard as a number
+**Use of generative tools.** Permitted for code and for prose, and must be
+disclosed, with prompts. Undisclosed use is a reporting failure under the rule
+above, and is marked as one. Text produced by a model is subject to the same standard as a number
 produced by one: state what generated it and at what setting.
 
 **Academic integrity.** The School of Continuous Improvement applies the

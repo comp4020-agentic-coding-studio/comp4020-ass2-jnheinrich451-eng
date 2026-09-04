@@ -27,3 +27,6 @@ related:
 ---
 
 <!-- body pending -->
+
+Deadlines, extensions and the use of generative tools are course-wide and
+live on the [policies page](/policies/).

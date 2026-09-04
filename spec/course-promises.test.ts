@@ -34,7 +34,18 @@ const bodyOf = (n: Node): string => {
   const entry = JSON.parse(readFileSync(resolve("dist/api", `${n.id}.json`), "utf8"));
   return entry.body ?? "";
 };
-const bodies = new Map(sessions.map((s) => [s.id, bodyOf(s)]));
+const bodies = new Map(nodes.map((n) => [n.id, bodyOf(n)]));
+
+/** A course-wide rule belongs in one place. The policies page is an ordinary
+ *  page copied into the API as its own collection, so it is addressed like
+ *  any other node: its id is `policies/index`. */
+const pageBody = (collection: string): string => {
+  const node = nodes.find((n) => n.type === collection);
+  if (!node) throw new Error(`no ${collection} node in the API to read`);
+  return bodies.get(node.id) ?? "";
+};
+
+const assessmentsWithBody = assessments.map((a) => ({ ...a, body: bodies.get(a.id) ?? "" }));
 const body = (n: Node) => bodies.get(n.id) ?? "";
 const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
 
@@ -107,6 +118,28 @@ describe("twelve weeks that do not repeat one another", () => {
     for (const s of sessions) {
       const n = words(body(s));
       expect(n, `week ${week(s)} (${s.id}) has ${n} words`).toBeGreaterThanOrEqual(250);
+    }
+  });
+});
+
+describe("a rule is stated in one place", () => {
+  // A fact stated on three pages is a fact that can disagree with itself. The
+  // build already refuses a link that points nowhere; this refuses a rule that
+  // has been copied instead of linked.
+  it("states course-wide rules once, on the policies page", () => {
+    const rules = [/late submissions are not accepted/i, /grace period/i, /must be disclosed/i];
+    const policies = pageBody("policies");
+    for (const rule of rules) {
+      expect(policies, `${rule} missing from policies`).toMatch(rule);
+      for (const a of assessmentsWithBody) {
+        expect(a.body, `${a.id} restates ${rule}`).not.toMatch(rule);
+      }
+    }
+  });
+
+  it("every assessment links to the policies page", () => {
+    for (const a of assessmentsWithBody) {
+      expect(a.body, `${a.id} does not link to /policies/`).toMatch(/\]\(\/policies\/?\)/);
     }
   });
 });

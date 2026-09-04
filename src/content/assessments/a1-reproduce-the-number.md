@@ -31,18 +31,16 @@ Almost nobody closes it, and the mark is in the account rather than in the size
 of the gap.
 
 Due end of week 5, which is the week that explains why the standard deviations
-you computed did not warn you. Grace period 12 hours. Late submissions are not
-accepted, and after the grace period the entry is recorded as absent, at the
-sample size it arrived with.
+you computed did not warn you. Deadlines, extensions and the use of generative
+tools are course-wide and live on the [policies page](/policies/).
 
 ## Before you start
 
 1. Individual work. 100 points, worth 20 per cent of the course.
 2. Three parts. Part A is 30 points, Part B 50, Part C 20. The marking
    criteria on this page are those three parts.
-3. Generative tools may be used for code and for prose and must be disclosed,
-   with prompts. Undisclosed use is a reporting failure under the course
-   policy and is marked as one.
+3. Generative tools are governed by the [policies page](/policies/). Read it
+   before you start rather than before you submit.
 4. Submit one PDF containing Parts A to C, at most four pages, and one archive
    holding everything needed to re-run Part A on a clean machine.
 
