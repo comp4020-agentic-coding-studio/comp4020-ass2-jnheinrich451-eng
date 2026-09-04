@@ -26,3 +26,8 @@ mise.local.toml
 # your course API key, and this repo goes public when you ship. Your tracked
 # harness is CLAUDE.md (and any AGENTS.md), not this directory.
 .claude/
+
+# The papers behind readings.ts, kept locally for verification. Publisher PDFs
+# don't belong in a repo that goes public at ship; every entry in
+# src/data/readings.ts links the published open-access version instead.
+/assets/

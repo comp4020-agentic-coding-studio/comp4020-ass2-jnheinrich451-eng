@@ -10,7 +10,7 @@ the site carries the whole course.
 
 ## How I got here
 
-Assignment 1 lost most of its marks on response: the idea was in my head and
+Assignment 1 received weakest of its marks on response: the idea was in my head and
 not on the page. So the harness came first this time. Three rules went into
 `CLAUDE.md` before any content, and they outrank fluency: argue instead of
 setting a mood, earn anything symbolic or cut it, and make non-adjacent weeks
@@ -18,8 +18,9 @@ need each other
 ([`3dde85d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3dde85d)).
 
 My anchor was week 5. I read three papers first, Heusel, Chong and Forsyth,
-and Bińkowski, kept the PDFs in the repo, and wrote that page myself before
-anything else existed. It fixed the register, the bench, and the terms the
+and Bińkowski, logged each in `readings.ts` with a link to its published
+page and a verified date, and wrote that page myself before anything else
+existed. It fixed the register, the bench, and the terms the
 later checks look for. Everything else was written against it: I put the
 structure in `build/SPINE.md` and the facts in `build/CONTENT.md`, and the
 agent brought the repo into agreement with those files instead of inventing
@@ -34,8 +35,7 @@ rule two pages stated differently, which became one sentence on the policies
 page plus two agreement tests, run before the edit so we knew they could fail
 ([`0c29cbd`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/0c29cbd)).
 Some I tolerated on purpose: week 5 stays at 589 words against a 350 to 500
-range because it is the anchor, and its description says "four public
-implementations" while the body hedges to "several", which I decided is fine.
+range because it is the anchor which I decided is fine.
 The checking ran both ways too. The agent read my claims against the PDFs and
 found my memory of Stein's method was right as a label and wrong as a design,
 which would have sent students building the wrong study in week 9
