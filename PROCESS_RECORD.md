@@ -1306,3 +1306,44 @@ Asking sometimes is not a practice.
 
 What would have caught this without asking anything: looking at the rendered
 slides. I measured seventeen and read two.
+
+## 2026-09-05 04:30 — The author's account replaces mine
+
+**Prompt:**
+
+> Oh could you use my tone to compose this? ... First, find an anchor, I use
+> week-5 as anchor, finish this first using 3 papars to finish the content of
+> this page. Second ... most work is we have an idea, and check spec, and we
+> agree or disagree, and test and provide results as feedback? So the build is
+> plain ... this task is not hard, not details worth considering? And tone can
+> be naturer!
+
+**Result:**
+Rewritten, 493 words, seven citations. The structure is now the author's:
+week 5 as the anchor, written by hand from the three verified papers before
+anything else existed, then a plain loop of instruction, check, discrepancy,
+decision. The record confirms the anchor claim exactly: the week 5 body and
+the PDFs land in 3dde85d, one commit before the spine exists.
+
+The account also now names what was tolerated rather than fixed, because the
+author is right that triage was half the decisions: week 5 left over the word
+range on purpose, the four-versus-several wording left standing. My first
+draft treated only the catches as evidence and skipped the deliberate
+non-fixes, which are the same kind of judgement.
+
+**Verified:**
+Word count 493 inside 400 to 600 with citations counted as single tokens,
+seven hashes all resolving, zero em-dashes, check:evidence exit 0.
+
+**Commit:** [`58e18b0`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/58e18b0)
+
+**What happened:**
+The author read my draft and disagreed with its story, not its facts. I had
+composed the build as a chain of caught failures, which is the shape my
+record entries naturally take, since I write one when something goes wrong.
+Their description of the same weeks is flatter and truer: mostly the work was
+finding out whether a thing could be done, agreeing or disagreeing, and
+moving on, with nothing that deserves the word breakthrough. The record
+over-samples drama because drama is what gets recorded. Worth remembering
+when drawing any future account from this file: the entries are the
+exceptions, and the loop between them was the process.
