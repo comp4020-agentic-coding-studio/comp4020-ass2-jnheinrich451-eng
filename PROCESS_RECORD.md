@@ -1104,3 +1104,52 @@ The portrait lines are committed commented out, with the exact filename each
 entry expects. `photoAlt` is required by a superRefine whenever `photo` is
 set, so a portrait dropped in without alt text fails the build rather than the
 review, and the comment is where that is said.
+
+## 2026-09-05 01:13 — Twelve weeks, generated
+
+**Prompt:**
+
+> Extend the home page with three elements ... (1) a "Twelve weeks" list
+> generated from the sessions collection ... (2) a "The bench" block with the
+> four lines I'm pasting ... (3) replace the three card descriptions with the
+> copy I'm pasting ... at 390×844 the twelve-weeks list must not wrap the date
+> onto a third line.
+
+**Result:**
+The list reads the collection for week, date, title and description, so the
+home page cannot fall out of step with the twelve pages it points at. The
+grouping is the part worth the care: it walks sessions in week order and opens
+a new group when the arc letter changes, rather than bucketing by letter. The
+two behave identically today, and differ the moment an arc is split across
+non-contiguous weeks, where bucketing would quietly reorder the course and
+this shows two groups.
+
+The bench block carries R, A, B and C with their true scores, and the
+1/N figure beneath. Worth noting the figure needed nothing done to it: the
+palette was chosen for both grounds when it was written, and the same file
+reads on the site's cream as it does on the deck's black.
+
+**Verified:**
+Both viewports through CDP rather than by eye. Twelve meta lines, one line
+each at 390x844 and at 1920x1080, no overflow and no offending elements at
+either. The date requirement is met more strictly than asked: it never reaches
+a second line, because week and date are held together with nowrap. Then read
+the rendered page in two crops, which is how I saw that the figure's own
+labels hold up on cream.
+
+**Commit:** [`3d9dddb`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3d9dddb)
+
+**What happened:**
+The third element could not be done. The card copy was not in the message,
+which is the fourth prompt in this build to reference a paste that did not
+arrive. Twice the content turned out to be in `build/CONTENT.md` already and I
+found it there; the bench lines this time were recoverable the same way. Copy
+that exists nowhere is not recoverable, and writing three descriptions myself
+would have produced something to be replaced rather than something to be used.
+Left alone, and reported.
+
+Putting the list on the home page also made an old flag visible. Week 4's
+description reads "One reference set, four public implementations, four
+different numbers", and its body says "several", because the hedge went into
+the prose and never reached the frontmatter. That sentence is now on the front
+page of the site, in a list built to be the course's shop window.
