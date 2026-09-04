@@ -1002,3 +1002,60 @@ text is the stale one.
 All four assessment briefs and all twelve sessions now exist. The checks that
 would catch this class of drift do not exist: the agreement test covers three
 named rules, and nothing compares a spec line against the brief it sits under.
+
+## 2026-09-04 23:43 — The artwork made downstream of the numbers
+
+**Prompt:**
+
+> Add --hero and --card modes to figures/bench-truth.py and figures/fid-vs-invN.py
+> ... Run pnpm check:evidence; the only remaining failures should be PROCESS.md.
+
+**Result:**
+The starter's two images are now rendered by the two scripts that compute the
+things they depict. That is the point of doing it this way rather than drawing
+something: the hero shows 5.12 and 4.88 because `bench-truth.py` computed them
+from the closed form on the same run, so the artwork cannot drift from week 2.
+The card reads the course code and title out of `src/course-config.ts` for the
+same reason.
+
+Both use the deck's real monospace. Astro caches Roboto Mono under
+`.astro/fonts` as woff2, which matplotlib cannot read, and fontTools converts
+it once into a ttf. The loader falls back to a generic mono and says so, since
+a figure quietly rendered in the wrong face is the kind of thing nobody
+notices until it is printed.
+
+`fid-vs-invN` now caches its measured rows. The sweep is 206 seconds and
+redrawing is instant, and separating them means an artwork change costs no
+re-measurement and cannot silently alter a number. The card rendered in 0s
+from that cache.
+
+**Verified:**
+Both images opened and read rather than trusted: the AVIF at 2400x800 and the
+PNG at 1200x630, checked as pictures for legibility, not just for dimensions.
+The first hero was left-heavy with an empty right third, because 24x8 inches
+is a 3:1 frame and the data limits were 4:1, so the equal-aspect axis padded
+the difference. Fixed by matching the ratios. pnpm check 13 of 13, build clean
+at 24 pages with no accessibility violations.
+
+**Commit:** [`1246da9`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/1246da9)
+
+**What happened:**
+Three things the instruction did not mention and one of them mattered.
+
+`course_record()` returned `code: 'custom'` on its first run. The regex found
+`code: "custom"` inside a zod `addIssue` call further up `course-config.ts`
+before reaching the course record, and returned a card that would have shipped
+with the wrong course code on it. Caught only because I printed what the
+helper returned instead of assuming it had worked. Scoped to the `courseMeta`
+block now.
+
+The hero's alt text still described "a lecture theatre reduced to flat gold
+and black shapes", which is not what the image is any more. The starter marker
+asked for the artwork *and its alt text*, and removing the marker without
+rewriting the alt would have left a page whose only description of its own
+image was wrong. Nothing in the build checks that, because axe can see that an
+alt exists and cannot see that it is false.
+
+`figures/__pycache__` had been committed several turns ago and I had not
+noticed. Untracked, with a `.gitignore` covering it and the two new derived
+directories.
