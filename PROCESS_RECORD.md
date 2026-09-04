@@ -1253,3 +1253,56 @@ mid ink the other figures use, which is chosen to survive both the site's
 cream and the deck's black; on a near-black slide at display size that reads
 as grey on grey. Deck-only assets get the deck's off-white. Only visible by
 looking at a rendered slide.
+
+## 2026-09-05 03:53 — Two bugs the author could see and my checks could not
+
+**Prompt:**
+
+> for slide 5, 7, 9, 10, there are boxes, maybe unrecognizsed font! And for
+> slide 7 and 9, the layout has problem, the formula is below the window.
+
+**Result:**
+Both real, both mine, and both invisible to the checks I had run on this deck
+one turn earlier.
+
+The boxes were blackboard-bold E and script N. `_style` sets
+`svg.fonttype: "none"` so figure labels inherit the page font, which is right
+for a figure and wrong for an equation: mathtext draws those letters from
+fonts no browser has, so they shipped as a `<text>` element and rendered as
+tofu. Outlining every glyph to a path fixes it. My first attempt at that also
+failed, because I put the rcParam above the `_style` import and `_style` reset
+it on the way past.
+
+The layout problem was worse, because I had checked for it and reported it
+clear. My canvas check measured `section.scrollHeight` against 720. A Reveal
+section is a fixed 720px box, so that number cannot exceed the limit it is
+being compared with; the check could not fail. Measuring how far the children
+actually reach, with fragments forced visible, put slide 9 at 703 of 720 and
+slide 14 at 703. That is content filling 98% of the canvas: it fits on the
+machine it was written on and clips on the next.
+
+**Verified:**
+27 of 27 equation SVGs contain no `<text>` element. Every slide re-measured
+with the corrected check, worst case now 636 of 720. Both flagged slides
+opened and read as pictures, which is where the script N and the boxed result
+were confirmed present and inside the frame.
+
+**Commit:** [`1fc21a1`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/1fc21a1)
+
+**What happened:**
+This is the fourth time in this build that a check has reported success
+against a value it could not have failed on, and the first time the author
+found the defect before I did. The pattern each time is the same: I write an
+assertion against where I assume the information lives, and it lives somewhere
+else. Bodies were not on index nodes. Criterion names were not in the body.
+Reveal's paused state was not the presence of a `.pause-overlay` element. A
+section's overflow is not its `scrollHeight`.
+
+The guard I adopted after the second of these was to ask what the check would
+have to see in order to fail. I did ask it of the equation loader, which is
+why that one has a guard test. I did not ask it of the canvas check, and the
+canvas check is the one that shipped a broken slide to the person reading it.
+Asking sometimes is not a practice.
+
+What would have caught this without asking anything: looking at the rendered
+slides. I measured seventeen and read two.
