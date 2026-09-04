@@ -11,13 +11,24 @@ related:
   - sessions/02-frechet-distance
 ---
 
-A page shows the closed form and its derivation at the same time, and a reader
-looks at the answer first. Slides can withhold it, which is the only reason
-this lecture exists as well as the session.
+There is one formal lecture in SLOP8412.
 
-Twelve slides, one step of the chain each. The step that costs something,
-restricting the coupling to be jointly Gaussian, gets a slide to itself with
-nothing else on it, and the room sits with it before the algebra resumes. The
-last slide plants week 5 three weeks before it happens.
+The Fréchet distance has to be derived once, carefully. After that the course
+leaves the whiteboard and moves to the measurement bench.
 
-The session is where the same derivation is done again without notes.
+The lecture is called *Two Gaussians, One Number*. It starts from one
+requirement, to compare two distributions without inventing correspondences
+between individual samples, and arrives at the Gaussian Wasserstein-2 closed
+form that FID uses. The last third separates the clean mathematical object
+from the measurement pipeline built around it: Inception features, finite
+samples, preprocessing, and a Gaussian fitted to whatever comes out.
+
+## After this lecture you should be able to
+
+- explain what a coupling is, and why the Wasserstein distance optimises over
+  couplings;
+- derive the mean and covariance decomposition in the Gaussian case;
+- interpret the two terms of the FID expression;
+- distinguish the Gaussian Wasserstein distance from the engineering choices
+  that make it FID;
+- name the four assumptions the rest of the semester audits.

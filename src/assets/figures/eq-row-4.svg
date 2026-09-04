@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="296.17pt" height="37.01pt" viewBox="0 0 296.17 37.01" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-05T03:17:22.481761</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 37.01 
+L 296.17 37.01 
+L 296.17 -0 
+L 0 -0 
+L 0 37.01 
+z
+" style="fill: none"/>
+  </g>
+  <g id="text_1">
+   <!-- $=\|\Delta\mu\|^2+\mathrm{Tr}(\Sigma_P+\Sigma_Q)-2\,\mathrm{Tr}(C)$ -->
+   <g style="fill: #b97d1c" transform="translate(7.2 25.06)">
+    <text>
+     <tspan x="3.70166" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">=</tspan>
+     <tspan x="23.323242" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">‖</tspan>
+     <tspan x="32.823242" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">Δ</tspan>
+     <tspan x="57.90918" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">‖</tspan>
+     <tspan x="80.274072" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">+</tspan>
+     <tspan x="99.895654" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">T</tspan>
+     <tspan x="109.501611" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">r</tspan>
+     <tspan x="117.313135" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">(</tspan>
+     <tspan x="124.725732" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">Σ</tspan>
+     <tspan x="149.153906" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">+</tspan>
+     <tspan x="168.775488" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">Σ</tspan>
+     <tspan x="191.950293" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">)</tspan>
+     <tspan x="203.064551" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">−</tspan>
+     <tspan x="222.686133" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">2</tspan>
+     <tspan x="237.85929" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">T</tspan>
+     <tspan x="247.465247" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">r</tspan>
+     <tspan x="255.276771" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">(</tspan>
+     <tspan x="275.95597" y="-0.276438" style="font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">)</tspan>
+     <tspan x="45.820801" y="-0.276438" style="font-style: oblique; font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">μ</tspan>
+     <tspan x="262.689368" y="-0.276438" style="font-style: oblique; font-size: 19px; font-family: 'DejaVu Sans'; fill: #b97d1c">C</tspan>
+     <tspan x="67.591016" y="-8.123437" style="font-size: 13.3px; font-family: 'DejaVu Sans'; fill: #b97d1c">2</tspan>
+     <tspan x="136.912451" y="2.573553" style="font-style: oblique; font-size: 13.3px; font-family: 'DejaVu Sans'; fill: #b97d1c">P</tspan>
+     <tspan x="180.962207" y="2.573553" style="font-style: oblique; font-size: 13.3px; font-family: 'DejaVu Sans'; fill: #b97d1c">Q</tspan>
+    </text>
+   </g>
+  </g>
+ </g>
+</svg>

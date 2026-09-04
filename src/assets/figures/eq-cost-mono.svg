@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="152.78pt" height="40.365156pt" viewBox="0 0 152.78 40.365156" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-05T03:17:22.280651</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 40.365156 
+L 152.78 40.365156 
+L 152.78 0 
+L 0 0 
+L 0 40.365156 
+z
+" style="fill: none"/>
+  </g>
+  <g id="text_1">
+   <!-- $\mathbb{E}(X-Y)^2=4$ -->
+   <g style="fill: #b97d1c" transform="translate(7.2 27.88)">
+    <text>
+     <tspan x="0" y="-0.484313" style="font-style: italic; font-size: 22px; font-family: 'STIXNonUnicode'; fill: #b97d1c"></tspan>
+     <tspan x="14.058044" y="-0.484313" style="font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">(</tspan>
+     <tspan x="41.998474" y="-0.484313" style="font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">−</tspan>
+     <tspan x="78.156677" y="-0.484313" style="font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">)</tspan>
+     <tspan x="101.635876" y="-0.484313" style="font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">=</tspan>
+     <tspan x="124.355603" y="-0.484313" style="font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">4</tspan>
+     <tspan x="22.641052" y="-0.484313" style="font-style: oblique; font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">X</tspan>
+     <tspan x="64.718201" y="-0.484313" style="font-style: oblique; font-size: 22px; font-family: 'DejaVu Sans'; fill: #b97d1c">Y</tspan>
+     <tspan x="86.950232" y="-9.570313" style="font-size: 15.4px; font-family: 'DejaVu Sans'; fill: #b97d1c">2</tspan>
+    </text>
+   </g>
+  </g>
+ </g>
+</svg>

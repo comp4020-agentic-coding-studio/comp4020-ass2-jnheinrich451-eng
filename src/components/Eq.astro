@@ -1,0 +1,72 @@
+---
+/**
+ * One display equation, typeset ahead of time by figures/equations.py.
+ *
+ * The stack has no maths renderer, so equations are SVG. They are referenced
+ * by the name they carry in that script rather than by path, which is what
+ * keeps sixteen slides using one set of notation: an equation is written once
+ * and cited, so a change to it cannot reach one slide and miss another.
+ *
+ * A name with no rendered file throws at build time and says which name, in
+ * the same spirit as an unresolved reading key.
+ */
+interface Props {
+  /** Key in EQUATIONS in figures/equations.py, without the `eq-` prefix. */
+  name: string;
+  /** What the equation says, in words, for anyone who cannot see it. */
+  alt: string;
+  /** `wide` for a full-measure equation; `inline` to sit inside a sentence. */
+  size?: "wide" | "inline";
+}
+
+const { name, alt, size } = Astro.props;
+
+const rendered = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/figures/eq-*.svg",
+  { eager: true },
+);
+const key = `../assets/figures/eq-${name}.svg`;
+const entry = rendered[key];
+if (!entry) {
+  const known = Object.keys(rendered)
+    .map((k) => k.replace("../assets/figures/eq-", "").replace(".svg", ""))
+    .sort()
+    .join(", ");
+  throw new Error(
+    `no rendered equation named "${name}". Add it to EQUATIONS in ` +
+      `figures/equations.py and rerun it. Known: ${known}`,
+  );
+}
+const image = entry.default;
+---
+
+<img
+  class:list={["eq", size && `eq--${size}`]}
+  src={image.src}
+  width={image.width}
+  height={image.height}
+  alt={alt}
+  loading="eager"
+  decoding="async"
+/>
+
+<style>
+  .eq {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-block: 0.6em;
+  }
+
+  /* Equations are drawn at a fixed point size, so a long one has to be
+     allowed to fill the measure rather than sit at its natural width. */
+  .eq--wide {
+    width: min(100%, 46em);
+  }
+
+  .eq--inline {
+    display: inline-block;
+    margin-block: 0;
+    vertical-align: middle;
+  }
+</style>

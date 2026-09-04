@@ -232,3 +232,8 @@ Course-wide rules (lateness, grace period, tool disclosure, re-marks)
 are stated once, on the policies page. Assessment pages link to them
 and never restate them. If a page needs to say what the rule is, it
 is the wrong page.
+
+## Reports
+Every report opens with a section titled "Open defects", listing anything
+found and not fixed, one line each, before anything about what was done.
+If there are none, the section says "none". Nothing else goes above it.

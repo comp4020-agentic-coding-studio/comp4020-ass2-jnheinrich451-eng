@@ -1,0 +1,103 @@
+---
+/**
+ * A way out of a deck.
+ *
+ * Reveal.js binds Escape to its own slide overview, so a presenter who wants
+ * out of the deck has no key that does it and has to reach for the browser's
+ * back button. This binds Escape to leaving instead, and puts a visible Back
+ * control on the slide for anyone who would never guess a keyboard shortcut.
+ *
+ * The listener runs in the capture phase so it sees the key before Reveal's
+ * own handler, and stops propagation so the overview never opens. It ignores
+ * the key while a text field has focus, and while the overview or the
+ * whiteboard is already open, so Escape still does the ordinary thing of
+ * closing whatever is on top before it closes the deck.
+ */
+interface Props {
+  /** Where Escape and the Back control lead, as a site-root path. */
+  back: string;
+  /** Short label for the control, e.g. the lecture it belongs to. */
+  label?: string;
+}
+
+const { back, label = "Back" } = Astro.props;
+const href = `${import.meta.env.BASE_URL.replace(/\/$/, "")}${back}`;
+---
+
+<a class="deck-exit" href={href} data-deck-exit>
+  <span aria-hidden="true">&larr;</span> {label}
+  <kbd>esc</kbd>
+</a>
+
+<script is:inline define:vars={{ href }}>
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+
+      const active = document.activeElement;
+      const typing =
+        active instanceof HTMLElement &&
+        (active.isContentEditable ||
+          ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName));
+      if (typing) return;
+
+      // Escape should close what is on top first. Reveal records those states
+      // as classes on `.reveal`, which is what to test: it renders a
+      // `.pause-overlay` element on every deck whether or not anything is
+      // paused, so looking for the element instead of the state matches always
+      // and this handler never fires.
+      const reveal = document.querySelector(".reveal");
+      const busy =
+        reveal?.classList.contains("overview") || reveal?.classList.contains("paused");
+      if (busy) return;
+
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      window.location.href = href;
+    },
+    { capture: true },
+  );
+</script>
+
+<style is:global>
+  .deck-exit {
+    position: fixed;
+    top: 1rem;
+    left: 1.25rem;
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.35em 0.7em;
+    border: 1px solid currentcolor;
+    border-radius: 999px;
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0.45;
+    transition: opacity 120ms ease;
+  }
+
+  .deck-exit:hover,
+  .deck-exit:focus-visible {
+    opacity: 1;
+  }
+
+  .deck-exit kbd {
+    padding: 0.05em 0.4em;
+    border: 1px solid currentcolor;
+    border-radius: 3px;
+    font: inherit;
+    opacity: 0.8;
+  }
+
+  /* The control is chrome, not content: keep it out of an exported PDF. */
+  @media print {
+    .deck-exit {
+      display: none;
+    }
+  }
+</style>
