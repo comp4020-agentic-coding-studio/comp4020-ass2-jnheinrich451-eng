@@ -660,3 +660,57 @@ check, since its output looks like evidence.
 
 One body left, week 11, deliberately skipped. The suite is down to a single
 failure naming it.
+
+## 2026-09-04 22:20 — Week 11, and the suite goes green
+
+**Prompt:**
+
+> Draft the body of sessions/11-why-it-persists ... This is institutional
+> analysis written completely straight. Make the strongest honest case FOR
+> continuing to report the score. If a sentence comments on the course, the
+> university, or itself, cut it. No irony.
+
+**Result:**
+412 words, and the only session that argues for the score. The constraint that
+shaped it was "strongest honest case": a weak version of this week would
+concede the argument while pretending to make it, and the tell would be irony.
+So the case is built on coordination rather than accuracy, which is the ground
+on which it actually wins. Nine years of results carry the row. Asking for it
+costs a reviewer nothing and answering costs an author one evaluation run.
+Recomputing baselines under a different metric is a public good, and public
+goods are underproduced.
+
+Kynkäänniemi's class-histogram result is placed inside that argument rather
+than against it: the result is published, cited, and has not displaced the
+metric, which is evidence for the week's thesis rather than an objection to
+it. Writing it as a scandal would have been the easy version and the wrong
+one.
+
+The bench closes where it opened. A is 5.12 and B is 4.88, unchanged since
+week 1, which states the week's argument as a measurement instead of a claim.
+
+**Verified:**
+Frontmatter compared block-for-block against HEAD, identical. Zero em dashes,
+ends on the exercise, bench numbers present. Then the whole suite: 10 of 10
+passing for the first time, including both accumulation checks and all three
+no-repetition checks, with the build clean at 26 pages and no accessibility
+violations.
+
+**Commit:** [`16484d9`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/16484d9)
+
+**What happened:**
+Nothing was flagged. Two things are worth recording now that all twelve exist.
+
+Week 5 is 589 words against a stated range of 350 to 500, and it is the only
+session outside it. It was written before the range was set, and it is the
+reference the other eleven were told to match for register, so every later
+week matched its voice while none matched its length.
+
+And the suite being green says less than it looks like it says. Eight of the
+ten checks are structural and were satisfied the moment twelve files existed
+with the right frontmatter. The two that could have caught drift, N-honest
+recurring and the bench returning, are threshold counts that fill up as weeks
+are written, so they went green by accumulation rather than by judgement. No
+check in this repo can currently tell a week that carries the argument forward
+from a week that merely contains the right words, which is the thing the
+brief's response criterion is actually about.
