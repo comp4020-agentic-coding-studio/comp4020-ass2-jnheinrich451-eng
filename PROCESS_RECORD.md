@@ -1384,3 +1384,44 @@ PDFs appeared, and acted on now because someone advised the author directly.
 Same pattern as the lectures deck: a flag at the end of a report changes
 nothing until the problem is made visible or repeated by a person. The record
 keeps ending up teaching the same lesson from different directions.
+
+## 2026-09-05 07:10 — A memory that was right about the wrong assignment
+
+**Prompt:**
+
+> Good and reflections, and could you check for me, in my view and memory, it
+> is compulsory to fill, the A1 and rest crits prove this
+
+**Result:**
+Checked against the live site, fetched fresh rather than answered from
+memory, and the answer is no for A2. Three places agree: the brief says
+"There is no separate reflection for this assignment: the week 7 retro
+presents the breakthrough from this same file", the assessment page says
+"Assignment repos carry none", and crit 6's own spec reads the shipped mark
+from PROCESS.md. The repo's check-evidence encodes the same rule and prints
+"none needed" for an ass2 repo.
+
+The author's memory was not wrong, it was stale. A1's harness really did
+require assignment-1.md in the assignment repo, and the weekly crits require
+crit-N.md, so their precedent was real. The rule changed with the A2 starter
+and nothing announced the change louder than a line in a README.
+
+reflections/crit-6.md, which was that README renamed, is gone, and the README
+is restored from the initial commit.
+
+**Verified:**
+check-evidence prints "none needed" and exits clean, both before and after
+the restore, which is itself the point: the gate never asked for the file the
+rename was trying to satisfy.
+
+**Commit:** [`3c0f9a5`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3c0f9a5)
+
+**What happened:**
+This file sat misnamed for two weeks across three renames, ass-2.md then
+assignment-2.md then crit-6.md, each rename an attempt to satisfy a
+requirement that does not exist for this repo. I flagged the first two
+renames and the file still ended up renamed a third time, because a flag
+tells someone they are wrong without telling them why their precedent no
+longer applies. What settled it was showing the A1 rule beside the A2 rule so
+the memory had somewhere to go. A correction that does not account for why
+the belief was reasonable does not stick.
