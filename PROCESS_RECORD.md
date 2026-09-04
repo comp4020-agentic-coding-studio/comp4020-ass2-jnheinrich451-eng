@@ -551,3 +551,55 @@ neither test is currently telling me anything I would not otherwise know. They
 were written to catch drift across twelve finished weeks, and they only start
 being informative once the twelve exist. A check that cannot fail informatively
 until the end of the work is worth keeping, but it is not backpressure yet.
+
+## 2026-09-04 21:41 — Weeks 8 and 9, and a spec line with nowhere to live
+
+**Prompt:**
+
+> Draft the bodies of sessions/08-video and sessions/09-human-evaluation ...
+> Week 8: Unterthiner is a workshop paper; say so. Do not name a specific
+> temporal failure; frame invisibility as a property of the instrument.
+> Week 9 must contain a costed number in hours and dollars, and must say
+> plainly that the bench has no images.
+
+**Result:**
+375 and 411 words. Week 8 is short because its argument is inheritance: swap
+Inception-v3 for I3D and the instrument changes while the estimator does not,
+so week 5 transfers whole and there is little left to say. Week 9 is the only
+session whose output is a protocol and a budget rather than a number, and the
+first with no closed form in it at all.
+
+The costed example is worked rather than asserted. Separating two candidates
+half a percentage point apart in human error rate, at eighty percent power,
+needs about 130,000 trials each, near 290 hours of paid attention and about
+7,200 dollars. I checked that against scipy rather than doing it in prose,
+because a number invented to sound expensive would be exactly the kind of
+claim this course spends twelve weeks objecting to.
+
+**Verified:**
+Frontmatter untouched, zero em dashes, both ending on the exercise, all
+measured rather than reread. The instruction not to name a temporal failure
+checked by grepping the body for the obvious candidates and finding none. The
+power arithmetic recomputed with scipy: 131,861 per group against the 130,000
+in the prose, 293 hours against 290, 7,326 dollars against 7,200, so the
+rounding in the text is honest in the right direction.
+
+**Commit:** [`9859e8f`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/9859e8f)
+
+**What happened:**
+The instruction and the spec collided. Week 8's second spec line says the
+student "can name one temporal failure that leaves the score unchanged, and
+show it", while this prompt forbids the page from naming one, and CONTENT.md's
+exercise is the re-run paragraph rather than a construction. Written as
+specified, the page would have satisfied the prompt and quietly abandoned a
+spec line the marker reads.
+
+Reconciled instead of chosen between: a "Before the session" line asks students
+to bring a failure they believe the features would not register, together with
+the experiment that would settle it. The student names one, the page names
+none, and the spec line has a home. That is also the better teaching move,
+since a named example on the page would be the answer handed over.
+
+Both accumulation checks went green this turn, having been red by one last
+turn, exactly as predicted. That confirms what I recorded then: they were not
+providing backpressure, they were counting down.
