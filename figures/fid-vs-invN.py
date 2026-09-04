@@ -18,11 +18,24 @@ Deck: week 2, slide 12. Reused on the week 5 page as Figure 5.1.
 from __future__ import annotations
 
 import argparse
+import json
 import time
+from pathlib import Path
 
 import numpy as np
 
-from _style import A_COL, ACCENT, B_COL, INK, save
+from _style import (
+    A_COL,
+    ACCENT,
+    B_COL,
+    GOLD,
+    GROUND,
+    INK,
+    course_record,
+    deck_mono,
+    save,
+    save_raster,
+)
 
 import matplotlib.pyplot as plt
 
@@ -37,7 +50,37 @@ parser.add_argument("--trials", type=int, default=10)
 parser.add_argument(
     "--sizes", type=int, nargs="+", default=[500, 1000, 2000, 5000, 10000, 20000, 50000]
 )
+parser.add_argument(
+    "--card",
+    action="store_true",
+    help="render the site's 1200x630 social card instead of the teaching figure",
+)
+parser.add_argument(
+    "--recompute", action="store_true", help="ignore the cached sweep and measure again"
+)
 args = parser.parse_args()
+
+# The sweep is about four minutes of linear algebra, and redrawing is instant.
+# Caching the measured rows keeps the two apart, so a change to the artwork
+# does not cost a re-measurement and cannot silently alter the numbers.
+CACHE = Path(__file__).resolve().parent / ".cache" / "fid-vs-invN.json"
+
+
+def load_cache(sizes, trials):
+    if args.recompute or not CACHE.exists():
+        return None
+    saved = json.loads(CACHE.read_text(encoding="utf-8"))
+    if saved.get("d") != D or saved.get("trials") != trials or saved.get("sizes") != list(sizes):
+        return None
+    return [tuple(r) for r in saved["rows"]]
+
+
+def store_cache(rows, sizes, trials):
+    CACHE.parent.mkdir(exist_ok=True)
+    CACHE.write_text(
+        json.dumps({"d": D, "trials": trials, "sizes": list(sizes), "rows": rows}, indent=1),
+        encoding="utf-8",
+    )
 
 
 def moments(x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -62,14 +105,18 @@ def frechet(m1, s1, m2, s2) -> float:
 
 
 rng = np.random.default_rng(20260810)
-rows = []
+rows = load_cache(args.sizes, args.trials) or []
 started = time.time()
+cached = bool(rows)
 
 print(f"d = {D}, trials = {args.trials}, sizes = {args.sizes}")
+if cached:
+    print(f"(reusing the measured sweep in {CACHE.relative_to(Path.cwd().parent)};"
+          " pass --recompute to measure again)")
 print(f"true FID(A, R) = {TRUE_A:.4f}   true FID(B, R) = {TRUE_B:.4f}\n")
 print(f"{'N':>7}{'1/N':>10}{'FID(A,R)':>12}{'sd':>8}{'FID(B,R)':>12}{'sd':>8}  ordering")
 
-for n in args.sizes:
+for n in args.sizes if not cached else []:
     a_runs, b_runs = [], []
     for _ in range(args.trials):
         mr, sr = moments(rng.standard_normal((n, D), dtype=np.float32))
@@ -86,6 +133,16 @@ for n in args.sizes:
         f"{n:>7}{1 / n:>10.5f}{a_mean:>12.3f}{np.std(a_runs, ddof=1):>8.3f}"
         f"{b_mean:>12.3f}{np.std(b_runs, ddof=1):>8.3f}  {order}"
     )
+
+if not cached:
+    store_cache(rows, args.sizes, args.trials)
+else:
+    for n, a_mean, b_mean, a_sd_, b_sd_ in rows:
+        order = "B < A (true)" if b_mean < a_mean else "A < B (flipped)"
+        print(
+            f"{n:>7}{1 / n:>10.5f}{a_mean:>12.3f}{a_sd_:>8.3f}"
+            f"{b_mean:>12.3f}{b_sd_:>8.3f}  {order}"
+        )
 
 rows.sort(key=lambda r: r[0])
 inv = np.array([1 / r[0] for r in rows])
@@ -140,6 +197,33 @@ print(
     f"the true gap is {TRUE_B - TRUE_A:+.3f}"
 )
 print(f"elapsed {time.time() - started:.0f}s")
+
+if args.card:
+    # The social card is the same measurement, drawn to be read at thumbnail
+    # size: one ink, no axes, and the course record taken from course-config
+    # rather than typed here, so a renamed course cannot leave a stale card.
+    meta = course_record()
+    mono = deck_mono()
+    fig, ax = plt.subplots(figsize=(12, 6.3), dpi=100)
+    fig.patch.set_facecolor(GROUND)
+    ax.set_facecolor(GROUND)
+
+    xs = np.linspace(0, inv.max() * 1.05, 100)
+    ax.plot(xs, np.polyval(fit_a, xs), color=GOLD, lw=1.8, alpha=0.55)
+    ax.plot(xs, np.polyval(fit_b, xs), color=GOLD, lw=1.8, alpha=0.28)
+    ax.plot(inv, a_hat, "o", ms=6, color=GOLD, alpha=0.9)
+    ax.plot(inv, b_hat, "s", ms=6, color=GOLD, alpha=0.45)
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.axis("off")
+    fig.subplots_adjust(left=0.05, right=0.97, top=0.60, bottom=0.07)
+
+    fig.text(0.05, 0.94, meta["code"], color=GOLD, fontsize=58, fontfamily=mono, va="top")
+    fig.text(
+        0.05, 0.74, meta["title"], color="#ded7cb", fontsize=25, fontfamily=mono, va="top"
+    )
+    save_raster(fig, "card.png", (1200, 630))
+    raise SystemExit(0)
 
 fig, ax = plt.subplots(figsize=(7.0, 4.2))
 xs = np.linspace(0, inv.max() * 1.05, 100)

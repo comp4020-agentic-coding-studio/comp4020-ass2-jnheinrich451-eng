@@ -1,0 +1,7 @@
+# Derived, and all three regenerate from what is committed.
+__pycache__/
+# The measured sweep, kept so redrawing the figure costs nothing. Regenerating
+# it is `python fid-vs-invN.py --recompute`, about four minutes.
+.cache/
+# Roboto Mono unpacked from Astro's woff2 cache for matplotlib.
+.fonts/

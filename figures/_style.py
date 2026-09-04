@@ -79,3 +79,95 @@ def save(fig, name: str) -> str:
     os.replace(tmp, path)
     print(f"\nwrote {path.relative_to(root)}")
     return str(path)
+
+
+# --- brand modes -----------------------------------------------------------
+# The site's hero and social card are generated from the same two scripts that
+# produce the teaching figures, so the artwork cannot drift from the numbers it
+# depicts. These render on a solid ground rather than transparent, because they
+# are images in their own right rather than overlays.
+
+GROUND = "#0d0c0b"  # the deck's ground, and the hero band on the site
+GOLD = "#b97d1c"  # --at-primary, the Slop lockup gold
+
+
+def deck_mono() -> str:
+    """The deck's own monospace, if Astro has fetched it.
+
+    Astro caches the Google font under `.astro/fonts/` as woff2, which
+    matplotlib cannot read; fontTools converts it in memory to a ttf that it
+    can. The filename carries a content hash, so it is globbed rather than
+    named. Falls back to whatever matplotlib calls monospace, and says so,
+    because a figure rendered in the wrong face is worth knowing about.
+    """
+    import glob
+    from pathlib import Path
+
+    import matplotlib.font_manager as fm
+
+    root = Path(__file__).resolve().parent.parent
+    found = glob.glob(str(root / ".astro" / "fonts" / "font-roboto-mono-*.woff2"))
+    if not found:
+        print("! Roboto Mono not in .astro/fonts (run pnpm build first); using fallback mono")
+        return "monospace"
+    try:
+        from fontTools.ttLib import TTFont
+
+        cache = root / "figures" / ".fonts"
+        cache.mkdir(exist_ok=True)
+        ttf = cache / "RobotoMono.ttf"
+        if not ttf.exists():
+            font = TTFont(found[0])
+            font.flavor = None
+            font.save(str(ttf))
+        fm.fontManager.addfont(str(ttf))
+        return fm.FontProperties(fname=str(ttf)).get_name()
+    except Exception as exc:  # brotli missing, or a font tools version change
+        print(f"! could not load Roboto Mono ({exc}); using fallback mono")
+        return "monospace"
+
+
+def save_raster(fig, path, size_px, to_avif=False):
+    """Write a fixed-pixel image into src/assets/images/, replacing a starter."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    out = root / "src" / "assets" / "images" / path
+    out.parent.mkdir(parents=True, exist_ok=True)
+    tmp = out.with_suffix(".tmp.png")
+    fig.savefig(tmp, dpi=fig.dpi, facecolor=fig.get_facecolor())
+    plt.close(fig)
+
+    from PIL import Image
+
+    img = Image.open(tmp).convert("RGB")
+    if img.size != size_px:
+        img = img.resize(size_px, Image.LANCZOS)
+    if to_avif:
+        img.save(out, format="AVIF", quality=72)
+    else:
+        img.save(out, format="PNG", optimize=True)
+    tmp.unlink()
+    print(f"\nwrote {out.relative_to(root)} at {img.size[0]}x{img.size[1]}")
+    return str(out)
+
+
+def course_record() -> dict:
+    """Read the course code and title from the one file that defines them."""
+    import re
+    from pathlib import Path
+
+    src = (Path(__file__).resolve().parent.parent / "src" / "course-config.ts").read_text(
+        encoding="utf-8"
+    )
+    # Scoped to the courseMeta call: the schema above it validates with
+    # `code: "custom"` zod issues, which a file-wide search for `code:` finds
+    # first and reports as the course code.
+    block = re.search(r"courseMeta\s*=\s*slopCourseMetaSchema\.parse\(\{(.*?)\n\}\)", src, re.S)
+    if not block:
+        raise SystemExit("could not find the courseMeta record in src/course-config.ts")
+    code = re.search(r'code:\s*"([^"]+)"', block.group(1))
+    title = re.search(r'title:\s*"([^"]+)"', block.group(1))
+    if not code or not title:
+        raise SystemExit("could not read code/title from the courseMeta record")
+    return {"code": code.group(1), "title": title.group(1)}
