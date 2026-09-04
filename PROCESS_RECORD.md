@@ -766,3 +766,54 @@ Both are the same class of thing: this site is now large enough that a fact
 can be stated in three places, and nothing in `spec/` checks that they agree.
 The dangling-ref check catches a broken link between pages; nothing catches a
 broken agreement between them.
+
+## 2026-09-04 23:03 — The first check that can catch drift rather than count it
+
+**Prompt:**
+
+> Two contradictions to resolve structurally. (1) Lateness: the canonical
+> sentence is [paste] ... Then add the two agreement tests I'm pasting to
+> course-promises.test.ts, working out where the policies body lives in the
+> build output. Run pnpm check; the tests should pass only after the edits, so
+> run them once before editing and tell me they failed.
+
+**Result:**
+The instruction to run the tests before editing is the whole point of the
+turn, and it worked: both failed, on the two different causes they were
+written for. The policies page did not contain the rules, and no assessment
+linked to it. A test written after the fix would have passed immediately and
+proved nothing about itself.
+
+Finding where the policies body lives took reading rather than guessing. It is
+an ordinary page copied into the API as its own collection by
+`courseApiCollections`, so its node id is `policies/index` and the same
+per-entry path the sessions use addresses it.
+
+The link line went onto all four assessments, not just A1. Three still hold
+pending bodies, and adding it now means the rule is a property of the
+collection rather than of the one entry that happened to be written first.
+
+**Verified:**
+Tests run before the edits and reported failing, then after and reported
+passing, 12 of 12. The base-path rewrite on the new markdown links checked in
+the built HTML: `/policies/` becomes
+`/comp4020-ass2-jnheinrich451-eng/policies/`, which matters because a
+root-absolute link that works locally and 404s on the deployed URL is exactly
+the failure the README warns about.
+
+**Commit:** [`0c29cbd`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/0c29cbd)
+
+**What happened:**
+The canonical sentence was never pasted; `[paste]` arrived as literal text.
+The regexes in the tests pinned the required phrases, and the A1 brief had the
+newer wording of the two contradicting texts, so I wrote the sentence from
+those and said so rather than stopping. The prompt also assumed the policies
+page existed to move rules onto; it was still the starter placeholder, so the
+rules had no canonical home until this turn made one.
+
+This is the first check in `spec/` that can catch drift rather than count up
+to a threshold. The others go green when twelve files exist; this one goes red
+the moment a rule is copied into a brief instead of linked, which can happen
+at any point and is invisible in a diff of one file. That is the gap I named
+two turns ago, and it is now closed for three rules. It is not closed for
+anything else two pages both assert.
