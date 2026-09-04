@@ -8,10 +8,8 @@ affiliation: PhD candidate, School of Continuous Improvement
 role: tutor
 email: tomasz.wierzba@slop.university
 contact: Ed forum, or before the session while the bench is being re-scored.
-# Portrait: drop the file in this directory as tomasz-wierzba.avif, then
-# uncomment both lines. photoAlt is required whenever photo is set.
-# photo: ./tomasz-wierzba.avif
-# photoAlt: 
+photo: ./tomasz-wierzba.avif
+photoAlt: An illustrated portrait of a person with dark curly hair and round glasses, in a dark open-collared shirt, looking away to the right, drawn in gold and near-black on cream with a vertical gold band behind them
 ---
 
 Tomasz Wierzba marks the assessments and maintains the bench. He pins the

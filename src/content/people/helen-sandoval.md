@@ -8,10 +8,8 @@ affiliation: School of Continuous Improvement
 role: convenor
 email: helen.sandoval@slop.university
 contact: Ed forum for anything the room would benefit from, email otherwise.
-# Portrait: drop the file in this directory as helen-sandoval.avif, then
-# uncomment both lines. photoAlt is required whenever photo is set.
-# photo: ./helen-sandoval.avif
-# photoAlt: 
+photo: ./helen-sandoval.avif
+photoAlt: An illustrated portrait of a person with short grey-blonde hair in a dark jacket, looking away to the right, drawn in gold and near-black on cream with a vertical gold band behind them
 ---
 
 Helen Sandoval convenes SLOP8412 and holds a continuing appointment in the
