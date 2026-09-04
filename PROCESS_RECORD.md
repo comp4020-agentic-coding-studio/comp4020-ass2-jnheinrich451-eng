@@ -1195,3 +1195,61 @@ What actually moved it was deleting the template paragraph from
 which made the gap visible instead of described. A defect you can see beats a
 defect you have been told about, and it took three weeks and an unrelated
 cleanup for this one to become the former.
+
+## 2026-09-05 03:18 — Seventeen slides, and a guard that matched everything
+
+**Prompt:**
+
+> I provide you with week-02-deck.md in build folder. I think this structure is
+> more detailed! Could you reconstruct it? And add one function, press esc key
+> can quit the slide
+
+**Result:**
+The deck rebuilt against a real specification rather than a chat outline, and
+the difference shows in what the spec forbids: no slide that only continues a
+formula, one coupling visual rather than two, the four-row reduction on a
+single board with fragments instead of four near-identical slides.
+
+The constraint that shaped the build was maths. The stack has no renderer, and
+this is a derivation deck where the notation is the argument. matplotlib's
+mathtext typesets a LaTeX subset with no external install, so 27 display
+equations are rendered to transparent SVG by a script, named, and cited by
+name from the slides. That is what makes the spec's notation convention hold:
+mu-P in the derivation and mu-r only after FID is now a property of a
+dictionary rather than of my proofreading, and `Eq.astro` throws on a name
+that has no rendered file.
+
+mathtext has no matrix environment. The block covariance is therefore built
+from a CSS grid with drawn brackets, and carries an aria-label, because a
+matrix assembled from spans is a picture as far as a screen reader is
+concerned.
+
+**Verified:**
+Escape tested by dispatching a real key event through CDP and reading
+`location.pathname` afterwards, not by inspecting the handler. All seventeen
+slides measured against the 1280x720 canvas: every one fits. Build clean at 27
+pages, no accessibility violations, deck structurally clean, suite 13 of 13.
+
+**Commit:** [`f968d07`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/f968d07)
+
+**What happened:**
+The Escape handler failed on its first test, and the reason is worth keeping.
+I had written a guard so that Escape would close Reveal's overview before it
+closed the deck, and implemented it as a query for `.reveal .overlay,
+.reveal .pause-overlay`. Reveal renders a `.pause-overlay` element into every
+deck whether or not anything is paused, so the guard matched on every press
+and the handler returned before doing anything. The test reported the overview
+opening, which is exactly what a handler that never runs looks like.
+
+The fix was to test the state rather than the element: Reveal records overview
+and paused as classes on `.reveal` itself. The general shape is one I have hit
+twice before in this repo, in the spec tests that passed vacuously: I wrote a
+condition against where I assumed the information lived, and it was somewhere
+else. What caught it this time was that I dispatched a real keypress and
+checked the resulting URL, rather than reading the code back and believing it.
+
+The equations also shipped once in the wrong colour. They were rendered in the
+mid ink the other figures use, which is chosen to survive both the site's
+cream and the deck's black; on a near-black slide at display size that reads
+as grey on grey. Deck-only assets get the deck's off-white. Only visible by
+looking at a rendered slide.
