@@ -1,0 +1,144 @@
+---
+/**
+ * The twelve teaching weeks, read from the sessions collection.
+ *
+ * Nothing here is written twice: week, date, title and description all come
+ * from the session entries, so a retitled week or a moved date changes this
+ * list by changing the page it points at. The arc letters are a loose
+ * frontmatter key, mapped to the names the course uses for its three parts.
+ *
+ * Grouping walks the sessions in week order and starts a new group whenever
+ * the arc changes, rather than bucketing by letter, so an arc that were ever
+ * split across non-contiguous weeks would show as two groups instead of
+ * silently reordering the course.
+ */
+import { getPublishedCollection } from "astro-course-university/content";
+import { withBase } from "astro-theme-university/url";
+import { formatCourseDate } from "../lib/dates";
+
+const ARC_NAMES: Record<string, string> = {
+  A: "Compute it",
+  B: "Break it",
+  C: "Live with it",
+};
+
+const sessions = (await getPublishedCollection("sessions")).sort(
+  (a, b) => a.data.week - b.data.week,
+);
+
+const arcOf = (data: unknown): string => {
+  const arc = (data as { arc?: unknown }).arc;
+  return typeof arc === "string" ? arc : "";
+};
+
+type Group = { arc: string; name: string; items: typeof sessions };
+const groups: Group[] = [];
+for (const session of sessions) {
+  const arc = arcOf(session.data);
+  const open = groups.at(-1);
+  if (open && open.arc === arc) open.items.push(session);
+  else groups.push({ arc, name: ARC_NAMES[arc] ?? arc, items: [session] });
+}
+---
+
+<section class="weeks" aria-labelledby="twelve-weeks">
+  <h2 id="twelve-weeks">Twelve weeks</h2>
+
+  {
+    groups.map((group) => (
+      <div class="weeks__arc">
+        <p class="weeks__arc-name">
+          {group.arc && <span class="weeks__arc-letter">Arc {group.arc}</span>}
+          {group.name}
+        </p>
+        <ol class="weeks__list">
+          {group.items.map((session) => (
+            <li class="weeks__item">
+              <p class="weeks__meta">
+                <span>Week {String(session.data.week).padStart(2, "0")}</span>
+                <span>{formatCourseDate(session.data.date)}</span>
+              </p>
+              <h3 class="weeks__title">
+                <a href={withBase(`/sessions/${session.id}/`)}>{session.data.title}</a>
+              </h3>
+              <p class="weeks__desc">{session.data.description}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .weeks__arc + .weeks__arc {
+    margin-block-start: var(--at-spacing-xl);
+  }
+
+  /* Same register as the metadata strip above a session's title. */
+  .weeks__arc-name,
+  .weeks__meta {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .weeks__arc-name {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--at-spacing-sm);
+    align-items: baseline;
+    margin-block: 0 var(--at-spacing-md);
+    padding-block-end: var(--at-spacing-sm);
+    border-block-end: 1px solid var(--at-primary);
+    font-size: var(--at-font-size-sm);
+    color: var(--at-primary);
+  }
+
+  .weeks__arc-letter::after {
+    content: " ·";
+  }
+
+  .weeks__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .weeks__item + .weeks__item {
+    margin-block-start: var(--at-spacing-lg);
+  }
+
+  .weeks__meta {
+    display: flex;
+    gap: var(--at-spacing-sm);
+    /* The week and the date are one unit and never break apart, which is what
+       keeps a narrow viewport from pushing the date onto a line of its own. */
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    margin-block: 0 0.15em;
+    font-size: var(--at-font-size-xs);
+    color: var(--at-text-muted, var(--at-tertiary));
+  }
+
+  .weeks__meta > span + span::before {
+    content: "· ";
+  }
+
+  .weeks__title {
+    margin-block: 0 0.25em;
+    font-size: var(--at-font-size-h4);
+  }
+
+  .weeks__desc {
+    margin-block: 0;
+  }
+
+  @media (max-width: 640px) {
+    .weeks__meta {
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+    }
+  }
+</style>

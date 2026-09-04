@@ -2,6 +2,8 @@
 import Card from "astro-theme-university/components/Card.astro";
 import CardGrid from "astro-theme-university/components/CardGrid.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import TwelveWeeks from "../components/TwelveWeeks.astro";
+import benchFigure from "../assets/figures/fid-vs-invN.svg";
 import heroImage from "../assets/images/hero-home.avif";
 import { courseMeta } from "../course-config";
 import { sessionLabels, siteConfig } from "../site-config";
@@ -41,6 +43,41 @@ import { sessionLabels, siteConfig } from "../site-config";
     never trains one. Not for anyone who needs the number to be fine.
   </p>
 
+  <TwelveWeeks />
+
+  <h2>The bench</h2>
+  <p>
+    One reference set and three candidates, in the 2048 dimensions a feature
+    extractor would have produced, chosen so that every score on them has a
+    closed form and can be checked by hand.
+  </p>
+  <dl class="bench">
+    <dt>R</dt>
+    <dd>N(0, I). The reference set.</dd>
+    <dt>A</dt>
+    <dd>N(0.05&middot;1, I). Mean shifted, covariance untouched. FID 5.12.</dd>
+    <dt>B</dt>
+    <dd>N(0, 1.1&middot;I). Mean exact, covariance too wide. FID 4.88.</dd>
+    <dt>C</dt>
+    <dd>
+      A bimodal mixture with R&rsquo;s mean and R&rsquo;s covariance. FID 0,
+      and visibly wrong.
+    </dd>
+  </dl>
+  <figure class="bench-figure">
+    <img
+      src={benchFigure.src}
+      width={benchFigure.width}
+      height={benchFigure.height}
+      alt="Estimated FID for candidates A and B plotted against one over N. Every estimate sits far above its true value, and B is measured as further from R than A at every sample size, which reverses the true ordering."
+      loading="lazy"
+      decoding="async"
+    />
+    <figcaption>
+      B is closer to R than A is, and no sample size in this sweep says so.
+    </figcaption>
+  </figure>
+
   <h2>Where to go next</h2>
   <CardGrid columns={2}>
     <Card title={sessionLabels.plural} href="/sessions/">
@@ -56,6 +93,40 @@ import { sessionLabels, siteConfig } from "../site-config";
 </ContentLayout>
 
 <style>
+  /* The bench: the name in the deck's mono so R, A, B and C read as labels
+     rather than as sentences beginning with a capital. */
+  .bench {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: var(--at-spacing-sm) var(--at-spacing-md);
+    margin-block: var(--at-spacing-lg);
+  }
+
+  .bench dt {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--at-primary);
+  }
+
+  .bench dd {
+    margin: 0;
+  }
+
+  .bench-figure {
+    margin-inline: 0;
+  }
+
+  .bench-figure img {
+    width: 100%;
+    height: auto;
+  }
+
+  .bench-figure figcaption {
+    margin-block-start: var(--at-spacing-sm);
+    font-size: var(--at-font-size-sm);
+  }
+
   .course-tags {
     display: flex;
     flex-wrap: wrap;
