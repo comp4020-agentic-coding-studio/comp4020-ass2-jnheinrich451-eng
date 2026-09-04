@@ -8,7 +8,6 @@ date: 2026-08-10
 arc: A
 required_reading: heusel-2017
 further_reading: [binkowski-2018]
-slides: /decks/week-02/
 spec:
   - you can derive the closed form from the definition without notes
   - you can say which step requires the Gaussian assumption and what

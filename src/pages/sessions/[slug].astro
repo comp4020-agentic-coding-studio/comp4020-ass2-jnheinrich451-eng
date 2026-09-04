@@ -4,7 +4,6 @@ import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
 import SpecList from "astro-course-university/components/SpecList.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
-import { withBase } from "astro-theme-university/url";
 import EntryMeta from "../../components/EntryMeta.astro";
 import Readings from "../../components/Readings.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
@@ -23,22 +22,6 @@ const { Content } = await render(session);
 // generated types and are read from an untyped view of the same data.
 const loose = session.data as Record<string, unknown>;
 const arc = typeof loose.arc === "string" ? loose.arc : undefined;
-
-// This course teaches in sessions rather than lectures, so a deck hangs off
-// the session it belongs to. `slides` is a loose key here — the sessions
-// schema doesn't declare it, and so doesn't enforce the `/decks/<slug>/`
-// shape the lectures schema does — so the path is checked before it is
-// rendered as a link.
-const rawSlides = loose.slides;
-const slides =
-  typeof rawSlides === "string" && /^\/decks\/[a-z0-9-]+\/$/.test(rawSlides)
-    ? rawSlides
-    : undefined;
-if (rawSlides !== undefined && slides === undefined) {
-  throw new Error(
-    `${session.id}: slides must look like "/decks/<slug>/", got ${JSON.stringify(rawSlides)}`,
-  );
-}
 ---
 
 <ContentLayout
@@ -47,9 +30,6 @@ if (rawSlides !== undefined && slides === undefined) {
   {...siteConfig}
 >
   <EntryMeta week={session.data.week} date={session.data.date} arc={arc} />
-  {slides && (
-    <p class="session-slides"><a href={withBase(slides)}>Open the slides</a></p>
-  )}
   <Content />
   <Readings required={loose.required_reading} further={loose.further_reading} />
   <SpecList spec={session.data.spec}>
