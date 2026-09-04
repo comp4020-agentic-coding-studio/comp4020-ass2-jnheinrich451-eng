@@ -817,3 +817,49 @@ the moment a rule is copied into a brief instead of linked, which can happen
 at any point and is invisible in a diff of one file. That is the gap I named
 two turns ago, and it is now closed for three rules. It is not closed for
 anything else two pages both assert.
+
+## 2026-09-04 23:07 — A2, and the check earning its keep the turn after it was written
+
+**Prompt:**
+
+> And next the A2: [full brief, including "Grace period: 12 hours. Late
+> submissions are not accepted" and "must be disclosed, with prompts"]
+
+**Result:**
+428 words, in A1's shape. The interesting part was not the writing.
+
+The brief as pasted restated the three rules that were made canonical on the
+policies page one turn earlier, which is exactly the drift the agreement test
+was written to stop. Copying the paste faithfully would have reintroduced the
+contradiction we had just spent a turn removing, and the test would have gone
+red on a body that looked correct in isolation. Both sentences became links to
+/policies/ instead.
+
+That is the check doing the thing threshold counts cannot: catching a
+regression that arrives from outside, in a single file, one turn after the
+decision it violates. The test was green before this turn and would have been
+red during it.
+
+Part B carries CONTENT.md's reason for preferring quantity breaks over
+estimator breaks, which the pasted brief did not include: a broken estimator
+can be repaired by measuring more, and a broken quantity cannot be repaired at
+all.
+
+**Verified:**
+Frontmatter compared block-for-block against HEAD, identical. Zero em dashes.
+The three forbidden phrases checked for individually and absent, two policies
+links present. Both the three parts and the three marking criteria confirmed
+in the built HTML. Suite 12 of 12, build clean.
+
+**Commit:** [`c30c7ac`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c30c7ac)
+
+**What happened:**
+Nothing was flagged, but a wording inconsistency in the frontmatter is worth
+recording before it hardens. A2's second marking criterion reads "the
+mechanism, stated in terms of the estimator or the instrument". Week 6,
+CONTENT.md and the brief itself all say the estimator or the **quantity**, and
+the instrument is week 3's term for the network. A student reading the
+criteria table beside Part B is told to pick between two different pairs of
+things. Frontmatter was out of scope for this turn, so it is reported rather
+than fixed, but it is the same class of defect the agreement test now catches
+for rules and does not catch for vocabulary.
