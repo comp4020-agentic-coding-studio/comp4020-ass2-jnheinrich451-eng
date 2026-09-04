@@ -956,3 +956,49 @@ Worth noting the verification caught nothing wrong this time and still earned
 its place: the middle marking criterion did not match my grep of the built
 page, which looked like a rendering failure and was an apostrophe encoded as
 `&#39;`. Two turns ago I would have reported that as a defect.
+
+## 2026-09-04 23:28 — The measurement log, and the last brief
+
+**Prompt:**
+
+> short measurement log: [three conditions, completeness half the mark, the
+> other half for discrepancies written down rather than tidied] ... This one is
+> easier
+
+**Result:**
+189 words. It was easier, and the temptation was to pad it up to the length of
+the other three. A brief whose content is three conditions and one standard
+should be three conditions and one standard, and giving it Parts and an
+in-person section to match its neighbours would have been shape borrowed
+rather than earned.
+
+One addition to the brief as given: a correction belongs in the week you found
+it rather than the week you were wrong, because a log rewritten to be right
+stops being a record of what you knew when. The brief implies that in asking
+for discrepancies untidied, but a student can honour "write down the
+discrepancy" and still go back and fix the earlier entry once the cause is
+known, which destroys the thing the mark is for.
+
+**Verified:**
+Frontmatter identical to HEAD, zero em dashes, one policies link, none of the
+three forbidden phrases. Both marking criteria confirmed in the built HTML.
+pnpm check 13 of 13, build clean at 24 pages.
+
+**Commit:** [`fdb7244`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/fdb7244)
+
+**What happened:**
+Nothing was flagged. A third spec-line discrepancy though, and they are now a
+pattern rather than three incidents. This one asks that every number carry its
+N and its implementation; the brief above it and the policies page both ask
+for three things, the reference set included.
+
+That is the same shape as the final report listing three of Part B's four
+criteria, and as A2's marking criterion naming the wrong pair of layers. In
+each case the frontmatter was written before the prose it now sits under, and
+the prose moved. The `spec:` block renders under the brief as the fixed
+contract a marker checks, so where the two disagree, the more binding-looking
+text is the stale one.
+
+All four assessment briefs and all twelve sessions now exist. The checks that
+would catch this class of drift do not exist: the agreement test covers three
+named rules, and nothing compares a spec line against the brief it sits under.
