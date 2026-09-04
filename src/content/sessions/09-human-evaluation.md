@@ -6,6 +6,7 @@ description:
 week: 9
 date: 2026-10-05
 arc: C
+required_reading: stein-2023
 spec:
   - you have designed a rating protocol for the bench and costed it in
     hours and dollars

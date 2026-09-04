@@ -6,6 +6,8 @@ description:
 week: 3
 date: 2026-08-17
 arc: A
+required_reading: kynkaanniemi-2023
+further_reading: [binkowski-2018]
 spec:
   - you can say which layer the features come from and how many dimensions
     it has

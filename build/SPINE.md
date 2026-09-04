@@ -11,18 +11,22 @@ Conventions
 - Reading keys below are the three already verified. Anything else is in the
   "to verify" table and must not enter `src/` until it has a `verified:` date.
 
-## Readings to verify (do not add to readings.ts until opened)
+## Reading keys on every session
 
-| Proposed key | Paper | Feeds |
+| Session | required_reading | further_reading |
 |---|---|---|
-| `dowson-landau-1982` | Dowson & Landau, *The Fréchet distance between multivariate normal distributions*, J. Multivariate Analysis | wk 2 |
-| `parmar-2022` | Parmar, Zhang & Zhu, *On Aliased Resizing and Surprising Subtleties in GAN Evaluation*, CVPR 2022 | wk 4 |
-| `kynkaanniemi-2019` | Kynkäänniemi et al., *Improved Precision and Recall Metric for Assessing Generative Models*, NeurIPS 2019 | wk 7 |
-| `naeem-2020` | Naeem et al., *Reliable Fidelity and Diversity Metrics for Generative Models*, ICML 2020 | wk 7 |
-| `unterthiner-2019` | Unterthiner et al., *Towards Accurate Generative Models of Video*, ICLR workshop 2019 | wk 8 |
-| `stein-2023` | Stein et al., *Exposing Flaws of Generative Model Evaluation Metrics and Their Unfair Treatment of Diffusion Models*, NeurIPS 2023 | wk 9, 10 |
-| `kynkaanniemi-2023` | Kynkäänniemi et al., *The Role of ImageNet Classes in Fréchet Inception Distance*, ICLR 2023 | wk 3, 11 |
-| `jayasumana-2024` | Jayasumana et al., *Rethinking FID: Towards a Better Evaluation Metric for Image Generation*, CVPR 2024 | wk 12 |
+| 01-the-number | heusel-2017 | |
+| 02-frechet-distance | heusel-2017 | binkowski-2018 |
+| 03-the-instrument | kynkaanniemi-2023 | binkowski-2018 |
+| 04-getting-it-right | parmar-2022 | |
+| 05-the-bias | chong-forsyth-2020 | binkowski-2018, heusel-2017 |
+| 06-blind-spots | | binkowski-2018 |
+| 07-dropping-the-gaussian | binkowski-2018 | kynkaanniemi-2019, naeem-2020 |
+| 08-video | unterthiner-2019 | chong-forsyth-2020 |
+| 09-human-evaluation | stein-2023 | |
+| 10-correlation | stein-2023 | kynkaanniemi-2023 |
+| 11-why-it-persists | kynkaanniemi-2023 | heusel-2017 |
+| 12-what-you-would-report-instead | jayasumana-2024 | stein-2023, chong-forsyth-2020 |
 
 ---
 
@@ -81,6 +85,8 @@ description:
 week: 3
 date: 2026-08-17
 arc: A
+required_reading: kynkaanniemi-2023
+further_reading: [binkowski-2018]
 spec:
   - you can say which layer the features come from and how many dimensions
     it has
@@ -97,11 +103,13 @@ related:
 ```yaml
 title: Getting it right
 description:
-  One reference set, four public implementations, four different numbers.
-  Resizing, pixel ranges and the matrix square root, each in turn.
+  The same reference set through different public implementations, and
+  the different numbers that come back. Resizing, pixel ranges and the
+  matrix square root, each in turn.
 week: 4
 date: 2026-08-24
 arc: A
+required_reading: parmar-2022
 spec:
   - you can produce two scores for the same images that differ only in the
     resize filter, and say which is right
@@ -153,6 +161,7 @@ week: 7
 date: 2026-09-21
 arc: B
 required_reading: binkowski-2018
+further_reading: [kynkaanniemi-2019, naeem-2020]
 spec:
   - you can say what precision and recall each report that a single scalar
     cannot
@@ -174,6 +183,8 @@ description:
 week: 8
 date: 2026-09-28
 arc: B
+required_reading: unterthiner-2019
+further_reading: [chong-forsyth-2020]
 spec:
   - you can say exactly what changed between FID and FVD and what did not
   - you can name one temporal failure that leaves the score unchanged, and
@@ -193,6 +204,7 @@ description:
 week: 9
 date: 2026-10-05
 arc: C
+required_reading: stein-2023
 spec:
   - you have designed a rating protocol for the bench and costed it in
     hours and dollars
@@ -214,6 +226,8 @@ description:
 week: 10
 date: 2026-10-12
 arc: C
+required_reading: stein-2023
+further_reading: [kynkaanniemi-2023]
 spec:
   - you can cite a study where the score and human raters disagreed on a
     ranking, and say what changed the result
@@ -233,6 +247,8 @@ description:
 week: 11
 date: 2026-10-19
 arc: C
+required_reading: kynkaanniemi-2023
+further_reading: [heusel-2017]
 spec:
   - you can make the strongest case for continuing to report the score,
     and mean it
@@ -253,6 +269,8 @@ description:
 week: 12
 date: 2026-10-26
 arc: C
+required_reading: jayasumana-2024
+further_reading: [stein-2023, chong-forsyth-2020]
 spec:
   - your replacement has been scored on the bench N-honestly against both
     FID and FID∞

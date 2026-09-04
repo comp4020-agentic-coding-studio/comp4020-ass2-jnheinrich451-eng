@@ -6,6 +6,8 @@ description:
 week: 12
 date: 2026-10-26
 arc: C
+required_reading: jayasumana-2024
+further_reading: [stein-2023, chong-forsyth-2020]
 spec:
   - your replacement has been scored on the bench N-honestly against both
     FID and FID∞

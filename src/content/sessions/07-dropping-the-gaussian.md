@@ -7,6 +7,7 @@ week: 7
 date: 2026-09-21
 arc: B
 required_reading: binkowski-2018
+further_reading: [kynkaanniemi-2019, naeem-2020]
 spec:
   - you can say what precision and recall each report that a single scalar
     cannot

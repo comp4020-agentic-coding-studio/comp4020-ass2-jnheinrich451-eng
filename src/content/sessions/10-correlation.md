@@ -6,6 +6,8 @@ description:
 week: 10
 date: 2026-10-12
 arc: C
+required_reading: stein-2023
+further_reading: [kynkaanniemi-2023]
 spec:
   - you can cite a study where the score and human raters disagreed on a
     ranking, and say what changed the result

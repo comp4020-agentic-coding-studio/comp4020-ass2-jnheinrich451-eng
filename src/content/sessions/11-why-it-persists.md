@@ -6,6 +6,8 @@ description:
 week: 11
 date: 2026-10-19
 arc: C
+required_reading: kynkaanniemi-2023
+further_reading: [heusel-2017]
 spec:
   - you can make the strongest case for continuing to report the score,
     and mean it
