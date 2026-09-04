@@ -1,4 +1,4 @@
-# Crit 6 — the Assignment 2 retro
+# Crit 6, the Assignment 2 retro
 
 The rules say assignment repos carry no reflection, and the retro presents
 from `PROCESS.md`. I know that; this entry is voluntary. I answered the two
