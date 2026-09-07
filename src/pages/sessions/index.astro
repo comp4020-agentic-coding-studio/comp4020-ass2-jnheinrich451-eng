@@ -1,6 +1,6 @@
 ---
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
-import SessionsGrid from "../../components/SessionsGrid.astro";
+import SessionJourney from "../../components/SessionJourney.astro";
 import { sessionLabels, siteConfig } from "../../site-config";
 ---
 
@@ -9,5 +9,5 @@ import { sessionLabels, siteConfig } from "../../site-config";
   description={`The twelve-week teaching schedule: what happens in each ${sessionLabels.singular.toLowerCase()}, what to prepare, and what leaves the room.`}
   {...siteConfig}
 >
-  <SessionsGrid />
+  <SessionJourney />
 </ContentLayout>

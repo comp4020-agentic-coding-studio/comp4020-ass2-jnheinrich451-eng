@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 570" role="img" aria-labelledby="hero-bench-title hero-bench-desc">
+<title id="hero-bench-title">Reference and candidate Gaussian contours</title>
+<desc id="hero-bench-desc">Separate panels on the same scale. R is centred at zero. A shifts 2.263 units along the all-ones direction. B stays centred and has standard deviation 1.049. Contours run from 0.5 to 3 standard deviations.</desc>
+<g data-distribution="R">
+    <path class="axes" d="M280 145h240 M400 30v230"/>
+    <circle class="origin" cx="400" cy="145" r="3"/>
+    <circle class="contour" cx="400" cy="145" r="15.5"/>
+<circle class="contour" cx="400" cy="145" r="31"/>
+<circle class="contour" cx="400" cy="145" r="46.5"/>
+<circle class="contour" cx="400" cy="145" r="62"/>
+<circle class="contour" cx="400" cy="145" r="77.5"/>
+<circle class="contour" cx="400" cy="145" r="93"/>
+    <circle class="mean-halo" cx="400" cy="145" r="12"/>
+    <circle class="mean" cx="400" cy="145" r="4"/>
+    <text x="290" y="40" class="label">R</text>
+    <text x="400" y="278" class="condition">REFERENCE</text>
+  </g>
+<g data-distribution="A">
+    <path class="axes" d="M80 410h240 M200 295v230"/>
+    <circle class="origin" cx="200" cy="410" r="3"/>
+    <circle class="contour" cx="270.14499269370555" cy="410" r="15.5"/>
+<circle class="contour" cx="270.14499269370555" cy="410" r="31"/>
+<circle class="contour" cx="270.14499269370555" cy="410" r="46.5"/>
+<circle class="contour" cx="270.14499269370555" cy="410" r="62"/>
+<circle class="contour" cx="270.14499269370555" cy="410" r="77.5"/>
+<circle class="contour" cx="270.14499269370555" cy="410" r="93"/>
+    <circle class="mean-halo" cx="270.14499269370555" cy="410" r="12"/>
+    <circle class="mean" cx="270.14499269370555" cy="410" r="4"/>
+    <text x="90" y="305" class="label">A</text>
+    <text x="200" y="543" class="condition">MEAN SHIFT</text>
+  </g>
+<g data-distribution="B">
+    <path class="axes" d="M480 410h240 M600 295v230"/>
+    <circle class="origin" cx="600" cy="410" r="3"/>
+    <circle class="contour" cx="600" cy="410" r="16.25653714663735"/>
+<circle class="contour" cx="600" cy="410" r="32.5130742932747"/>
+<circle class="contour" cx="600" cy="410" r="48.76961143991205"/>
+<circle class="contour" cx="600" cy="410" r="65.0261485865494"/>
+<circle class="contour" cx="600" cy="410" r="81.28268573318675"/>
+<circle class="contour" cx="600" cy="410" r="97.5392228798241"/>
+    <circle class="mean-halo" cx="600" cy="410" r="12"/>
+    <circle class="mean" cx="600" cy="410" r="4"/>
+    <text x="490" y="305" class="label">B</text>
+    <text x="600" y="543" class="condition">WIDER SPREAD</text>
+  </g>
+</svg>

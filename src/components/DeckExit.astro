@@ -30,6 +30,9 @@ const href = `${import.meta.env.BASE_URL.replace(/\/$/, "")}${back}`;
 </a>
 
 <script is:inline define:vars={{ href }}>
+  // Keep the return link outside Reveal's transformed slide canvas.
+  const exitLink = document.querySelector('[data-deck-exit]');
+  if (exitLink) document.body.append(exitLink);
   document.addEventListener(
     "keydown",
     (event) => {
@@ -69,9 +72,9 @@ const href = `${import.meta.env.BASE_URL.replace(/\/$/, "")}${back}`;
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
-    padding: 0.35em 0.7em;
-    border: 1px solid currentcolor;
-    border-radius: 999px;
+    padding: 0.35em 0;
+    border: 0;
+    border-radius: 0;
     font-family: var(--at-font-mono, ui-monospace, monospace);
     font-size: 0.75rem;
     letter-spacing: 0.08em;
@@ -88,8 +91,8 @@ const href = `${import.meta.env.BASE_URL.replace(/\/$/, "")}${back}`;
 
   .deck-exit kbd {
     padding: 0.05em 0.4em;
-    border: 1px solid currentcolor;
-    border-radius: 3px;
+    border: 0;
+    border-radius: 0;
     font: inherit;
     opacity: 0.8;
   }

@@ -36,12 +36,14 @@ Where FID gets its mathematics, before we ask whether it deserves our trust.
     <Eq name="fid-location" alt="Squared norm of mu-r minus mu-g." />
   </div>
   <div>
-    <p class="label">Shape</p>
+    <p class="label">Covariance</p>
     <Eq name="fid-shape" alt="Trace of sigma-r plus sigma-g minus twice the matrix square root term." />
   </div>
 </div>
 
 By the end of this lecture every symbol here should have a reason to be here.
+
+<p class="small">Covariance describes spread and correlation, not arbitrary distribution shape.</p>
 
 ```notes
 - give them the destination before the derivation; nobody follows a derivation
@@ -304,6 +306,8 @@ measurement decision.**
 In the original experiments the score rose monotonically as each of these
 disturbances grew stronger.
 
+<p class="label">Schematic trends, not measured values · original experiment identified in speaker notes</p>
+
 ```notes
 - source: Heusel et al. 2017, Figure 3 and the discussion around it
 - the curves here are redrawn schematics, not their measured values; say so if
@@ -339,8 +343,8 @@ Reference R, candidates A and B, scored by the closed form rather than by
 sampling.
 
 <div class="split">
-  <div><Eq name="bench-a" alt="W-2 squared of R and A equals 5.12." /></div>
-  <div><Eq name="bench-b" alt="W-2 squared of R and B is approximately 4.88." /></div>
+  <div class="bench-case"><p class="label">A / mean shift</p><Eq name="bench-a" alt="W-2 squared of R and A equals 5.12." /><p class="small">2,048 × 0.05²</p></div>
+  <div class="bench-case"><p class="label">B / wider spread</p><Eq name="bench-b" alt="W-2 squared of R and B is approximately 4.88." /><p class="small">2,048 × (√1.1 − 1)²</p></div>
 </div>
 
 **B wins.** We will spend the rest of the course asking whether that ranking

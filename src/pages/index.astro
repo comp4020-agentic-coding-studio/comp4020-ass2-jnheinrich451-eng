@@ -1,25 +1,92 @@
 ---
+import HeroBenchmark from "../components/HeroBenchmark.astro";
+import ZeroScore from "../components/ZeroScore.astro";
 import Card from "astro-theme-university/components/Card.astro";
 import CardGrid from "astro-theme-university/components/CardGrid.astro";
-import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import BaseLayout from "astro-theme-university/layouts/BaseLayout.astro";
 import TwelveWeeks from "../components/TwelveWeeks.astro";
 import benchFigure from "../assets/figures/fid-vs-invN.svg";
-import heroImage from "../assets/images/hero-home.avif";
 import { courseMeta } from "../course-config";
 import { sessionLabels, siteConfig } from "../site-config";
 
+const titleWords = courseMeta.title.split(" ");
 ---
 
-<ContentLayout
+<BaseLayout
   title={`${courseMeta.code}: ${courseMeta.title}`}
   description={courseMeta.description}
-  heroImage={heroImage}
-  heroImageAlt="Three gold circles on a black ground, so nearly the same size that they overlap, with the bench's two true distances beside them: 5.12 and 4.88"
   {...siteConfig}
 >
+  <section class="audit-hero" slot="hero" aria-labelledby="course-title">
+    <div class="audit-hero__inner">
+      <div class="audit-hero__copy">
+        <p class="audit-hero__eyebrow">
+          <span>{courseMeta.code}</span>
+          <span>{courseMeta.session} / {courseMeta.year}</span>
+          <span>Postgraduate</span>
+        </p>
+        <h1 id="course-title">{titleWords.map((word) => <span>{word}</span>)}</h1>
+        <p class="audit-hero__claim">
+          FID governs what counts as progress in generative modelling. It is
+          biased, sample-size dependent, and routinely compared across
+          incompatible conditions.
+        </p>
+        <a class="audit-hero__action" href="#benchmark">Inspect the benchmark <span aria-hidden="true">&darr;</span></a>
+      </div>
+
+      <figure class="audit-hero__visual">
+        <HeroBenchmark />
+        <div class="audit-hero__ranking">
+          <span>Closed-form ranking</span>
+          <strong><b data-score="B">B&nbsp; 4.88</b> <i>&lt;</i> <b data-score="A">A&nbsp; 5.12</b></strong>
+        </div>
+        <figcaption>Reference conditions / d = 2048 / lower is better</figcaption>
+      </figure>
+    </div>
+  </section>
+
   <ul class="course-tags" aria-label="Course tags">
     {courseMeta.tags.map((tag) => <li>{tag}</li>)}
   </ul>
+
+  <section class="audit-panel" id="benchmark" aria-labelledby="benchmark-title">
+    <header class="audit-panel__header">
+      <p>Benchmark 00 / closed-form truth</p>
+      <p class="audit-panel__status"><span aria-hidden="true"></span> Instrument online</p>
+    </header>
+    <div class="audit-panel__intro">
+      <h2 id="benchmark-title">A perfect score can miss the shape.</h2>
+      <p>
+        The candidates do not change. The instrument does. Every week asks
+        what the same four distributions let the score see, hide, or reverse.
+      </p>
+    </div>
+    <dl class="audit-panel__readout">
+      <div>
+        <dt><span>R</span> Reference</dt>
+        <dd><strong>0.00</strong><small>baseline</small></dd>
+      </div>
+      <div>
+        <dt><span>A</span> Location shift</dt>
+        <dd><strong>5.12</strong><small>true FID</small></dd>
+      </div>
+      <div>
+        <dt><span>B</span> Spread shift</dt>
+        <dd><strong>4.88</strong><small>true FID</small></dd>
+      </div>
+      <div class="audit-panel__fault">
+        <dt><span>C</span> Shape failure</dt>
+        <dd><strong>0.00</strong><small>visibly wrong</small></dd>
+      </div>
+    </dl>
+    <ZeroScore />
+    <p class="audit-panel__verdict">
+      <span>Open defect</span>
+      A lower number does not guarantee a better distribution.
+    </p>
+  </section>
+
+  <TwelveWeeks />
 
   <h2>What you will do</h2>
   <p>
@@ -42,8 +109,6 @@ import { sessionLabels, siteConfig } from "../site-config";
     Not for anyone who wants to learn to build generative models; this course
     never trains one. Not for anyone who needs the number to be fine.
   </p>
-
-  <TwelveWeeks />
 
   <h2>The bench</h2>
   <p>
@@ -90,9 +155,427 @@ import { sessionLabels, siteConfig } from "../site-config";
       <p>Who teaches the course and how to reach them.</p>
     </Card>
   </CardGrid>
-</ContentLayout>
+</BaseLayout>
+
+<script>
+  let cleanupTitle: (() => void) | undefined;
+  const initialiseTitle = () => {
+  cleanupTitle?.();
+  const title = document.querySelector<HTMLElement>(".audit-hero h1");
+  const desktop = window.matchMedia("(min-width: 901px)");
+
+  const fitTitleLines = () => {
+    if (!title) return;
+
+    const chamber = title.parentElement;
+    if (!chamber) return;
+    const chamberStyle = getComputedStyle(chamber);
+    const availableWidth =
+      chamber.clientWidth -
+      parseFloat(chamberStyle.paddingLeft);
+    const lines = [...title.querySelectorAll("span")];
+    for (const line of lines) {
+      line.style.transform = "none";
+    }
+    if (desktop.matches) {
+      const widestLine = Math.max(
+        ...lines.map((line) => line.getBoundingClientRect().width),
+      );
+      const sharedScale = (availableWidth * 0.85) / widestLine;
+      for (const line of lines) {
+        line.style.transform = `translateX(-0.04em) scaleX(${sharedScale})`;
+      }
+    }
+  };
+
+  if (title) {
+    let disposed = false;
+    const observer = new ResizeObserver(fitTitleLines);
+    observer.observe(title);
+    void document.fonts.ready.then(() => { if (!disposed) fitTitleLines(); });
+    desktop.addEventListener("change", fitTitleLines);
+    cleanupTitle = () => {
+      disposed = true;
+      observer.disconnect();
+      desktop.removeEventListener("change", fitTitleLines);
+      cleanupTitle = undefined;
+    };
+    fitTitleLines();
+  }
+  };
+  document.addEventListener("astro:page-load", initialiseTitle);
+  document.addEventListener("astro:before-swap", () => cleanupTitle?.());
+  initialiseTitle();
+</script>
 
 <style>
+  .audit-hero {
+    grid-column: full;
+    color: #f3eee4;
+    background: #030305;
+    border-block: 1px solid rgb(185 125 28 / 35%);
+  }
+
+  .audit-hero__inner {
+    display: grid;
+    /* Meet the university theme's vertical content rule exactly. The course
+       title occupies the margin to its left; the instrument begins at it. */
+    grid-template-columns:
+      max(
+        calc(var(--at-gutter) + var(--at-sidebar-inset)),
+        calc((100vw - var(--at-content-inset) - var(--at-content-width)) / 2)
+      )
+      minmax(0, 1fr);
+    height: calc(100svh - var(--at-nav-height));
+    min-height: 42rem;
+  }
+
+  .audit-hero__copy {
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    container-type: inline-size;
+    min-width: 0;
+    padding: clamp(1.5rem, 3vh, 2.5rem) clamp(1.5rem, 1.75vw, 2rem);
+  }
+
+  .audit-hero__eyebrow,
+  .audit-hero__action,
+  .audit-hero__visual figcaption,
+  .audit-panel__header,
+  .audit-panel__readout,
+  .audit-panel__verdict span {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .audit-hero__eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    margin: 0;
+    color: #c68a2a;
+    font-size: 0.72rem;
+  }
+
+  .audit-hero__eyebrow span + span::before {
+    content: "/ ";
+    color: rgb(243 238 228 / 35%);
+  }
+
+  .audit-hero h1 {
+    width: 100%;
+    min-height: 0;
+    min-width: 0;
+    contain: inline-size;
+    align-self: stretch;
+    margin: clamp(0.75rem, 2vh, 1.25rem) 0;
+    color: #f3eee4;
+    font-size: clamp(3rem, 12vw, 4.25rem);
+    font-weight: 580;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+  }
+
+  .audit-hero h1 span {
+    display: block;
+  }
+
+  @media (min-width: 901px) {
+    .audit-hero h1 {
+      /* The title owns the complete middle row: metadata above, claim below. */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: clamp(5.95rem, 11.2vh, 8.9rem);
+    }
+
+    .audit-hero h1 span {
+      width: max-content;
+      white-space: nowrap;
+      /* One shared fit preserves the words' relative widths; only the longest
+         line terminates at the divider. */
+      transform: translateX(-0.04em) scaleX(0.75);
+      transform-origin: left center;
+    }
+  }
+
+  .audit-hero__claim {
+    max-width: 35rem;
+    margin-block: 0 clamp(1rem, 2.5vh, 1.75rem);
+    color: rgb(243 238 228 / 76%);
+    font-size: clamp(1rem, 1.4vw, 1.2rem);
+  }
+
+  .audit-hero__action {
+    align-self: flex-start;
+    justify-self: start;
+    padding-block: 0.7rem;
+    color: #c68a2a;
+    font-size: 0.75rem;
+    text-decoration: none;
+    border-block-end: 1px solid currentcolor;
+  }
+
+  .audit-hero__action:hover {
+    color: #e1aa50;
+  }
+
+  .audit-hero__visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    border-inline-start: 1px solid rgb(185 125 28 / 25%);
+  }
+
+  .audit-hero__visual { padding: 1.5rem 2rem 8rem; }
+  .audit-hero__ranking b { font-weight: inherit; }
+  .audit-hero__visual[data-active='A'] [data-score='A'],
+  .audit-hero__visual[data-active='B'] [data-score='B'] { color: #fff1ce; text-decoration: underline; text-underline-offset: .3em; }
+
+  .audit-hero__visual figcaption {
+    position: absolute;
+    z-index: 1;
+    inset-inline: 2rem;
+    inset-block-end: 1.5rem;
+    color: rgb(243 238 228 / 50%);
+    font-size: 0.67rem;
+  }
+
+  .audit-hero__ranking {
+    position: absolute;
+    z-index: 1;
+    inset-inline-end: clamp(1.5rem, 3vw, 3rem);
+    inset-block-end: clamp(1.5rem, 3vh, 2.5rem);
+    display: grid;
+    gap: 0.6rem;
+    min-width: min(15rem, calc(100% - 3rem));
+    padding: 0 0 0.75rem;
+    text-align: end;
+    color: #f3eee4;
+    border-block-end: 1px solid #c68a2a;
+  }
+
+  .audit-hero__ranking span,
+  .audit-hero__ranking strong {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .audit-hero__ranking span {
+    color: rgb(243 238 228 / 55%);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .audit-hero__ranking strong {
+    color: #c68a2a;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 500;
+  }
+
+  .audit-hero__ranking i {
+    padding-inline: 0.5rem;
+    color: rgb(243 238 228 / 45%);
+    font-style: normal;
+  }
+
+  .audit-panel {
+    margin-block: var(--at-spacing-xl) var(--at-spacing-2xl);
+    border: 1px solid var(--at-border);
+    background: var(--at-bg-alt);
+  }
+
+  .audit-panel__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    color: var(--at-text-muted);
+    font-size: var(--at-font-size-xs);
+    border-block-end: 1px solid var(--at-divider);
+  }
+
+  .audit-panel__header p {
+    margin: 0;
+  }
+
+  .audit-panel__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .audit-panel__status span {
+    width: 0.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--at-success);
+    box-shadow: 0 0 0 3px var(--at-success-soft);
+  }
+
+  .audit-panel__intro {
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
+
+  .audit-panel__intro h2 {
+    margin-block-start: 0;
+  }
+
+  .audit-panel__intro p {
+    max-width: 39rem;
+    margin-block-end: 0;
+  }
+
+  .audit-panel__readout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 0;
+    border-block: 1px solid var(--at-divider);
+  }
+
+  .audit-panel__readout > div {
+    min-width: 0;
+    padding: 1rem;
+  }
+
+  .audit-panel__readout > div + div {
+    border-inline-start: 1px solid var(--at-divider);
+  }
+
+  .audit-panel__readout dt,
+  .audit-panel__readout dd {
+    margin: 0;
+  }
+
+  .audit-panel__readout dt {
+    color: var(--at-text-muted);
+    font-size: 0.65rem;
+  }
+
+  .audit-panel__readout dt span {
+    display: block;
+    margin-block-end: 0.65rem;
+    color: var(--at-primary);
+    font-size: 1rem;
+  }
+
+  .audit-panel__readout dd {
+    display: flex;
+    flex-direction: column;
+    margin-block-start: 1.25rem;
+  }
+
+  .audit-panel__readout strong {
+    color: var(--at-heading);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 500;
+  }
+
+  .audit-panel__readout small {
+    color: var(--at-text-muted);
+    font-size: 0.62rem;
+  }
+
+  .audit-panel__fault {
+    background: var(--at-warning-soft);
+  }
+
+  .audit-panel__verdict {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  .audit-panel__verdict span {
+    color: var(--at-warning);
+    font-size: var(--at-font-size-xs);
+  }
+
+  @media (max-width: 900px) {
+    .audit-hero__inner {
+      height: auto;
+      grid-template-columns: 1fr;
+    }
+
+    .audit-hero__copy {
+      min-width: 0;
+      grid-template-rows: auto auto auto auto;
+      padding-inline: var(--at-gutter);
+    }
+
+    .audit-hero__visual {
+      min-height: 18rem;
+      aspect-ratio: auto;
+      border-block-start: 1px solid rgb(185 125 28 / 25%);
+      border-inline-start: 0;
+    }
+
+    .audit-panel__readout {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .audit-panel__readout > div:nth-child(3) {
+      border-inline-start: 0;
+    }
+
+    .audit-panel__readout > div:nth-child(n + 3) {
+      border-block-start: 1px solid var(--at-divider);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .audit-hero__inner {
+      min-height: auto;
+    }
+
+    .audit-hero__copy {
+      padding-block: 2.5rem;
+    }
+
+    .audit-hero__eyebrow span:last-child {
+      flex-basis: 100%;
+    }
+
+    .audit-hero__eyebrow span:last-child::before {
+      content: "";
+    }
+
+    .audit-hero__visual {
+      min-height: 0;
+      padding: 1.5rem .75rem;
+      gap: 1.5rem;
+      aspect-ratio: auto;
+    }
+    .audit-hero__visual figcaption {
+      position: static;
+      text-align: center;
+      font-size: .6rem;
+    }
+
+    .audit-hero__ranking {
+      position: static;
+      justify-self: end;
+      inset-inline-end: 1rem;
+      inset-block-end: 1rem;
+      min-width: min(15rem, calc(100% - 2rem));
+    }
+
+    .audit-panel__header,
+    .audit-panel__verdict {
+      align-items: flex-start;
+      grid-template-columns: 1fr;
+      flex-direction: column;
+    }
+  }
+
   /* The bench: the name in the deck's mono so R, A, B and C read as labels
      rather than as sentences beginning with a capital. */
   .bench {

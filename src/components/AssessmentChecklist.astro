@@ -1,0 +1,57 @@
+---
+interface Props { id: string; spec: string[]; }
+const { id, spec } = Astro.props;
+---
+<assessment-checklist data-assessment={id}>
+  <section aria-labelledby="assessment-spec">
+    <p class="eyebrow">Submission review</p>
+    <h2 id="assessment-spec">Spec</h2>
+    <p>The brief poses the problem and leaves room for a response. The spec is the fixed part: what a marker checks. Some lines can be checked mechanically; the rest call for judgement.</p>
+    <p class="help">Tick each requirement after reviewing your evidence. These ticks record your review, not a grade or confirmation that the requirement is met.</p>
+    <ul>{spec.map((item,index)=><li><label><input type="checkbox" value={item} aria-describedby="review-storage" /><span><small>{String(index+1).padStart(2,'0')}</small>{item}</span></label></li>)}</ul>
+    <div class="review-footer"><p role="status" aria-live="polite" data-review-count>0 / {spec.length} reviewed</p><button type="button" hidden>Clear review</button></div>
+    <p id="review-storage" class="help">Without JavaScript, ticks last until you leave this page.</p>
+  </section>
+</assessment-checklist>
+<script>
+  class AssessmentChecklist extends HTMLElement {
+    private cleanup?: () => void;
+    connectedCallback() {
+      const inputs = [...this.querySelectorAll<HTMLInputElement>('input')];
+      const reset = this.querySelector<HTMLButtonElement>('button')!;
+      const storage = this.querySelector<HTMLElement>('#review-storage')!;
+      const key = `slop8412:review:${this.dataset.assessment}`;
+      const update = () => { this.querySelector('[data-review-count]')!.textContent = `${inputs.filter(i=>i.checked).length} / ${inputs.length} reviewed`; };
+      try {
+        const saved: unknown = JSON.parse(sessionStorage.getItem(key) ?? '[]');
+        if(Array.isArray(saved)) inputs.forEach(input=>input.checked=saved.includes(input.value));
+        sessionStorage.setItem(key,JSON.stringify(inputs.filter(i=>i.checked).map(i=>i.value)));
+        storage.textContent = 'Saved in this browser tab only. Nothing is submitted or sent to teaching staff.';
+      } catch { storage.textContent = 'Storage is unavailable. Ticks last until you leave this page.'; }
+      const change = () => {
+        update();
+        try {sessionStorage.setItem(key,JSON.stringify(inputs.filter(i=>i.checked).map(i=>i.value)));}
+        catch {storage.textContent = 'Storage is unavailable. Ticks last until you leave this page.';}
+      };
+      const clear = () => {inputs.forEach(i=>i.checked=false);change();};
+      this.addEventListener('change',change);reset.addEventListener('click',clear);reset.hidden=false;update();
+      this.cleanup = () => {this.removeEventListener('change',change);reset.removeEventListener('click',clear);};
+    }
+    disconnectedCallback(){this.cleanup?.();}
+  }
+  if(!customElements.get('assessment-checklist'))customElements.define('assessment-checklist',AssessmentChecklist);
+</script>
+<style>
+  section {margin-block:3rem;border-top:1px solid var(--at-primary);padding-top:1.5rem;}
+  .eyebrow,small,[data-review-count] {font:.75rem var(--at-font-mono,monospace);color:var(--at-primary);}
+  .eyebrow {text-transform:uppercase;letter-spacing:.05em;}
+  .help {font-size:.85rem;color:var(--at-text-muted);line-height:1.6;}
+  ul {list-style:none;padding:0;}
+  li {border-bottom:1px solid var(--at-border);}
+  label {display:flex;gap:1rem;padding:1rem .25rem;cursor:pointer;line-height:1.6;}
+  input {flex-shrink:0;width:1.1rem;height:1.1rem;margin-top:.2rem;accent-color:var(--at-primary);}
+  small {display:block;margin-bottom:.3rem;}
+  .review-footer {display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+  button {font:inherit;color:var(--at-text);background:transparent;border:0;border-bottom:1px solid var(--at-primary);padding:.5rem;cursor:pointer;}
+  :is(input,button):focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+</style>

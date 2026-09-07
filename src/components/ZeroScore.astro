@@ -1,0 +1,70 @@
+---
+import plot from '../assets/figures/zero-score.svg?raw';
+import { withBase } from 'astro-theme-university/url';
+---
+<zero-score data-mode="shape">
+  <div class="zero-heading">
+    <p class="eyebrow">The candidate the score cannot distinguish</p>
+    <h2>FID 0.00.<br />Different distributions.</h2>
+    <p>R has one peak. C has two. Their mean and covariance agree exactly, so FID assigns zero distance to distributions with different shapes.</p>
+  </div>
+  <div class="experiment">
+    <div class="switch" role="group" aria-label="Compare shapes and Gaussian fits">
+      <button type="button" data-mode="shape" aria-pressed="true">Actual distributions</button>
+      <button type="button" data-mode="moments" aria-pressed="false">What FID sees</button>
+    </div>
+    <div class="legend"><span>R · Reference</span><span>C · Bimodal mixture</span></div>
+    <div class="plot" set:html={plot} />
+    <p class="explanation" aria-live="polite">Two peaks survive in C. The Gaussian reference has only one.</p>
+  </div>
+  <dl class="moments"><div><dt>Mean · both</dt><dd>0</dd></div><div><dt>Covariance · both</dt><dd>I</dd></div><div><dt>Population FID</dt><dd>0.00</dd></div></dl>
+  <p class="footnote">Exact densities along e₁. C mixes two Gaussians equally, with means ±0.9 and component variance 0.19 on this axis; the other 2,047 coordinates match R. Zero is the population score, not a guarantee for finite samples.</p>
+  <a class="follow" href={withBase('/sessions/06-blind-spots/')}>Follow the failure in week 6 →</a>
+</zero-score>
+<script>
+  class ZeroScore extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = 'true';
+      this.querySelectorAll('button').forEach(button => button.addEventListener('click', () => {
+        const mode = button.dataset.mode!;
+        this.dataset.mode = mode;
+        this.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+        this.querySelector('.explanation')!.textContent = mode === 'moments'
+          ? 'The two Gaussian fits coincide. Mean and covariance cannot retain C’s two peaks.'
+          : 'Two peaks survive in C. The Gaussian reference has only one.';
+      }));
+    }
+  }
+  if (!customElements.get('zero-score')) customElements.define('zero-score', ZeroScore);
+</script>
+<style>
+  zero-score { display: block; padding: clamp(1rem, 3vw, 2.5rem); border-top: 1px solid var(--at-border); }
+  .eyebrow { font: .7rem var(--at-font-mono, monospace); text-transform: uppercase; letter-spacing: .08em; color: var(--at-primary); }
+  h2 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.08; margin-block: .8rem 1rem; letter-spacing: -.04em; }
+  .zero-heading > p:last-child { max-width: 40rem; }
+  .experiment { margin-block: 1.75rem; }
+  .switch { display: flex; flex-wrap: wrap; gap: .5rem; }
+  button { color: var(--at-text); background: var(--at-bg); border: 1px solid var(--at-border); padding: .75rem 1rem; min-height: 44px; font: inherit; font-size: .85rem; cursor: pointer; }
+  button[aria-pressed='true'] { border-color: var(--at-primary); box-shadow: inset 0 -3px var(--at-primary); }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--at-primary); outline-offset: 4px; }
+  .legend { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .8rem; margin-top: 1.25rem; }
+  .legend span::before { content: ''; display: inline-block; width: 1.5rem; border-top: 2px solid var(--at-text); vertical-align: middle; margin-right: .4rem; }
+  .legend span + span::before { border-color: var(--at-primary); border-top-style: dashed; }
+  .plot :global(svg) { display: block; width: 100%; height: auto; }
+  .plot :global(path) { fill: none; vector-effect: non-scaling-stroke; }
+  .plot :global(.axis) { stroke: var(--at-border); }
+  .plot :global(.reference) { stroke: var(--at-text); stroke-width: 2; }
+  .plot :global(.candidate), .plot :global(.fitted) { stroke: var(--at-primary); stroke-width: 2.5; stroke-dasharray: 7 5; }
+  .plot :global(.fitted) { display: none; }
+  [data-mode='moments'] .plot :global(.candidate) { display: none; }
+  [data-mode='moments'] .plot :global(.fitted) { display: block; }
+  .plot :global(text) { fill: var(--at-text-muted); font: 12px monospace; text-anchor: middle; }
+  .explanation { min-height: 3em; font-size: .9rem; }
+  .moments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--at-border); margin: 0; }
+  .moments > div { padding: 1rem .5rem; }
+  dt { font-size: .7rem; color: var(--at-text-muted); }
+  dd { margin: .3rem 0 0; font: 1.7rem var(--at-font-mono, monospace); }
+  .footnote { font-size: .78rem; color: var(--at-text-muted); margin-top: 1rem; }
+  .follow { display: inline-block; margin-top: .5rem; }
+</style>

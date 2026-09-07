@@ -2,7 +2,7 @@
 import { render } from "astro:content";
 import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
-import SpecList from "astro-course-university/components/SpecList.astro";
+import AssessmentChecklist from "../../components/AssessmentChecklist.astro";
 import Callout from "astro-theme-university/components/Callout.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
 import MarkingModel from "../../components/MarkingModel.astro";
@@ -19,6 +19,8 @@ export async function getStaticPaths() {
 
 const { assessment } = Astro.props;
 const { Content } = await render(assessment);
+// Surface the existing submission instruction; keep the authored brief authoritative.
+const submission = assessment.body?.replace(/\r\n/g,'\n').match(/Submit [\s\S]*?(?=\n\n|\n\d+\.|$)/)?.[0].replace(/\s+/g,' ').trim();
 ---
 
 <ContentLayout
@@ -35,13 +37,27 @@ const { Content } = await render(assessment);
       </Callout>
     )
   }
-  <p><strong>Due:</strong> {formatCourseDate(assessment.data.due)} · <strong>Weight:</strong> {assessment.data.weight}%</p>
-  <Content />
-  <SpecList spec={assessment.data.spec}>
-    The brief poses the problem and leaves room for a response. The spec is the
-    fixed part: what a marker checks. Some lines can be checked mechanically;
-    the rest call for judgement.
-  </SpecList>
+  <div class="assessment-facts">
+    <div><p class="fact-label">Due · Week {assessment.data.week}</p><p><time datetime={assessment.data.due.toISOString()}>{formatCourseDate(assessment.data.due)}</time></p></div>
+    <div><p class="fact-label">Course weight</p><p class="fact-weight">{assessment.data.weight}%</p></div>
+    {submission && <div class="submission"><p class="fact-label">What to submit</p><p>{submission}</p></div>}
+  </div>
+  <nav class="brief-nav" aria-label="Assessment sections"><a href="#assessment-brief">Brief ↓</a><a href="#assessment-spec">Review spec ↓</a>{assessment.data.marking && <a href="#how-marked">Marking ↓</a>}</nav>
+  <div id="assessment-brief" class="assessment-reading"><Content /></div>
+  <AssessmentChecklist id={assessment.id} spec={assessment.data.spec} />
   {assessment.data.marking && <MarkingModel marking={assessment.data.marking} />}
   <RelatedContent entry={assessment} collections={graphCollections} />
 </ContentLayout>
+<style>
+  .assessment-facts {display:grid;grid-template-columns:2fr 1fr;gap:1rem 2rem;border-block:1px solid var(--at-primary);padding-block:1.25rem;margin-block:1.5rem;}
+  .assessment-facts p {margin:0;line-height:1.65;}
+  .assessment-facts .fact-label {font:.7rem var(--at-font-mono,monospace);text-transform:uppercase;color:var(--at-text-muted);margin-bottom:.5rem;}
+  .fact-weight {font-size:2rem;color:var(--at-primary);}
+  .submission {grid-column:1/-1;}
+  .brief-nav {display:flex;flex-wrap:wrap;gap:1.5rem;margin-block:1.5rem 2.5rem;font:.8rem var(--at-font-mono,monospace);}
+  .brief-nav a:focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+  .assessment-reading {max-width:68ch;line-height:1.75;}
+  .assessment-reading :global(h2) {margin-top:2.5rem;padding-bottom:.5rem;border-bottom:1px solid var(--at-border);}
+  #assessment-brief,:global(#assessment-spec),:global(#how-marked) {scroll-margin-top:calc(var(--at-nav-height) + 1rem);}
+  @media(max-width:650px){.assessment-facts {gap:1rem;}.brief-nav {gap:1rem;}}
+</style>

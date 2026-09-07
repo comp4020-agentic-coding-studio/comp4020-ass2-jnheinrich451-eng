@@ -1,0 +1,113 @@
+---
+import { getPublishedCollection } from 'astro-course-university/content';
+import { withBase } from 'astro-theme-university/url';
+import { formatCourseDate } from '../lib/dates';
+const sessions = (await getPublishedCollection('sessions')).sort((a,b)=>a.data.week-b.data.week);
+const arc = (s: typeof sessions[number]) => String((s.data as Record<string,unknown>).arc ?? '');
+const names: Record<string,string> = {A:'Compute it',B:'Break it',C:'Live with it'};
+const groups = [...new Set(sessions.map(arc))].map(id=>({id,name:names[id]??id,items:sessions.filter(s=>arc(s)===id)}));
+---
+<session-journey>
+  <nav class="journey-rail" aria-label="Navigate teaching weeks">
+    <p class="rail-label">Twelve measurements</p>
+    <div class="rail-track">
+      <span class="moving-ring" aria-hidden="true"></span>
+      {groups.map(group=><div class="rail-group"><p>{group.name}</p><ol>{group.items.map(s=><li><a href={`#session-week-${s.data.week}`} data-week={s.data.week} aria-label={`Week ${s.data.week}: ${s.data.title}`}><span>{String(s.data.week).padStart(2,'0')}</span><span class="rail-title">{s.data.title}</span></a></li>)}</ol></div>)}
+    </div>
+    <p class="rail-readout">Week <span data-current-week>01</span> / 12</p>
+  </nav>
+  <div class="journey-content">
+    {groups.map(group=><section class="journey-arc" aria-labelledby={`journey-arc-${group.id}`}>
+      <header><p>Arc {group.id} / Weeks {group.items[0].data.week}–{group.items.at(-1)!.data.week}</p><h2 id={`journey-arc-${group.id}`}>{group.name}</h2></header>
+      {group.items.map(s=><article id={`session-week-${s.data.week}`} data-session-week={s.data.week}>
+        <p class="week-meta">Week {String(s.data.week).padStart(2,'0')} · <time datetime={s.data.date.toISOString()}>{formatCourseDate(s.data.date)}</time></p>
+        <h3><a href={withBase(`/sessions/${s.id}/`)}>{s.data.title}</a></h3>
+        <p>{s.data.description}</p>
+        <a class="open-session" href={withBase(`/sessions/${s.id}/`)}>Open session →</a>
+        {s.data.week===2 && <a class="lecture-branch" href={withBase('/lectures/week-02/')}><span aria-hidden="true">↳</span> Lecture 02 · Two Gaussians, One Number →</a>}
+      </article>)}
+    </section>)}
+  </div>
+</session-journey>
+<script>
+  class SessionJourney extends HTMLElement {
+    private cleanup?: () => void;
+    connectedCallback() {
+      const rail = this.querySelector<HTMLElement>('.rail-track')!;
+      const ring = this.querySelector<HTMLElement>('.moving-ring')!;
+      const articles = [...this.querySelectorAll<HTMLElement>('[data-session-week]')];
+      const links = [...this.querySelectorAll<HTMLAnchorElement>('[data-week]')];
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const scrollPadding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+        const threshold = parseFloat(getComputedStyle(articles[0]).scrollMarginTop) + scrollPadding + 2;
+        // Let even the final week reach the same reading line as earlier weeks.
+        const content = this.querySelector<HTMLElement>('.journey-content')!;
+        content.style.paddingBottom = `${Math.max(0, window.innerHeight - threshold - articles.at(-1)!.offsetHeight)}px`;
+        let active = articles[0];
+        for (const article of articles) if (article.getBoundingClientRect().top <= threshold) active = article;
+        const week = active.dataset.sessionWeek!;
+        for (const link of links) {
+          if (link.dataset.week === week) link.setAttribute('aria-current','location');
+          else link.removeAttribute('aria-current');
+        }
+        const link = links.find(l=>l.dataset.week===week)!;
+        const box = link.getBoundingClientRect(), track = rail.getBoundingClientRect();
+        ring.style.top = `${box.top-track.top+box.height/2}px`;
+        this.querySelector('[data-current-week]')!.textContent = week.padStart(2,'0');
+      };
+      const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
+      window.addEventListener('scroll',queue,{passive:true});
+      window.addEventListener('resize',queue);
+      const observer = new ResizeObserver(queue); observer.observe(this);
+      void document.fonts.ready.then(queue);
+      update();
+      this.cleanup = () => {window.removeEventListener('scroll',queue);window.removeEventListener('resize',queue);observer.disconnect();cancelAnimationFrame(frame);};
+    }
+    disconnectedCallback() {this.cleanup?.();}
+  }
+  if (!customElements.get('session-journey')) customElements.define('session-journey',SessionJourney);
+</script>
+<style>
+  session-journey {display:grid;grid-template-columns:12rem minmax(0,1fr);gap:2.5rem;align-items:start;margin-block:2rem;}
+  .journey-rail {position:sticky;top:calc(var(--at-nav-height) + 1rem);max-height:calc(100dvh - var(--at-nav-height) - 2rem);overflow-y:auto;scrollbar-width:thin;padding-inline:.4rem;}
+  .rail-label,.rail-readout,.week-meta,.journey-arc header p {font:.7rem var(--at-font-mono,monospace);letter-spacing:.05em;color:var(--at-text-muted);}
+  .rail-label {text-transform:uppercase;margin:0 0 1rem;}
+  .rail-track {position:relative;border-left:1px solid var(--at-border);padding-left:.75rem;}
+  .rail-group > p {font-size:.8rem;color:var(--at-primary);margin:.6rem 0 .25rem;}
+  ol {list-style:none;padding:0;margin:0;}
+  .rail-group a {display:flex;gap:.55rem;align-items:center;min-height:30px;font-size:.68rem;text-decoration:none;color:var(--at-text-muted);}
+  .rail-group a > span:first-child {font-family:var(--at-font-mono,monospace);}
+  .rail-group [aria-current] {color:var(--at-primary);font-weight:700;}
+  .moving-ring {position:absolute;left:-6px;top:35px;width:11px;height:11px;box-sizing:border-box;border:2px solid var(--at-primary);border-radius:50%;background:var(--at-bg);transform:translateY(-50%);transition:top 220ms ease;box-shadow:0 0 0 4px var(--at-bg);}
+  .rail-readout {margin-top:1rem;}
+  .rail-readout span {color:var(--at-primary);}
+  .journey-arc + .journey-arc {margin-top:3rem;}
+  .journey-arc header {border-bottom:1px solid var(--at-primary);padding-bottom:.8rem;margin-bottom:.5rem;}
+  .journey-arc header p {text-transform:uppercase;margin:0 0 .5rem;}
+  h2 {margin:0;font-size:2rem;letter-spacing:-.04em;}
+  article {padding:1.75rem 0;border-bottom:1px solid var(--at-border);scroll-margin-top:calc(var(--at-nav-height) + 2rem);}
+  h3 {margin:.6rem 0;font-size:1.5rem;line-height:1.2;}
+  h3 a {text-decoration:none;}
+  article > p:not(.week-meta) {line-height:1.65;}
+  .week-meta {margin:0;}
+  .open-session,.lecture-branch {font-size:.85rem;}
+  .lecture-branch {display:block;margin-top:1rem;padding-left:.8rem;border-left:1px solid var(--at-primary);}
+  a:focus-visible {outline:2px solid var(--at-primary);outline-offset:3px;}
+  a:hover {color:var(--at-primary);text-decoration:underline;}
+  @media(max-width:650px){
+    session-journey {grid-template-columns:minmax(0,1fr);gap:1.5rem;}
+    .journey-rail {top:var(--at-nav-height);z-index:5;background:var(--at-bg);padding:.75rem 0;border-block:1px solid var(--at-border);}
+    .rail-label {display:none;}
+    .rail-track {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;border:0;padding:0;}
+    .rail-group > p {font-size:.67rem;margin:0 0 .3rem;}
+    .rail-group ol {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));}
+    .rail-group a {min-height:36px;justify-content:center;font-size:.7rem;border-bottom:2px solid var(--at-border);}
+    .rail-group [aria-current] {border-color:var(--at-primary);background:var(--at-bg-alt);}
+    .rail-title,.moving-ring {display:none;}
+    .rail-readout {margin:.4rem 0 0;font-size:.65rem;}
+    article {scroll-margin-top:calc(var(--at-nav-height) + 9rem);}
+  }
+  @media(prefers-reduced-motion:reduce){.moving-ring {transition:none;}}
+</style>

@@ -21,6 +21,11 @@ const ARC_NAMES: Record<string, string> = {
   B: "Break it",
   C: "Live with it",
 };
+const ARC_CLAIMS: Record<string, string> = {
+  A: 'Establish what the number measures and reproduce it under controlled conditions.',
+  B: 'Test the assumptions: sample bias, missing shape, and what changes beyond images.',
+  C: 'Compare the score with human judgement and decide what evidence to report.',
+};
 
 const sessions = (await getPublishedCollection("sessions")).sort(
   (a, b) => a.data.week - b.data.week,
@@ -43,14 +48,19 @@ for (const session of sessions) {
 
 <section class="weeks" aria-labelledby="twelve-weeks">
   <h2 id="twelve-weeks">Twelve weeks</h2>
+  <p class="weeks__lead">A zero score is the beginning of the audit. Build the measurement, expose what it misses, then decide what deserves to count as evidence.</p>
+  <nav class="weeks__route" aria-label="Jump to a course arc">
+    {groups.map(group => <a href={`#course-arc-${group.arc}`}><span>Weeks {group.items[0].data.week}–{group.items.at(-1)!.data.week}</span><strong>{group.name}</strong></a>)}
+  </nav>
 
   {
     groups.map((group) => (
-      <div class="weeks__arc">
+      <div class="weeks__arc" id={`course-arc-${group.arc}`}>
         <p class="weeks__arc-name">
           {group.arc && <span class="weeks__arc-letter">Arc {group.arc}</span>}
           {group.name}
         </p>
+        <p class="weeks__claim">{ARC_CLAIMS[group.arc]}</p>
         <ol class="weeks__list">
           {group.items.map((session) => (
             <li class="weeks__item">
@@ -71,6 +81,18 @@ for (const session of sessions) {
 </section>
 
 <style>
+  .weeks { margin-block: 3rem; }
+  .weeks__lead { max-width: 40rem; }
+  .weeks__route { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 1.5rem 0 2.5rem; border-block: 1px solid var(--at-border); }
+  .weeks__route a { display: grid; gap: .4rem; padding: 1rem .6rem; text-decoration: none; }
+  .weeks__route a + a { border-left: 1px solid var(--at-border); }
+  .weeks__route span { font: .7rem var(--at-font-mono, monospace); color: var(--at-text-muted); }
+  .weeks__route strong { font-size: clamp(.9rem, 2vw, 1.2rem); }
+  .weeks__route a:hover { background: var(--at-bg-alt); }
+  .weeks__route a:focus-visible { outline: 2px solid var(--at-primary); outline-offset: 3px; }
+  .weeks__arc { scroll-margin-top: calc(var(--at-nav-height) + 1rem); }
+  .weeks__claim { color: var(--at-text-muted); margin-bottom: 1.5rem; }
+  .weeks__item { padding-left: 1rem; border-left: 1px solid var(--at-border); }
   .weeks__arc + .weeks__arc {
     margin-block-start: var(--at-spacing-xl);
   }

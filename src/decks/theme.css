@@ -12,6 +12,42 @@
  * background. */
 @import url("astro-theme-university/styles/deck.css");
 
+/* Return control stays plain even when the deck's link/key styles load last. */
+body a.deck-exit,
+body a.deck-exit kbd {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  text-decoration: none;
+}
+body a.deck-exit:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* Week 2: a quiet lecture board, with the same ground as the homepage. */
+:root { --r-background-color: #030305; }
+.reveal .slides section h2 {
+  letter-spacing: -.035em;
+  line-height: 1.12;
+  padding-bottom: .3em;
+  border-bottom: 1px solid #b97d1c66;
+}
+.reveal .slides section.impact h1 { text-transform: none; line-height: 1.02; letter-spacing: -.055em; }
+.reveal .slides section.impact { color: #f3eee4; background: #030305; }
+.reveal .slides section.impact h1 { color: #e1aa50; }
+.reveal .slides section.impact h1 { background: transparent; box-shadow: none; display: block; }
+.reveal .slides section.impact > p { max-width: 30ch; font-size: .85em; }
+.reveal .slides section > p:has(> img:not(.eq)) { text-align: center; }
+.reveal .bench-case { padding: .5em .7em; border-left: 2px solid #b97d1c; background: #b97d1c0d; }
+.reveal .board { border-left: 2px solid #b97d1c; padding-left: .7em; }
+.reveal .boxed { background: #b97d1c0d; }
+.reveal .slides section > p { line-height: 1.35; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides section, .reveal .fragment { transition: none !important; animation: none !important; }
+}
+
 /* A running foot on every slide.
  *
  * astromotion has no footer of its own, and repeating markup on twelve
@@ -188,4 +224,24 @@
    its slide, but not at the cost of pushing itself off the canvas. */
 .reveal .boxed .eq {
   max-height: 78px;
+}
+
+/* Portrait phones read the complete deck vertically at a usable text size. */
+@media (max-width: 600px) and (orientation: portrait) {
+  html:has(.reveal) { overflow-y: auto !important; height: auto !important; }
+  body.reveal-viewport { overflow: visible !important; height: auto !important; }
+  .reveal { height: auto !important; overflow: visible !important; font-size: 18px; }
+  .reveal .slides { position: static !important; width: 100% !important; height: auto !important; transform: none !important; inset: auto !important; margin: 0 !important; text-align: left; }
+  .reveal .slides > section { position: relative !important; display: block !important; visibility: visible !important; opacity: 1 !important; transform: none !important; inset: auto !important; width: 100% !important; height: auto !important; min-height: 0 !important; padding: 3rem 1.2rem 2rem !important; box-sizing: border-box; border-bottom: 1px solid #b97d1c66; }
+  .reveal .slides section h1 { font-size: 2.5rem; }
+  .reveal .slides section h2 { font-size: 1.7rem; }
+  .reveal .slides section p { font-size: 1rem; }
+  .reveal .slides section .label { font-size: .7rem; }
+  .reveal .slides .fragment { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .reveal .split, .reveal .pipeline, .reveal .assumptions { display: grid; grid-template-columns: 1fr; }
+  .reveal .pipeline .join, .reveal .pipeline .rail { grid-column: auto; grid-row: auto; }
+  .reveal .slides section img { max-width: 100%; height: auto; }
+  .reveal .slides section .boxed { display: block; padding: .4rem; }
+  .reveal .backgrounds, .reveal .controls, .reveal .progress, .reveal .slide-number, .reveal .slides::after { display: none !important; }
+  .deck-exit { position: fixed; width: fit-content; }
 }

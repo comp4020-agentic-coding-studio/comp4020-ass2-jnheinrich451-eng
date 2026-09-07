@@ -1,0 +1,69 @@
+---
+import contours from '../assets/figures/hero-benchmark.svg?raw';
+---
+<hero-benchmark>
+  <div class="plot" set:html={contours} />
+  <div class="controls" role="group" aria-label="Inspect a benchmark distribution">
+    <button type="button" data-choice="R" aria-pressed="false">R <span>Reference</span></button>
+    <button type="button" data-choice="A" aria-pressed="false">A <span>Mean shift</span></button>
+    <button type="button" data-choice="B" aria-pressed="false">B <span>Wider spread</span></button>
+  </div>
+  <p class="detail" aria-live="polite">Select a distribution to inspect its conditions.</p>
+  <p class="note">Same-scale 2D projections along the mean-shift direction.<br />Contours: 0.5–3 standard deviations. Scores use all 2,048 dimensions.</p>
+</hero-benchmark>
+<script>
+  class HeroBenchmark extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = 'true';
+      const descriptions: Record<string, string> = {
+        R: 'R · N(0, I) · Reference FID 0.00',
+        A: 'A · N(0.05·1, I) · Mean shift only · FID 5.12',
+        B: 'B · N(0, 1.1I) · Covariance change only · FID 4.88',
+      };
+      const select = (id: string) => {
+        this.dataset.active = id;
+        this.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.choice === id)));
+        this.querySelector('.detail')!.textContent = descriptions[id];
+        const figure = this.closest('figure');
+        if (figure) figure.dataset.active = id;
+      };
+      this.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => select(button.dataset.choice!));
+        button.addEventListener('focus', () => select(button.dataset.choice!));
+        button.addEventListener('pointerenter', event => {
+          if (event.pointerType === 'mouse') select(button.dataset.choice!);
+        });
+      });
+    }
+  }
+  if (!customElements.get('hero-benchmark')) customElements.define('hero-benchmark', HeroBenchmark);
+</script>
+<style>
+  hero-benchmark { display: block; width: min(100%, 44rem); min-width: 0; color: #e1aa50; }
+  .plot :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
+  .plot :global(.axes) { stroke: #c68a2a; stroke-opacity: .25; stroke-dasharray: 2 5; fill: none; }
+  .plot :global(.contour) { fill: none; stroke: #c68a2a; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .plot :global(.origin) { fill: none; stroke: #f3eee4; stroke-opacity: .5; }
+  .plot :global(.mean) { fill: #ffe3a0; }
+  .plot :global(.mean-halo) { fill: #c68a2a; opacity: .18; }
+  .plot :global(text) { fill: #e1aa50; font-family: var(--at-font-mono, monospace); }
+  .plot :global(.label) { font-size: 25px; }
+  .plot :global(.condition) { font-size: 11px; letter-spacing: 2px; text-anchor: middle; }
+  .plot :global(g) { transition: opacity 180ms ease; }
+  hero-benchmark[data-active] .plot :global(g) { opacity: .3; }
+  hero-benchmark[data-active='R'] .plot :global([data-distribution='R']),
+  hero-benchmark[data-active='A'] .plot :global([data-distribution='A']),
+  hero-benchmark[data-active='B'] .plot :global([data-distribution='B']) { opacity: 1; }
+  .controls { display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+  button { background: transparent; border: 1px solid #705123; color: #e1aa50; padding: .65rem .9rem; min-height: 44px; font: inherit; cursor: pointer; }
+  button span { font-size: .75rem; margin-left: .4rem; }
+  button:hover, button[aria-pressed='true'] { background: #241a0d; border-color: #e1aa50; }
+  button:focus-visible { outline: 2px solid #f3eee4; outline-offset: 4px; }
+  .detail, .note { text-align: center; padding-inline: .5rem; }
+  .detail { color: #f3eee4; font-size: .85rem; min-height: 2.8em; margin: 1rem 0 .25rem; }
+  .note { color: #b4afa6; font-size: .72rem; margin: 0; }
+  @media (prefers-reduced-motion: no-preference) { .plot { animation: reveal 900ms ease-out both; } }
+  @keyframes reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .plot :global(g) { transition: none; } }
+</style>
