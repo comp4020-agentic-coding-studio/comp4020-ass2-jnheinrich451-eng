@@ -1542,3 +1542,49 @@ mock in hand is different from saying so in a paragraph, which is the lesson
 this build keeps re-teaching: the deck moved to the lecture only when the
 empty page was visible, and the studio will get scoped only because the
 alternative is visible too.
+
+## 2026-09-08 06:47 — The workbench, pinned before it was trusted
+
+**Prompt:**
+
+> Oh yes no backend, I forget, I think spec mentions? Then without backend, if
+> it is implementable? Yes if could place in Week1 lecture!
+
+**Result:**
+Implementable and implemented, all client side. The platform question was
+answered from the README and the live brief rather than memory: GitHub Pages,
+static, marked at the deployed URL, so a backend was never available and is
+not missed. `src/lib/bench.ts` carries the bench in dependency-free
+TypeScript: seeded splitmix32, Box-Muller, a Jacobi eigensolver, and week 2's
+symmetric cross term. One scoring at the capped d of 64 is a few
+milliseconds.
+
+The order of work was the point. The numpy fixture and the agreement test
+existed before the component did: figures/bench-reference.py writes closed
+forms and six-sigma estimator envelopes to spec/bench-reference.json, and the
+JavaScript is held to them. A second implementation of one score is week 4's
+lesson aimed at ourselves, and this time the pin was built first.
+
+**Verified:**
+Closed forms agree with numpy to 1e-9 across nine parameter points. The
+envelope test was falsified before being believed: a deliberately wrong
+engine, v of 1.35 against the envelope built at 1.0, escapes the band. Then
+the shipped page was driven over CDP like a visitor: numbers populate on
+load, three presses grow the strip from one dot to four, preset C reads true
+0.000 while estimating 22.79, and 390x844 does not overflow. The first
+falsification attempt silently never ran, because vitest will not collect a
+file outside its root and my pipeline swallowed the "no test files" message;
+the file moved inside spec/ and ran for real.
+
+**Commit:** [`ea6c3d3`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/ea6c3d3)
+
+**What happened:**
+Preset C came out better than designed. At d 64 and N 100 it scores a true
+0.000 against an estimate near 22, so one click shows the blind spot and the
+finite-sample bias at once, stacked, which no week of the course manages in a
+single view.
+
+One visible defect caught by looking rather than testing: the component's
+heading sat directly under a page title saying the same words. The heading is
+now a prop, and the lecture page, which already names the instrument, passes
+none. The screenshot found it; no check would have.
