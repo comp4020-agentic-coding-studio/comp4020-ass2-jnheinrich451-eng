@@ -1623,3 +1623,40 @@ minute of ordinary browsing. The pattern is now familiar enough to state as a
 rule: my verification explores the states I imagined, and the author's
 browsing explores the states the site actually has. Both catches this build
 that mattered most, the clipped slides and this one, came from the second.
+
+## 2026-09-08 07:15 — Three questions from a reader, one of them about the fiction
+
+**Prompt:**
+
+> what is D and N? And what is true 0.07? I think this visualization or
+> explanation needs some polish? And the "the course pins in spec/", this
+> spec/ if it is a fake lead?
+
+**Result:**
+All three were real. The controls assumed a visitor already knew the
+course's letters; they now read "dimensions d" and "samples N", the body
+defines all four controls, both number panels name their quantity as FID,
+and the scatter gained a legend placed outside the SVG because the renderer
+wipes the SVG on every press.
+
+The spec/ question was the best catch. The page said the arithmetic is
+"pinned in spec/", which is true of this repository and meaningless inside
+the course: no SlopU student can see that directory, the reference links
+nowhere, and a course page pointing at the machinery of its own construction
+breaks the register rule that the course never comments on itself. It was a
+fake lead in exactly the author's sense. The line now says "pinned against
+the course's reference implementation", which is week 4's own vocabulary
+making the same claim inside the fiction.
+
+**Verified:**
+Build clean, 20 of 20 tests, and the polished panel read as a picture:
+legend, spelled-out labels, and named quantities all present in the render.
+
+**Commit:** [`4247219`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/4247219)
+
+**What happened:**
+The fiction boundary is a place I had not been checking. Every other
+consistency rule in this repo has a test, and none of them can see a
+sentence that is true for the builder and false for the reader. Grepping
+course-facing content for repository paths would catch the class; noted as
+a candidate check rather than built, since the author is mid-review.
