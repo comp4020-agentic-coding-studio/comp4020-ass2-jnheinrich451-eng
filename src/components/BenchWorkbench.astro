@@ -105,8 +105,14 @@ const { heading } = Astro.props;
 <script>
   import { closedForm, score, type Candidate } from "../lib/bench";
 
-  const root = document.querySelector("[data-wb-controls]");
-  if (root instanceof HTMLFormElement) {
+  // The theme runs Astro's ClientRouter, so navigating away and back swaps
+  // the DOM without re-running this module. Everything therefore lives in
+  // setup(), called once now and again on every astro:page-load, with a
+  // marker on the form so one visit cannot be initialised twice.
+  function setup() {
+    const root = document.querySelector("[data-wb-controls]");
+    if (!(root instanceof HTMLFormElement) || root.dataset.wbReady === "true") return;
+    root.dataset.wbReady = "true";
     const read = (name: string, fallback: number): number => {
       const input = root.elements.namedItem(name);
       const value = input instanceof HTMLInputElement ? Number(input.value) : NaN;
@@ -224,6 +230,9 @@ const { heading } = Astro.props;
 
     render();
   }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
 </script>
 
 <style>
