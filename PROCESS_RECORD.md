@@ -1503,3 +1503,42 @@ verified against the Python figure numbers, workbench before checker,
 Pyodide only as a stretch. Thirteen days remain and the artefact band
 punishes an unreliable core interaction harder than it rewards an ambitious
 one, so the phasing is the decision, not the ambition.
+
+## 2026-09-08 06:40 — The workbench designed with real numbers before any code
+
+**Prompt:**
+
+> Yes workbench first, we need to build step by step, and I need to check the
+> effect then proceed. For we are unsure of many things ... for FID, what it
+> will produce I am unclear, so the visualization design we need discussion.
+
+**Result:**
+A design discussion answered with a computed mock instead of a sketch. The
+question "what will FID produce" has a three-part answer the mock shows: two
+clouds you cannot tell apart, a true value beside an estimate that disagrees
+with it by two orders of magnitude, and a strip where every press of "draw
+again" adds one point above the dashed true line, so the student builds week
+5's figure with their own clicks.
+
+The load-bearing measurement was dimension. At d = 2 the estimate matches the
+truth and the workbench would quietly contradict week 5; at d = 64 with
+N = 100 the estimate reads 22 against a true 0.16, and one evaluation costs
+4 ms, so the phenomenon is dramatic and the interaction is instant. The d
+control is not a nicety, it is the pedagogy.
+
+**Verified:**
+Every number in the mock computed by numpy in this turn, including the six
+history dots, which are six actual draws. The mock screenshotted at both
+marking viewports and sent to the author before any component code exists.
+
+**Commit:** [`workbench mock`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commits/main)
+
+**What happened:**
+The author's own STUDIO.md asks for a Jupyter: cells, restart, a terminal,
+file manipulation, arbitrary imports. That is a real product called
+JupyterLite and it is a final-project-sized idea, not an A2-sized one; the
+A2-sized version of the same ambition is this workbench. Saying so with a
+mock in hand is different from saying so in a paragraph, which is the lesson
+this build keeps re-teaching: the deck moved to the lecture only when the
+empty page was visible, and the studio will get scoped only because the
+alternative is visible too.
