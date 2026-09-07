@@ -1,0 +1,342 @@
+---
+/**
+ * The bench, live: the week 1 exercise as an instrument on the page.
+ *
+ * Everything runs in the visitor's browser against src/lib/bench.ts, the
+ * engine that spec/bench-engine.test.ts pins to numpy. No request leaves the
+ * page; the site stays static, which is the platform this course ships on.
+ *
+ * Three readouts carry three of the course's claims. The scatter shows two
+ * of d coordinates and the clouds cannot be told apart. The pair of numbers
+ * shows the closed form against the estimate from the samples just drawn.
+ * The strip adds one dot per press, above a dashed line at the true value,
+ * so a visitor builds week 5's figure with their own clicks.
+ *
+ * Changing any parameter clears the strip: dots are only comparable when
+ * every press measured the same thing, which is week 5's N-honesty rule
+ * enforced by the interface rather than stated by it.
+ */
+
+/**
+ * On a page whose own title already names the instrument, pass no heading
+ * and the section stays anonymous rather than saying the same thing twice.
+ */
+interface Props {
+  heading?: string;
+}
+const { heading } = Astro.props;
+---
+
+<section class="workbench" aria-label={heading ?? "The bench, live"}>
+  {heading && <h2>{heading}</h2>}
+  {heading && (
+    <p>
+      The number you compute is not the number that is true. Draw your own
+      samples and watch the gap.
+    </p>
+  )}
+
+  <noscript>
+    <p>
+      The instrument needs JavaScript. Its arithmetic is
+      <code>src/lib/bench.ts</code> in the repository, pinned against numpy by
+      <code>spec/bench-engine.test.ts</code>, and week 5 shows what it would
+      have shown you.
+    </p>
+  </noscript>
+
+  <form class="wb-controls" data-wb-controls>
+    <div class="wb-field">
+      <label for="wb-shift">mean shift</label>
+      <input id="wb-shift" name="shift" type="number" step="0.01" min="-2" max="2" value="0.05" />
+    </div>
+    <div class="wb-field">
+      <label for="wb-v">cov scale v</label>
+      <input id="wb-v" name="v" type="number" step="0.05" min="0.1" max="4" value="1" />
+    </div>
+    <div class="wb-field">
+      <label for="wb-d">d</label>
+      <input id="wb-d" name="d" type="number" step="1" min="2" max="64" value="64" />
+    </div>
+    <div class="wb-field">
+      <label for="wb-n">N</label>
+      <input id="wb-n" name="n" type="number" step="10" min="10" max="2000" value="100" />
+    </div>
+    <button type="button" data-wb-score>score</button>
+    <button type="button" class="wb-ghost" data-wb-again>draw again</button>
+    <div class="wb-presets" role="group" aria-label="Bench candidates">
+      <button type="button" class="wb-ghost" data-wb-preset="A" title="N(0.05·1, I)">A</button>
+      <button type="button" class="wb-ghost" data-wb-preset="B" title="N(0, 1.1·I)">B</button>
+      <button type="button" class="wb-ghost" data-wb-preset="C" title="the week 6 mixture">C</button>
+    </div>
+  </form>
+
+  <div class="wb-panes">
+    <figure class="wb-scatter">
+      <svg viewBox="0 0 320 300" role="img" data-wb-scatter aria-label="Scatter of the reference and candidate samples, first two coordinates"></svg>
+      <figcaption data-wb-scatter-caption>
+        2 of 64 coordinates. The difference you cannot see is the whole of the
+        number.
+      </figcaption>
+    </figure>
+    <div>
+      <div class="wb-nums" aria-live="polite">
+        <div>
+          <div class="wb-num-label">true, closed form</div>
+          <div class="wb-num wb-true" data-wb-true>&nbsp;</div>
+        </div>
+        <div>
+          <div class="wb-num-label">estimate, this draw</div>
+          <div class="wb-num wb-est" data-wb-estimate>&nbsp;</div>
+        </div>
+      </div>
+      <figure class="wb-strip">
+        <svg viewBox="0 0 340 170" role="img" data-wb-strip aria-label="Estimates accumulating above the true value"></svg>
+        <figcaption>
+          Every press adds a point. This is week 5&rsquo;s figure, built by
+          your own clicks. Changing any setting clears it, because points are
+          only comparable when every press measured the same thing.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { closedForm, score, type Candidate } from "../lib/bench";
+
+  const root = document.querySelector("[data-wb-controls]");
+  if (root instanceof HTMLFormElement) {
+    const read = (name: string, fallback: number): number => {
+      const input = root.elements.namedItem(name);
+      const value = input instanceof HTMLInputElement ? Number(input.value) : NaN;
+      return Number.isFinite(value) ? value : fallback;
+    };
+    const write = (name: string, value: number) => {
+      const input = root.elements.namedItem(name);
+      if (input instanceof HTMLInputElement) input.value = String(value);
+    };
+    const el = <T extends Element>(sel: string) => document.querySelector(sel) as T;
+    const scatter = el<SVGSVGElement>("[data-wb-scatter]");
+    const strip = el<SVGSVGElement>("[data-wb-strip]");
+    const trueOut = el<HTMLElement>("[data-wb-true]");
+    const estOut = el<HTMLElement>("[data-wb-estimate]");
+    const scatterCaption = el<HTMLElement>("[data-wb-scatter-caption]");
+
+    let seed = 20260808;
+    let mixture = false;
+    let history: number[] = [];
+
+    const params = () => ({
+      shift: Math.max(-2, Math.min(2, read("shift", 0.05))),
+      v: Math.max(0.1, Math.min(4, read("v", 1))),
+      d: Math.max(2, Math.min(64, Math.round(read("d", 64)))),
+      n: Math.max(10, Math.min(2000, Math.round(read("n", 100)))),
+    });
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const dot = (x: number, y: number, r: number, fill: string, opacity = "1") => {
+      const c = document.createElementNS(svgNS, "circle");
+      c.setAttribute("cx", x.toFixed(1));
+      c.setAttribute("cy", y.toFixed(1));
+      c.setAttribute("r", String(r));
+      c.setAttribute("fill", fill);
+      c.setAttribute("opacity", opacity);
+      return c;
+    };
+
+    const render = () => {
+      const { shift, v, d, n } = params();
+      const candidate: Candidate = mixture
+        ? { kind: "mixture", a: 0.9 }
+        : { kind: "gaussian", shift, v };
+      const truth = mixture ? 0 : closedForm({ shift, v, d });
+      const result = score(candidate, d, n, seed);
+      history.push(result.estimate);
+      if (history.length > 30) history.shift();
+
+      trueOut.textContent = truth.toFixed(3);
+      estOut.textContent = result.estimate.toFixed(2);
+      scatterCaption.textContent =
+        `2 of ${d} coordinates. The difference you cannot see is the whole of the number.`;
+
+      scatter.replaceChildren();
+      const shown = Math.min(n, 400);
+      for (let i = 0; i < shown; i++) {
+        const [rx, ry] = result.reference2d[i];
+        scatter.append(dot(160 + 36 * rx, 150 - 36 * ry, 2.6, "var(--wb-ref)", "0.75"));
+      }
+      for (let i = 0; i < shown; i++) {
+        const [cx, cy] = result.candidate2d[i];
+        scatter.append(dot(160 + 36 * cx, 150 - 36 * cy, 2.6, "var(--wb-cand)", "0.75"));
+      }
+
+      strip.replaceChildren();
+      const top = Math.max(...history, truth) * 1.15 + 1e-9;
+      const y = (value: number) => 158 - 140 * (value / top);
+      const line = document.createElementNS(svgNS, "line");
+      line.setAttribute("x1", "16");
+      line.setAttribute("x2", "330");
+      line.setAttribute("y1", y(truth).toFixed(1));
+      line.setAttribute("y2", y(truth).toFixed(1));
+      line.setAttribute("stroke", "var(--wb-truth)");
+      line.setAttribute("stroke-dasharray", "5 4");
+      line.setAttribute("stroke-width", "1.5");
+      strip.append(line);
+      const label = document.createElementNS(svgNS, "text");
+      label.textContent = `true ${truth.toFixed(2)}`;
+      label.setAttribute("x", "252");
+      label.setAttribute("y", String(Math.max(12, y(truth) - 6)));
+      label.setAttribute("fill", "var(--wb-truth)");
+      label.setAttribute("font-size", "11");
+      label.setAttribute("font-family", "var(--at-font-mono, monospace)");
+      strip.append(label);
+      history.forEach((value, i) => {
+        strip.append(dot(24 + (306 / 29) * i, y(value), 4.5, "var(--wb-cand)"));
+      });
+    };
+
+    const rescore = (clear: boolean) => {
+      if (clear) history = [];
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      render();
+    };
+
+    root.addEventListener("input", () => {
+      mixture = false;
+      rescore(true);
+    });
+    el<HTMLButtonElement>("[data-wb-score]").addEventListener("click", () => rescore(true));
+    el<HTMLButtonElement>("[data-wb-again]").addEventListener("click", () => rescore(false));
+    for (const button of document.querySelectorAll<HTMLButtonElement>("[data-wb-preset]")) {
+      button.addEventListener("click", () => {
+        mixture = button.dataset.wbPreset === "C";
+        if (button.dataset.wbPreset === "A") {
+          write("shift", 0.05);
+          write("v", 1);
+        } else if (button.dataset.wbPreset === "B") {
+          write("shift", 0);
+          write("v", 1.1);
+        }
+        rescore(true);
+      });
+    }
+
+    render();
+  }
+</script>
+
+<style>
+  .workbench {
+    --wb-ref: #9d968b;
+    --wb-cand: #c9782a;
+    --wb-truth: #3a7d44;
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+  }
+
+  .wb-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-sm) var(--at-spacing-lg);
+    align-items: end;
+    border-block: 1px solid var(--at-border, #e4ddd0);
+    padding-block: var(--at-spacing-sm);
+    margin-block-end: var(--at-spacing-lg);
+  }
+
+  .wb-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .wb-field label,
+  .wb-num-label,
+  .wb-controls button {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .wb-field input {
+    font: inherit;
+    width: 5.2rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wb-controls button {
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: var(--at-primary);
+    color: var(--at-white, #fff);
+    cursor: pointer;
+  }
+
+  .wb-controls button.wb-ghost {
+    background: transparent;
+    color: var(--at-secondary, var(--at-primary));
+  }
+
+  .wb-presets {
+    display: flex;
+    gap: var(--at-spacing-sm);
+  }
+
+  .wb-panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--at-spacing-lg);
+  }
+
+  @media (max-width: 640px) {
+    .wb-panes {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .wb-panes figure {
+    margin: 0;
+  }
+
+  .wb-panes svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklab, var(--at-primary) 4%, transparent);
+    border: 1px solid var(--at-border, #e4ddd0);
+    border-radius: 4px;
+  }
+
+  .wb-panes figcaption {
+    font-size: var(--at-font-size-sm);
+    margin-block-start: var(--at-spacing-xs);
+  }
+
+  .wb-nums {
+    display: flex;
+    gap: var(--at-spacing-xl);
+    margin-block-end: var(--at-spacing-sm);
+  }
+
+  .wb-num {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.8rem;
+  }
+
+  .wb-true {
+    color: var(--wb-truth);
+  }
+
+  .wb-est {
+    color: #b5495b;
+  }
+</style>
