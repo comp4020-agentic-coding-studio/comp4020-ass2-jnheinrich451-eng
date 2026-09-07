@@ -55,11 +55,11 @@ const { heading } = Astro.props;
       <input id="wb-v" name="v" type="number" step="0.05" min="0.1" max="4" value="1" />
     </div>
     <div class="wb-field">
-      <label for="wb-d">d</label>
+      <label for="wb-d">dimensions d</label>
       <input id="wb-d" name="d" type="number" step="1" min="2" max="64" value="64" />
     </div>
     <div class="wb-field">
-      <label for="wb-n">N</label>
+      <label for="wb-n">samples N</label>
       <input id="wb-n" name="n" type="number" step="10" min="10" max="2000" value="100" />
     </div>
     <button type="button" data-wb-score>score</button>
@@ -73,6 +73,10 @@ const { heading } = Astro.props;
 
   <div class="wb-panes">
     <figure class="wb-scatter">
+      <p class="wb-legend" aria-hidden="true">
+        <span class="wb-key wb-key--ref">&#9679;</span> R, the reference
+        <span class="wb-key wb-key--cand">&#9679;</span> the candidate
+      </p>
       <svg viewBox="0 0 320 300" role="img" data-wb-scatter aria-label="Scatter of the reference and candidate samples, first two coordinates"></svg>
       <figcaption data-wb-scatter-caption>
         2 of 64 coordinates. The difference you cannot see is the whole of the
@@ -82,11 +86,11 @@ const { heading } = Astro.props;
     <div>
       <div class="wb-nums" aria-live="polite">
         <div>
-          <div class="wb-num-label">true, closed form</div>
+          <div class="wb-num-label">true FID, closed form</div>
           <div class="wb-num wb-true" data-wb-true>&nbsp;</div>
         </div>
         <div>
-          <div class="wb-num-label">estimate, this draw</div>
+          <div class="wb-num-label">estimated FID, this draw</div>
           <div class="wb-num wb-est" data-wb-estimate>&nbsp;</div>
         </div>
       </div>
@@ -322,6 +326,22 @@ const { heading } = Astro.props;
     background: color-mix(in oklab, var(--at-primary) 4%, transparent);
     border: 1px solid var(--at-border, #e4ddd0);
     border-radius: 4px;
+  }
+
+  .wb-legend {
+    margin-block: 0 var(--at-spacing-xs);
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.06em;
+  }
+
+  .wb-key--ref {
+    color: var(--wb-ref);
+  }
+
+  .wb-key--cand {
+    color: var(--wb-cand);
+    margin-inline-start: 0.9em;
   }
 
   .wb-panes figcaption {
