@@ -1588,3 +1588,38 @@ One visible defect caught by looking rather than testing: the component's
 heading sat directly under a page title saying the same words. The heading is
 now a prop, and the lecture page, which already names the instrument, passes
 none. The screenshot found it; no check would have.
+
+## 2026-09-08 07:05 — The workbench dies on the way back
+
+**Prompt:**
+
+> Ty, and the bug, when I first enter this page, it can be shown correctly,
+> but if I open rest pages, and back, there are no dots!
+
+**Result:**
+The symptom named the cause: works on first load, empty after navigating away
+and back is the signature of a client-side router swapping DOM under a module
+script that runs once. The theme ships Astro's ClientRouter; my component
+bound its listeners and drew its panels at module evaluation, so the swapped-in
+page had markup and no behaviour. Everything now lives in setup(), called at
+load and on every astro:page-load, with a marker attribute so one visit cannot
+initialise twice.
+
+**Verified:**
+Reproduced before fixing, on the author's exact path driven over CDP: 200
+scatter dots on first load, zero after away-and-back. Same script after the
+fix: 200 on return, and two presses of draw again grow the strip to three
+dots, which is the part a lesser check would skip, since a rendered panel
+with dead buttons looks identical in a screenshot.
+
+**Commit:** [`ea6c3d3` fix follows in the workbench commit history](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commits/main)
+
+**What happened:**
+I drove the component hard yesterday and only ever on a first load. The
+navigation path was not in my test because arriving from another page did not
+occur to me as a state the component could be in, and no check in spec/
+observes whether scripts survive the router. The author found it inside a
+minute of ordinary browsing. The pattern is now familiar enough to state as a
+rule: my verification explores the states I imagined, and the author's
+browsing explores the states the site actually has. Both catches this build
+that mattered most, the clipped slides and this one, came from the second.
