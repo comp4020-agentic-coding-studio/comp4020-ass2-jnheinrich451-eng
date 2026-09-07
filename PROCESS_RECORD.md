@@ -1465,3 +1465,41 @@ no; today the question was whether providing it voluntarily costs anything,
 and the evidence says no again. The file that was twice renamed to satisfy an
 imagined requirement now exists to record a real habit, which is a better
 reason than the one it started with.
+
+## 2026-09-08 06:05 — A second agent's work folded in, and two components proposed
+
+**Prompt:**
+
+> I use codex to make the appearance better ... if we can build a studio or a
+> code place, they can run and modify code, and test visualize on their own?
+> And another is math, the math derivation, I think we can use a code form ...
+> kind of like video games! With fun.
+
+**Result:**
+The codex appearance pass reviewed and committed as one piece: five new
+components, two figure scripts with SVGs, per-change viewport screenshots
+kept under build/, and a new spec file. Reviewed before committing, not
+after: build green at 27 pages, 15 of 15 tests passing, and the new tests
+read dist/ HTML directly, so they cannot pass vacuously against fields that
+do not exist, which is more than my own first spec tests managed.
+
+Two thin spots noted in the commit rather than fixed, since they are the
+other agent's register: the new figure scripts print one line each where the
+house rule asks for the plotted numbers, and HeroBenchmark states the bench
+facts in a third place.
+
+**Verified:**
+pnpm check on the exact tree that got committed, including the second
+agent's uncommitted work, before it was committed.
+
+**Commit:** [`ea45e92`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/ea45e92)
+
+**What happened:**
+The turn's real content is a proposal, answered in the report rather than
+built: an in-browser bench workbench and a derivation checker. Both pass the
+traceability rule, which is the bar new components have to clear, and the
+recommendation is one shared scoring module, plain JavaScript at small d
+verified against the Python figure numbers, workbench before checker,
+Pyodide only as a stretch. Thirteen days remain and the artefact band
+punishes an unreliable core interaction harder than it rewards an ambitious
+one, so the phasing is the decision, not the ambition.
