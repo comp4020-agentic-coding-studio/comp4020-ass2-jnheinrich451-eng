@@ -1761,3 +1761,56 @@ The third defect was a platform fact worth keeping: Astro stamps scope
 attributes at build time, so a span created by the script never matched its
 own scoped rule and the note ran into the number. Runtime-created elements
 need :global, or styling through inherited custom properties.
+
+## 2026-09-13 09:20 — Week 11, and the last outline closes
+
+**Asked:**
+
+> Yes please, I need it
+
+**Result:**
+Weeks 1 to 8 put instruments on the bench. Week 11 puts one on the reader.
+A claim is declared together with the protocol behind it, and the page runs
+that protocol twelve times on fresh recordings and reports what the runs
+support rather than what the claim asserts.
+
+Four outcomes, all of them real and all of them driven in the browser. Your
+protocol backs the claim and another, equally honest, reverses it. Your own
+protocol contradicts you. The instrument reports the candidate you named at
+its own floor, which is not ranking it low but being unable to see it. Or,
+on independent frames, there is no ordering in the evidence at all.
+
+The panel at the bottom is the deliverable: the sentence the evidence
+supports, with the instrument, the sample size, the repeat count and the
+protocol that reverses it. It never says a candidate is worse, only that an
+instrument at a sample size called it worse, which is the shape a claim has
+to take before a reader can disagree with it.
+
+Measuring first paid again: the verdicts are unanimous at every sample size,
+so the disagreement between instruments is not sampling noise and no amount
+of further measurement dissolves it. That is a stronger and less convenient
+finding than the instability I had expected to build around.
+
+**Verified:**
+numpy recorded every instrument's verdict at every sample size and at zero
+correlation before the engine existed; the spec failed on the missing
+function, then passed, then failed again on a verdict rule that returns the
+smaller score. All four outcomes driven over the devtools protocol, plus a
+router round trip and the phone viewport. Build clean, 113 of 113 tests.
+
+**Commit:** [`02f4088`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/02f4088)
+
+**What happened:**
+Two defects were mine and both were honesty defects rather than bugs. The
+floor line told the reader that the verdict does not change with N while the
+page had only ever measured the verdict at one N; it now runs the verdict at
+each sample size and reports what it found. And the "no ordering" outcome was
+advertised in the legend but unreachable, because the recordings' structure
+was not something a reader could declare - found by reading my own component
+rather than by any check, which is the third time this month that reading the
+rendered page has caught what the suite could not.
+
+One check was quietly dying too. The outline-labelling assertion is inside an
+`if` on a stage no lecture has any more, so it had nothing left to exercise.
+It now asserts both directions, and was falsified by forcing every lecture
+page to call itself a preview.
