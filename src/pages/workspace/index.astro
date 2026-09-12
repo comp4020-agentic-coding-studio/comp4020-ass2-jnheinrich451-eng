@@ -1,0 +1,30 @@
+---
+import BaseLayout from 'astro-theme-university/layouts/BaseLayout.astro';
+import PythonWorkspace from '../../components/workspace/PythonWorkspace.astro';
+import LabNavigation from '../../components/LabNavigation.astro';
+import { siteConfig } from '../../site-config';
+import { withBase } from 'astro-theme-university/url';
+---
+<BaseLayout title="Workspace" description="Change the code behind a Gaussian-distance experiment. Test how sample size affects estimated scores while the distributions stay fixed." mainAttrs={{class:'workspace-main'}} {...siteConfig}>
+  <div class="workspace-page">
+    <LabNavigation current="workspace" />
+    <header><p class="eyebrow">SLOP8412 / Experimental workspace / 01</p><h1>The distributions stay fixed.<br />Does the ranking?</h1><p>Change the sample size, seed or estimator. Run real Python and examine what moves. A smaller reported score need not mean a better underlying distribution.</p></header>
+    <aside class="experiment-note" aria-label="Experiment scope"><strong>A one-dimensional model of the measurement problem.</strong> This lab fits Gaussians to synthetic scalar samples. It is not image-based FID: there are no images, Inception features or 2,048-dimensional covariance matrices. R, A and B here are local toy distributions, not the course bench parameters.</aside>
+    <PythonWorkspace />
+    <section class="experiment-guide" aria-labelledby="try-next"><div><h2 id="try-next">Make one change. Keep the evidence.</h2><ol><li>Run the starter. Compare the mean estimates with the population distances.</li><li>Change only the seed. Does the ordering survive?</li><li>Increase the repetitions. This stabilises the average; does it remove finite-sample bias?</li><li>Change <code>ddof=1</code> to <code>ddof=0</code>. Record the implementation change alongside the score.</li></ol><p>Continue with <a href={withBase('/sessions/05-the-bias/')}>Week 5: The bias</a>, or record the result in your <a href={withBase('/assessments/measurement-log/')}>measurement log</a>.</p></div>
+    <div><h2>Before you run</h2><ul><li>Python 3.12 / Pyodide 0.27.7 and NumPy download from jsDelivr on first Run. First loading may take a while.</li><li>Runs execute locally in your browser. There is no course execution server or submission service. Only run code you trust; Python can access browser networking.</li><li>Stop & reset clears variables, not cells. Execution is limited to 30 seconds per cell; runtime loading to 90 seconds.</li><li>Individual code cells share variables in execution order. Run all clears variables and runs top to bottom, stopping on the first error. Resetting or leaving this page clears runtime state; saved source cells remain.</li><li>Export creates a Python file with <code># %%</code> cell separators; importing it restores the cells. This is a code-cell notebook, not full <code>.ipynb</code> file support. For plots, assign or update a JSON-compatible <code>plot</code> dictionary as the starter does.</li></ul></div></section>
+  </div>
+</BaseLayout>
+<style>
+  :global(.at-main.workspace-main) {grid-column:full;display:block;padding:0;}
+  :global(body:has(.workspace-main)::after) {display:none;}
+  .workspace-page {grid-column:full;max-width:1440px;width:100%;box-sizing:border-box;margin:auto;padding:2.5rem clamp(1rem,4vw,4rem);}
+  header {max-width:58rem;}
+  .eyebrow {font:.75rem var(--at-font-mono,monospace);letter-spacing:.08em;color:var(--at-primary);}
+  h1 {font-size:clamp(2rem,4vw,3.7rem);line-height:1.08;letter-spacing:-.045em;margin-block:1rem;}
+  header>p:last-child {font-size:1.15rem;line-height:1.65;max-width:65ch;}
+  .experiment-note {border-left:2px solid var(--at-primary);padding:.5rem 1rem;max-width:90ch;font-size:.9rem;line-height:1.65;margin-top:1.5rem;}
+  .experiment-guide {display:grid;grid-template-columns:1fr 1fr;gap:3rem;line-height:1.75;}
+  h2 {font-size:1.4rem;}
+  @media(max-width:800px){.experiment-guide {grid-template-columns:1fr;gap:1rem;}}
+</style>

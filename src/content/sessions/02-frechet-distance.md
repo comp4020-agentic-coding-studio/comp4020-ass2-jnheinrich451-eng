@@ -18,22 +18,22 @@ related:
   - 01-the-number
 ---
 
-Set the library aside for this session and try to get the distance between A
-and R out of the definition alone. The Wasserstein-2 distance between two
-distributions is the smallest value, over every joint distribution having
-those two as its marginals, of the expected squared distance between paired
-samples. It is an optimisation, and the space it searches is very large.
+The bench has a population score before anyone draws a sample. Set the
+library aside and recover it from the definition. The squared Wasserstein-2
+distance W₂² is the minimum expected squared distance between paired samples,
+over all joint distributions with the prescribed marginals. W₂ is the square
+root of that minimum. FID uses the squared quantity.
 
 This session is the argument that turns that optimisation into arithmetic.
 
 ## The chain
 
-Restrict the coupling to be jointly Gaussian. Under that restriction the
-objective depends on nothing but the two means and the two covariances, the
-search over couplings collapses to a search over cross-covariances, and the
-optimum has a closed form:
+For Gaussian marginals, an optimal coupling can be chosen jointly Gaussian;
+this does not increase the minimum. The quadratic objective depends on the
+means, marginal covariances and cross-covariance of the coupling. Optimising
+the admissible cross-covariance gives:
 
-d² = ‖μ₁ − μ₂‖² + Tr(Σ₁ + Σ₂ − 2(Σ₁Σ₂)^½)
+W₂² = ‖μ₁ − μ₂‖² + Tr(Σ₁ + Σ₂ − 2(Σ₁Σ₂)^½)
 
 Two terms, and they do different work. The first is the squared distance
 between the means, and no property of either distribution's shape enters it.
@@ -46,31 +46,43 @@ it; read them for how a borrowed result becomes a metric, not for the algebra.
 
 ## The step that costs
 
-Only one step in that chain needs the assumption, and it is the first:
-restricting the coupling to be jointly Gaussian. Everything after it is
-algebra that holds regardless. Without that restriction there is no closed
-form at all, and the distance has to be recovered by solving the transport
-problem numerically.
+Gaussian marginals justify the jointly Gaussian optimum. For arbitrary
+distributions, their means and covariances alone do not generally determine
+W₂². Special non-Gaussian cases can still be solved analytically; what fails
+is the claim that these moments suffice for every distribution.
 
-So the score is defined on Gaussians and computed on features that are not.
-Week 7 is where we stop assuming, and see what the alternatives cost.
+FID applies the Gaussian formula to feature moments even when the feature
+distributions are not Gaussian. It then compares their Gaussian fits, not
+necessarily their true transport distance. Week 6 tests what this loses;
+week 7 asks what alternatives cost.
 
 ## Two forms of the same trace
 
 The cross term appears as (Σ₁Σ₂)^½ in the papers and as
-(Σ₁^½ Σ₂ Σ₁^½)^½ in careful implementations. The two matrices are not the
-same, but their traces are equal, and the second is symmetric. That
+(Σ₁^½ Σ₂ Σ₁^½)^½ in careful implementations. The two matrices are not generally
+the same, but their traces are equal, and the second is symmetric. That
 distinction is invisible on paper and not invisible to a numerical routine,
 which is week 4's subject.
+
+## Make covariance visible
+
+Open the [2D correlation experiment](/math-lab/#correlation). Match the
+reference, then select positive and negative correlation. Record the full
+squared distance and both marginal distances. Explain why changing a
+relationship can move the full score while neither coordinate curve moves.
+This is a zero-mean, two-dimensional population calculation, not a sampled
+score or a projection of candidate A or B.
 
 ## Exercise
 
 Both bench candidates reduce to a scalar times 2048. A differs from R in its
-mean alone, so its distance is 2048 × 0.05², or 5.12. B differs in covariance
-alone, so its distance is 2048 × (2.1 − 2√1.1), or about 4.88. Derive both by
+mean alone, so its population FID is 2048 × 0.05², or 5.12. B differs in covariance
+alone, so its population FID is 2048 × (2.1 − 2√1.1), or about 4.88. Derive both by
 hand. Then project the bench onto two coordinates and compute the distance in
 that plane by hand as well, and check it against the library.
 
-Score the bench at large N and compare. B is the better candidate, by a
-little. The library will return neither 5.12 nor 4.88; it will return
-something above both. Record what you get, and at what N.
+Score the bench at large N and compare. B has the smaller population FID,
+by a little; estimated scores fluctuate and need not preserve that ordering.
+Record both estimates and N in your [measurement log](/assessments/measurement-log/).
+Keep the population values beside them: week 5 needs that baseline to ask
+whether the discrepancy is sampling variation or systematic bias.

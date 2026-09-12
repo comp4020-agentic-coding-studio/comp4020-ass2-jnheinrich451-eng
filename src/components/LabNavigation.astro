@@ -1,0 +1,11 @@
+---
+import {withBase} from 'astro-theme-university/url';
+interface Props {current:'workspace'|'math-lab'}
+const {current}=Astro.props;
+---
+<!-- Keep essential separation on the element itself. Page-scoped CSS can be
+     absent during a route/style refresh; these links must never touch then. -->
+<nav class="lab-navigation" aria-label="Interactive labs" style="display:flex;flex-wrap:wrap;gap:0.75rem 1.5rem;">
+  <a href={withBase('/workspace/')} aria-current={current==='workspace'?'page':undefined}>Python workspace</a>
+  <a href={withBase('/math-lab/')} aria-current={current==='math-lab'?'page':undefined}>Maths lab</a>
+</nav>

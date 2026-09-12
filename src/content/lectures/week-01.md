@@ -7,6 +7,8 @@ week: 1
 date: 2026-08-03
 arc: A
 workbench: true
+lecture_format: demo
+lecture_stage: ready
 related:
   - sessions/01-the-number
 ---

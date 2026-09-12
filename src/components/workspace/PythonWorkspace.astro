@@ -1,0 +1,81 @@
+---
+import starter from '../../../figures/workspace-sample-size.py?raw';
+import { withBase } from 'astro-theme-university/url';
+import NotebookCell from './NotebookCell.astro';
+const parts=starter.split(/(?=^rng =|^# The workspace accepts)/m);
+---
+<python-workspace data-worker={withBase('/workspace/python.worker.mjs')}>
+  <div class="workspace-toolbar" aria-label="Notebook controls">
+    <button data-action="run" disabled>Run all ↗</button>
+    <button data-action="add" disabled>+ Code cell</button>
+    <button data-action="stop" disabled>Stop & reset</button>
+    <button data-action="restart" disabled>Reset runtime</button>
+    <button data-action="export" disabled>Export .py</button>
+    <label class="import-label">Import .py<input type="file" accept=".py,text/x-python,text/plain" disabled /></label>
+    <button data-action="restore" disabled>Restore starter</button>
+  </div>
+  <p class="runtime-status" role="status" aria-live="polite">Enable JavaScript to execute Python. The starter remains readable below.</p>
+  <p id="notebook-help" class="help">Run cell: shared variables · Run all: fresh variables, top to bottom · Ctrl / ⌘ + Enter: run focused cell · Tab: leave editor. Deleting a cell does not undo its Python variables; reset or Run all to rebuild state.</p>
+  <div class="workspace-panes">
+    <section aria-labelledby="editor-heading">
+      <div class="pane-heading"><h2 id="editor-heading">01 / Notebook</h2><span>Python · NumPy</span></div>
+      <div data-cells>{parts.map((code,index)=><NotebookCell code={code} index={index} />)}</div>
+      <p id="code-storage" class="help">Export a copy before leaving. Browser storage is not a backup.</p>
+    </section>
+    <section class="results" aria-labelledby="results-heading">
+      <div class="pane-heading"><h2 id="results-heading">02 / Results</h2><span data-result-state>No run yet</span></div>
+      <h3 data-plot-title>Your code supplies the evidence.</h3>
+      <div data-plot><p class="empty-plot">Run all to compute the starter plot. Cells can change the plot by assigning or modifying the <code>plot</code> dictionary.</p></div>
+      <p class="help" data-run-note>The latest plot stays here while you work. Cell outputs appear beneath each editor. Saved cells do not include live Python variables or outputs.</p>
+    </section>
+  </div>
+  <template><NotebookCell /></template>
+</python-workspace>
+<script>
+  import './notebook-controller';
+</script>
+<style>
+  python-workspace {
+    --ws-bg:#ffffff; --ws-surface:#ffffff; --ws-text:#24211c;
+    --ws-muted:#655f56; --ws-border:#c6bfb3; --ws-control:#8e7b59;
+    --ws-accent:#865600; --ws-focus:#17648e; --ws-button:#eab85b;
+    --ws-series-a:#865600; --ws-series-b:#17648e; --ws-series-c:#85417e;
+    --ws-series-d:#486824; --ws-series-e:#a13d32; --ws-series-f:#47423b;
+  }
+  :global(html[data-theme='dark']) python-workspace {
+    color-scheme:dark;
+    --ws-bg:#030305; --ws-surface:#0c0c10; --ws-text:#eee8dc;
+    --ws-muted:#c2beb4; --ws-border:#484036; --ws-control:#a18a60;
+    --ws-accent:#eab85b; --ws-focus:#85c7e9;
+    --ws-series-a:#eab85b; --ws-series-b:#85c7e9; --ws-series-c:#d6a3d8;
+    --ws-series-d:#a6cf8a; --ws-series-e:#f69f96; --ws-series-f:#eee8dc;
+  }
+  python-workspace {display:block;background:var(--ws-bg);color:var(--ws-text);color-scheme:light;border-top:1px solid var(--ws-accent);padding:1.25rem;margin-block:2rem;}
+  python-workspace :global(*) {scrollbar-color:var(--ws-control) transparent;scrollbar-width:thin;}
+  python-workspace :global(*::-webkit-scrollbar) {width:8px;height:8px;}
+  python-workspace :global(*::-webkit-scrollbar-track),python-workspace :global(*::-webkit-scrollbar-corner) {background:transparent;}
+  python-workspace :global(*::-webkit-scrollbar-thumb) {background:var(--ws-control);border-radius:4px;}
+  .workspace-toolbar {display:flex;flex-wrap:wrap;gap:.6rem;}
+  button,.import-label {font:.8rem var(--at-font-mono,monospace);background:transparent;border:1px solid var(--ws-control);color:var(--ws-text);border-radius:2px;padding:.65rem .8rem;cursor:pointer;}
+  button[data-action=run] {background:var(--ws-button);color:#24211c;border-color:var(--ws-accent);}
+  button:disabled {opacity:.5;cursor:default;}
+  .import-label {position:relative;display:flex;align-items:center;margin:0;}
+  input[type=file] {position:absolute;inset:0;opacity:0;width:100%;cursor:pointer;}
+  .import-label:focus-within,button:focus-visible {outline:2px solid var(--ws-focus);outline-offset:3px;}
+  .runtime-status {font:.8rem/1.6 var(--at-font-mono,monospace);color:var(--ws-accent);min-height:2.6em;margin-block:1rem;}
+  .workspace-panes {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem;align-items:start;}
+  .workspace-panes section {min-width:0;}
+  .results {position:sticky;top:calc(var(--at-nav-height) + 1rem);max-height:calc(100dvh - var(--at-nav-height) - 2rem);overflow:auto;}
+  .pane-heading {display:flex;flex-wrap:wrap;gap:.5rem;justify-content:space-between;align-items:center;border-block:1px solid var(--ws-border);padding-block:.8rem;margin-bottom:1rem;}
+  .pane-heading h2 {font:.8rem var(--at-font-mono,monospace);color:var(--ws-accent);margin:0;}
+  .pane-heading span {font:.7rem var(--at-font-mono,monospace);color:var(--ws-muted);}
+  .help {color:var(--ws-muted);font-size:.75rem;line-height:1.65;}
+  h3 {font-size:1.25rem;color:var(--ws-text);}
+  .empty-plot {padding:3rem 1rem;border-block:1px dashed var(--ws-control);color:var(--ws-muted);line-height:1.8;}
+  [data-plot] :global(svg) {display:block;width:100%;height:auto;}
+  [data-plot] :global(.plot-legend) {list-style:none;display:flex;flex-wrap:wrap;gap:.6rem 1rem;padding:0;font-size:.75rem;}
+  [data-plot] :global(.plot-table) {overflow:auto;max-height:24rem;}
+  [data-plot] :global(table) {font-size:.75rem;color:var(--ws-text);width:100%;}
+  [data-plot] :global(:is(th,td,caption)) {color:var(--ws-text);background:var(--ws-surface);padding:.5rem;text-align:left;}
+  @media(max-width:800px){.workspace-panes {grid-template-columns:minmax(0,1fr);}python-workspace {padding:1rem;}button,.import-label {padding:.65rem .5rem;font-size:.75rem;}.results {position:static;max-height:none;overflow:visible;}}
+</style>

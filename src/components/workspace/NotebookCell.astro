@@ -1,0 +1,29 @@
+---
+interface Props { code?: string; index?: number; }
+const {code='',index=0}=Astro.props;
+---
+<section class="notebook-cell" data-cell>
+  <div class="cell-toolbar">
+    <label for={`cell-code-${index}`} data-cell-label>Code cell {index+1}</label>
+    <span data-execution aria-label="Execution number">[ ]</span>
+    <button data-cell-action="run" disabled>Run cell</button>
+    <button data-cell-action="add" disabled>+ Below</button>
+    <button data-cell-action="delete" disabled>Delete</button>
+  </div>
+  <textarea id={`cell-code-${index}`} spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="notebook-help" wrap="off">{code}</textarea>
+  <p class="cell-status" data-cell-status>No execution yet.</p>
+  <details class="console" open><summary>Cell output / errors</summary><pre data-output tabindex="0" aria-label={`Output of code cell ${index+1}`}>No execution yet.</pre></details>
+</section>
+<style>
+  .notebook-cell {margin-bottom:1.5rem;border-bottom:1px solid var(--ws-border);padding-bottom:1rem;min-width:0;}
+  .cell-toolbar {display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.6rem;}
+  label {font:.8rem var(--at-font-mono,monospace);font-weight:400;margin-right:auto;}
+  [data-execution] {font:.75rem var(--at-font-mono,monospace);color:var(--ws-accent);}
+  button {font:.7rem var(--at-font-mono,monospace);padding:.45rem .6rem;background:transparent;border:1px solid var(--ws-control);color:var(--ws-text);cursor:pointer;}
+  button:disabled {opacity:.5;cursor:default;}
+  textarea {box-sizing:border-box;width:100%;max-width:100%;height:20rem;min-height:7rem;resize:vertical;background:var(--ws-surface);color:var(--ws-text);border:1px solid var(--ws-border);padding:.8rem;font:.8rem/1.65 var(--at-font-mono,monospace);tab-size:4;}
+  .cell-status {font:.7rem/1.6 var(--at-font-mono,monospace);color:var(--ws-muted);}
+  pre {background:var(--ws-surface);color:var(--ws-text);padding:.8rem;max-height:14rem;overflow:auto;font:.75rem/1.6 var(--at-font-mono,monospace);}
+  summary {cursor:pointer;padding:.5rem 0;font-size:.8rem;}
+  :is(button,textarea,pre):focus-visible {outline:2px solid var(--ws-focus);outline-offset:3px;}
+</style>

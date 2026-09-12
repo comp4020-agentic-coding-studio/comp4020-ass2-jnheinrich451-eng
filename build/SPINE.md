@@ -11,6 +11,24 @@ Conventions
 - Reading keys below are the three already verified. Anything else is in the
   "to verify" table and must not enter `src/` until it has a `verified:` date.
 
+## Lecture rhythm: 4+1
+
+Weekly sessions remain the twelve-week backbone. A live introduction in
+week 1 precedes four formal lectures, roughly three teaching weeks apart.
+Dates follow the corresponding scheduled session, including the teaching break.
+
+| Week | Format | Role in the argument | Later use |
+|---|---|---|---|
+| 1 | Live introduction | Meet the bench and observe sampling variation | Week 5 revisits the gap |
+| 2 | Formal lecture | Derive the Gaussian squared distance | Week 5 separates population quantity from estimate |
+| 5 | Formal lecture | Question the estimate using the pinned protocol | Week 8 tests what transfers to video |
+| 8 | Formal lecture | Change the instrument without assuming its validity | Week 11 must defend the evidence behind a report |
+| 11 | Formal lecture | Defend a reporting protocol with the semester's evidence | Week 12 presentations test that defence |
+
+Weeks 5, 8 and 11 initially ship as explicitly labelled outline previews,
+with existing session/lab links, not as completed slide decks. The week 2
+deck is retained pending the author's separate refinement direction.
+
 ## Reading keys on every session
 
 | Session | required_reading | further_reading |

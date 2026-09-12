@@ -912,9 +912,9 @@ Optional speaker-note connection:
 
 ## Two Gaussians, One Number
 
-There is one formal lecture in SLOP8412.
+This is the first of four formal lectures in SLOP8412, following the week 1 live introduction.
 
-The Fréchet distance has to be derived once, carefully. After that, the course leaves the whiteboard and moves to the measurement bench.
+The Fréchet distance has to be derived once, carefully. Lectures in weeks 5, 8 and 11 return to the measurement bench to question the estimate, change the instrument and defend what gets reported.
 
 This lecture starts from a simple requirement — compare two distributions without inventing sample-to-sample correspondences — and arrives at the Gaussian Wasserstein-2 closed form used by FID. The final part separates the clean mathematical object from the practical measurement pipeline built around Inception features, finite samples, preprocessing, and Gaussian moment fitting.
 

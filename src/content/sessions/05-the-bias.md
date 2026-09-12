@@ -1,7 +1,7 @@
 ---
 title: The bias
 description:
-  FID is biased at every finite N, the bias depends on the generator, and
+  Finite-sample FID is biased, the bias depends on the generator, and
   fixing N does not repair the comparison
 week: 5
 date: 2026-08-31
@@ -9,8 +9,8 @@ arc: B
 required_reading: chong-forsyth-2020
 further_reading: [binkowski-2018, heusel-2017]
 spec:
-  - you can say why the estimator sits above the true value, from the
-    expansion rather than from intuition
+  - you can explain the leading bias in expectation from the expansion,
+    and distinguish it from the error in one estimate
   - you have produced two models whose measured ranking is stable,
     repeatable, and wrong
   - you can say what an N-honest comparison is, and why it is not enough
@@ -22,23 +22,25 @@ related:
 Take the bench. Freeze both generators. Score the first one against the
 reference set with 1,000 samples, then again with 50,000.
 
-The second number is lower. Nothing about the generator changed.
+The average score can fall as N increases while nothing about the generator
+changes. One pair of measurements cannot establish that trend; repeat the
+draws and compare their averages.
 
 ## What moved
 
-Both moments in the score are estimated from samples, and the score is a
-smooth nonlinear function of them. Expand it around the true value and
-the second-order term does not vanish in expectation. What you get is the
-true score plus a term that falls off as 1/N.
+Week 2 supplied a population quantity; week 4 pinned its implementation.
+Sampling still intervenes. Where the score is sufficiently smooth and the
+moment estimates satisfy the expansion's assumptions, the leading bias is
+of order 1/N, with higher-order corrections. It depends on the generator.
 
-The term is positive. Every FID you have ever read is too high, including
-the ones in your own week 4 notebook.
+The upward bias concerns the score in expectation over repeated draws.
+An individual estimate can fall below its population value. Likewise, a
+larger sample does not guarantee a lower score on every run. Your week 4
+notebook contains observations, not expectations.
 
-That alone would be survivable. If the inflation were a property of the
-score, everyone would report numbers that are wrong by the same amount and
-the ordering would still hold. It is not a property of the score. The size
-of the term depends on the sampling variance of the generator being
-measured, which is to say it depends on the generator.
+If every generator had the same expected inflation, their ordering would
+survive it. Different bias terms can change the ordering even when N is
+identical. That is the comparison we need to test.
 
 Chong and Forsyth measured this across four models and found the
 relationship linear in 1/N in every case, with slopes that differ
@@ -66,22 +68,22 @@ Across a hundred evaluations, every single estimate of the better model
 came out worse than every single estimate of the worse one. The reported
 standard deviations were 0.2 and 0.5.
 
-So the estimator was not uncertain. It was precise, repeatable, and wrong,
-and its error bars gave no warning at all. At 100,000 samples the ordering
-came out right in all hundred trials.
+The estimates were precise, repeatable, and wrongly ordered. Their small
+standard deviations described sampling variation, not accuracy. At 100,000
+samples the ordering came out right in all hundred trials in that experiment.
 
 ## Where 50,000 came from
 
-Heusel and colleagues generate 50,000 images. The paper offers no argument
-for the figure, and none has been supplied since. The number that governs
-almost every score in the field entered the record as a setting.
+The original score used 50,000 generated images. Treat that as a protocol
+setting, not a sample-size guarantee for every generator and reference set.
 
 ## The repair, and its price
 
 Compute the score at several sample sizes, fit a line in 1/N, read off the
-intercept. Chong and Forsyth call the result FID∞. It requires no new
-theory. It requires that you evaluate more than once, which is the entire
-reason it is not standard.
+intercept. This estimates FID∞ for the chosen sampling protocol; it is not
+an exact correction. Inspect fit residuals and sensitivity to the N range.
+A finite reference set held fixed does not become a population reference
+merely because generated-sample N is extrapolated to infinity.
 
 We will use it on the bench from week 6 onwards. Week 4's numbers are now
 retired.
@@ -92,6 +94,18 @@ Read Chong and Forsyth for Figure 2. Come able to say what the differing
 slopes mean, and what the caption admits.
 
 ## Exercise
+
+First use the [Python workspace](/workspace/). Keep both generators fixed,
+run the starter, then change only the seed. Compare the mean estimates at
+each N with the known population values. Increase repetitions to separate
+Monte Carlo variation from a persistent discrepancy.
+
+This is a one-dimensional preparatory model, not the 2,048-dimensional bench
+or the published inversion below. The starter shares a reference draw between
+A and B within each trial, but redraws it across trials and sample sizes.
+Record that protocol, the seed, N, repetitions and implementation in your
+[measurement log](/assessments/measurement-log/). Do not assume its ranking
+must reverse for your chosen seed.
 
 Reproduce the inversion using the construction in Bińkowski, Appendix D.2.
 Report the sample size at which the ordering becomes stable, and report the

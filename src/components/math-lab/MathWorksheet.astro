@@ -1,0 +1,86 @@
+---
+import {WORKSHEETS,runWorksheet} from '../../lib/math-worksheet';
+import {worksheetFigure} from '../../../figures/math-worksheet';
+const initial=runWorksheet(WORKSHEETS[0].source);
+const graph=worksheetFigure(initial);
+---
+<math-worksheet>
+  <header class="worksheet-heading"><div><p class="eyebrow">Experiment 02 / Equation-driven worksheet</p><h2>Write the construction.<br/>Interrogate the number.</h2></div><p>Different causes can collapse to the same score. Write a constraint, find its solutions, then inspect what each solution changes.</p></header>
+  <div class="worksheet-toolbar"><label for="worksheet-example">Starting question <select id="worksheet-example" data-example disabled>{WORKSHEETS.map((w,i)=><option value={i}>{w.name}</option>)}</select></label><button data-load disabled>Load example</button><button data-undo disabled>Undo edit</button></div>
+  <p data-question class="question">{WORKSHEETS[0].question}</p>
+  <div class="worksheet-grid">
+    <section class="source-panel" aria-labelledby="worksheet-source-title">
+      <div class="panel-heading"><h3 id="worksheet-source-title">Your definitions</h3><span>01 / INPUT</span></div>
+      <label class="editor-label" for="worksheet-source">Mathematical worksheet</label>
+      <textarea id="worksheet-source" data-source spellcheck="false" autocapitalize="off" autocomplete="off" maxlength="12000" aria-describedby="worksheet-help" disabled>{WORKSHEETS[0].source}</textarea>
+      <p id="worksheet-help" class="quiet">Edit a parameter or expression. Definitions recalculate together; each name is defined once. Ctrl / ⌘ + Enter runs immediately. Tab leaves the editor.</p>
+      <div class="run-controls"><button data-run disabled>Evaluate worksheet ↗</button><label><input data-live type="checkbox" checked disabled/> Recalculate as I type</label></div>
+      <p data-status role="status" aria-live="polite">Enable JavaScript to edit and solve locally. The initial construction is shown below.</p>
+      <details class="syntax"><summary>Language and numerical limits</summary>
+        <p>This is a bounded maths language, not Python or a general proof assistant. It uses no runtime downloads or backend.</p>
+        <ul><li><code>+ - * / ^</code>, parentheses, <code>sqrt(x)</code>, <code>abs(x)</code> and <code>pi</code>. Write multiplication explicitly.</li><li><code>Normal(mean=…, sd=…)</code> takes scalars or equal-length vectors. Vectors mean independent coordinates, with diagonal covariance. No full covariance matrices or broadcasting.</li><li><code>distance(R, G)</code> computes squared Gaussian W₂ distance. R and G are required; other names are yours.</li><li><code>solve D = 4 for m</code> holds other independent parameters fixed and follows dependent definitions. Define m first. The equation must expand to a polynomial of degree at most 2 in m; variable denominators and symbolic square roots are unsupported.</li><li><code>check D = guess</code> compares numbers at the current construction, with relative tolerance 10⁻⁹. Agreement is not proof of an identity.</li><li>Up to 16 dimensions, 100 lines and 12,000 characters. Each coordinate requires |mean| ≤ 1000 and 0.01 ≤ sd ≤ 1000. Algebra uses floating-point coefficients; displayed decimals are rounded.</li></ul>
+      </details>
+    </section>
+    <section class="result-panel" aria-labelledby="worksheet-result-title">
+      <div class="panel-heading"><h3 id="worksheet-result-title">The resulting construction</h3><span>02 / OUTPUT</span></div>
+      <p data-stale hidden class="stale">Previous successful result. It does not describe the current editor.</p>
+      <div class="scoreline"><div><p class="quiet">Squared Gaussian distance(R, G)</p><output data-worksheet-total>2.5</output></div><p class="score-meta"><span data-dimensions>1 dimension</span><br/>Population calculation<br/>Not image-based FID</p></div>
+      <p class="plot-legend"><span class="reference-key">● R / reference</span><span class="candidate-key">● G / candidate</span></p>
+      <label class="marginal-label" for="worksheet-dimension">View marginal <select id="worksheet-dimension" data-dimension disabled><option value="0">Coordinate 1</option></select></label>
+      <svg data-worksheet-plot viewBox="0 0 800 340" role="img" aria-labelledby="worksheet-plot-title worksheet-plot-desc">
+        <title id="worksheet-plot-title">Gaussian marginal probability densities</title><desc id="worksheet-plot-desc">Reference mean 0 and standard deviation 1; candidate mean 1.5 and standard deviation 1.5. The horizontal and vertical axes adapt to the construction.</desc>
+        {[0,1,2,3,4].map(i=><line x1="55" x2="745" y1={285-i*60} y2={285-i*60} class="plot-grid"/>)}
+        <path data-ws-reference d={graph.paths[0]} class="reference-path"/><path data-ws-candidate d={graph.paths[1]} class="candidate-path"/>
+        {[0,1,2,3,4].map(i=><text data-x-tick x={55+i*172.5} y="323" text-anchor="middle">{(graph.lo+(graph.hi-graph.lo)*i/4).toFixed(2)}</text>)}
+      </svg>
+      <p data-axis-note class="quiet">Density vs feature coordinate. Both axes adapt; Gaussian tails continue beyond view.</p>
+      <div class="table-wrap"><table><caption>Contribution of each coordinate to the total</caption><thead><tr><th scope="col">Coordinate</th><th scope="col">Mean²</th><th scope="col">SD difference²</th><th scope="col">Sum</th></tr></thead><tbody data-contributions><tr><th scope="row">1</th><td>2.25</td><td>0.25</td><td>2.5</td></tr></tbody></table></div>
+      <details><summary>Show computation and current values</summary><p>For diagonal covariance, D = Σᵢ [(μR,ᵢ − μG,ᵢ)² + (σR,ᵢ − σG,ᵢ)²]. These σ values are standard deviations. Off-diagonal covariance is not represented.</p><pre data-values>m = 1.5
+s = 1.5
+D = 2.5</pre></details>
+    </section>
+  </div>
+  <section class="reasoning-panel" aria-labelledby="worksheet-reasoning-title"><div class="panel-heading"><h3 id="worksheet-reasoning-title">Solutions and challenges</h3><span>03 / REASONING</span></div><div data-command-results><p>The initial constraint reduces to m² − 3.75 = 0. There are two means: approximately −1.9364917 and +1.9364917. Enable JavaScript to apply either solution.</p></div></section>
+  <p class="worksheet-footnote">The equation is the source of truth: applying a solution edits its parameter above. Nothing is uploaded. Your last valid worksheet is saved in this browser when storage is available; clear it with <button data-clear disabled>Reset saved worksheet</button>.</p>
+</math-worksheet>
+<script>import './math-worksheet-controller';</script>
+<style>
+  math-worksheet {--ws-bg:#fff;--ws-soft:#faf8f3;--ws-text:#24211c;--ws-muted:#655f56;--ws-rule:#c6bfb3;--ws-gold:#865600;--ws-blue:#17648e;display:block;color:var(--ws-text);background:var(--ws-bg);border-block:1px solid var(--ws-gold);padding:clamp(1rem,2.4vw,2rem);margin-block:2rem;}
+  :global(html[data-theme=dark]) math-worksheet {--ws-bg:#030305;--ws-soft:#101012;--ws-text:#eee8dc;--ws-muted:#c2beb4;--ws-rule:#645b4d;--ws-gold:#eab85b;--ws-blue:#85c7e9;color-scheme:dark;}
+  .worksheet-heading {display:flex;gap:2rem;justify-content:space-between;align-items:end;margin-bottom:1.8rem;}.worksheet-heading>p {max-width:43ch;font-size:.95rem;line-height:1.7;margin:0;}
+  .eyebrow,.panel-heading>span {font:.7rem var(--at-font-mono,monospace);letter-spacing:.06em;color:var(--ws-gold);}.eyebrow {margin:0 0 .8rem;}
+  h2 {font-size:clamp(1.65rem,3vw,2.65rem);letter-spacing:-.035em;line-height:1.12;margin:0;color:var(--ws-text);}
+  h3 {font-size:1rem;color:var(--ws-text);margin:0;}.panel-heading {display:flex;justify-content:space-between;gap:.7rem;align-items:baseline;margin-bottom:1rem;border-bottom:1px solid var(--ws-rule);padding-bottom:.8rem;}
+  .worksheet-toolbar,.run-controls {display:flex;gap:.7rem 1rem;flex-wrap:wrap;align-items:end;}.worksheet-toolbar {padding-top:1rem;border-top:1px solid var(--ws-rule);}.worksheet-toolbar label {flex:1;min-width:12rem;max-width:25rem;}
+  label {display:block;font-size:.8rem;font-weight:400;}.run-controls label {display:flex;gap:.5rem;align-items:center;min-height:2.75rem;}
+  select,textarea {background:var(--ws-bg);color:var(--ws-text);border:1px solid var(--ws-rule);font: .85rem/1.6 var(--at-font-mono,monospace);box-sizing:border-box;max-width:100%;}
+  select {padding:.5rem;width:100%;margin-top:.35rem;}button {font:.8rem/1.5 var(--at-font-mono,monospace);background:transparent;color:var(--ws-text);border:1px solid var(--ws-gold);padding:.6rem .85rem;cursor:pointer;min-height:2.75rem;}
+  button:disabled {opacity:.5;cursor:default;}[data-run] {background:var(--ws-gold);color:var(--ws-bg);}
+  .question {color:var(--ws-gold);font-size:.95rem;line-height:1.65;margin:1.2rem 0 1.6rem;}
+  .worksheet-grid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:2rem;}.worksheet-grid>section {min-width:0;}
+  .editor-label {margin-bottom:.5rem;color:var(--ws-muted);}textarea {width:100%;min-height:22rem;resize:vertical;background:var(--ws-soft);padding:1rem;tab-size:2;scrollbar-color:var(--ws-gold) transparent;}
+  .quiet {font-size:.78rem;line-height:1.65;color:var(--ws-muted);}.run-controls {margin-top:1rem;align-items:center;}input {accent-color:var(--ws-gold);}
+  [data-status] {font:.8rem/1.65 var(--at-font-mono,monospace);color:var(--ws-gold);min-height:2.7em;overflow-wrap:anywhere;}
+  details {font-size:.85rem;line-height:1.7;margin-top:1.1rem;}summary {cursor:pointer;color:var(--ws-gold);padding:.4rem 0;}code {font-size:.85em;}li {margin-bottom:.65rem;}
+  .scoreline {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.scoreline .quiet {margin:.2rem 0;}output {font:clamp(2.5rem,4.5vw,4rem)/1.2 var(--at-font-sans,sans-serif);letter-spacing:-.04em;color:var(--ws-gold);overflow-wrap:anywhere;}
+  .score-meta {font:.7rem/1.7 var(--at-font-mono,monospace);color:var(--ws-muted);}.plot-legend {display:flex;gap:1rem;font-size:.8rem;margin:1rem 0;}.reference-key {color:var(--ws-blue);}.candidate-key {color:var(--ws-gold);}
+  .marginal-label {display:flex;align-items:center;gap:.8rem;}.marginal-label select {width:auto;margin:0;}
+  svg {display:block;width:100%;height:auto;}.plot-grid {stroke:var(--ws-rule);opacity:.45;}.reference-path,.candidate-path {fill:none;stroke-width:3;}.reference-path {stroke:var(--ws-blue);}.candidate-path {stroke:var(--ws-gold);}svg text {fill:var(--ws-muted);font:18px var(--at-font-mono,monospace);}
+  .table-wrap {overflow:auto;scrollbar-color:var(--ws-gold) transparent;}table {width:100%;border-collapse:collapse;font:.78rem/1.6 var(--at-font-mono,monospace);}caption {text-align:left;font:.8rem/1.5 var(--at-font-sans,sans-serif);padding:.5rem 0;color:var(--ws-muted);}
+  /* Recalculation creates unscoped cells. Anchor their styles to the static
+     wrapper so initial headers and live rows keep identical column edges. */
+  .table-wrap :global(th),.table-wrap :global(td) {text-align:right;vertical-align:middle;border-bottom:1px solid var(--ws-rule);padding:.6rem .3rem;font-variant-numeric:tabular-nums;}
+  .table-wrap :global(th:first-child) {text-align:left;}
+  pre {white-space:pre-wrap;overflow-wrap:anywhere;background:var(--ws-soft);color:var(--ws-text);padding:.8rem;font:.8rem/1.7 var(--at-font-mono,monospace);}
+  .reasoning-panel {margin-top:1.75rem;}.stale {color:var(--ws-gold);border-left:2px solid var(--ws-gold);padding:.6rem;font-size:.85rem;}[hidden] {display:none!important;}
+  [data-command-results] {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
+  [data-command-results] :global(article) {background:var(--ws-soft);border-top:2px solid var(--ws-gold);padding:1.2rem;min-width:0;overflow-wrap:anywhere;}
+  [data-command-results] :global(h4) {font:.85rem/1.6 var(--at-font-mono,monospace);color:var(--ws-text);margin:0 0 .8rem;}
+  [data-command-results] :global(p),[data-command-results] :global(li) {font-size:.85rem;line-height:1.65;}
+  [data-command-results] :global(button) {font:.8rem/1.5 var(--at-font-mono,monospace);background:transparent;color:var(--ws-text);border:0;border-bottom:1px solid var(--ws-gold);padding:.6rem .2rem;margin:.3rem 1rem .3rem 0;cursor:pointer;min-height:2.75rem;}
+  [data-command-results] :global(button:disabled) {opacity:.5;cursor:default;}[data-command-results] :global(summary) {cursor:pointer;color:var(--ws-gold);font-size:.85rem;}
+  .worksheet-footnote {margin-top:1.5rem;font-size:.78rem;line-height:1.7;color:var(--ws-muted);}.worksheet-footnote button {border:0;border-bottom:1px solid var(--ws-gold);padding:.2rem;min-height:2rem;font-size:inherit;}
+  :is(button,textarea,select,input,summary):focus-visible,[data-command-results] :global(button:focus-visible) {outline:2px solid var(--ws-blue);outline-offset:3px;}
+  @media(max-width:900px){.worksheet-grid {grid-template-columns:minmax(0,1fr);}.worksheet-heading {display:block;}.worksheet-heading>p {margin-top:1rem;max-width:65ch;}}
+  @media(max-width:500px){[data-command-results] {grid-template-columns:minmax(0,1fr);}textarea {font-size:16px;min-height:25rem;padding:.65rem;}svg text {font-size:27px;}.scoreline {align-items:start;flex-direction:column;gap:0;}.score-meta {margin-top:.5rem;}.panel-heading>span {font-size:.6rem;}.table-wrap :global(th),.table-wrap :global(td) {font-size:.67rem;}}
+</style>

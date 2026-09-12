@@ -1,0 +1,96 @@
+---
+import { INITIAL,curves,pixelX } from '../../../figures/math-lab';
+const graph=curves(INITIAL);
+---
+<math-lab>
+  <div class="lab-topline"><p>Experiment 01 / Gaussian distance</p><label class="lock-label"><input data-lock type="checkbox" disabled /> Keep score at 4</label></div>
+  <div class="lab-grid">
+    <section class="distribution-panel" aria-labelledby="distribution-title">
+      <h2 id="distribution-title">Different constructions. One score.</h2>
+      <p class="legend"><span class="reference-key">— R · reference</span><span class="candidate-key">— G · candidate</span><span data-pin-legend></span></p>
+      <svg data-density viewBox="0 0 800 405" role="group" aria-labelledby="density-title density-desc">
+        <title id="density-title">Reference and candidate Gaussian densities</title>
+        <desc id="density-desc">Reference mean zero, standard deviation one. Move the circular mean handle or square spread handle. Sliders and number fields below provide the same controls.</desc>
+        <text x="55" y="28" class="axis-label plot-heading">Probability density · vertical scale adjusts</text>
+        <g data-grid>{[0,1,2,3,4].map(i=><g><line x1="55" x2="755" y1={320-i*65} y2={320-i*65}/><text x="45" y={324-i*65} text-anchor="end" data-y-label>{(graph.maxY*i/4).toFixed(2)}</text></g>)}</g>
+        {[-8,-4,0,4,8].map(x=><text x={pixelX(x)} y="347" text-anchor="middle" class="axis-label">{x}</text>)}
+        <text x="405" y="383" text-anchor="middle" class="axis-label plot-caption">Feature coordinate · fixed horizontal scale (tails continue beyond view)</text>
+        <path data-reference d={graph.paths[0]} class="reference-curve"/>
+        <g data-pinned-curves></g>
+        <path data-candidate d={graph.paths[1]} class="candidate-curve"/>
+        <line data-spread-line x1={pixelX(1.5)} x2={pixelX(3)} y1="309" y2="309" class="spread-line"/>
+        <circle data-handle="mu" cx={pixelX(1.5)} cy="309" r="10" role="slider" tabindex="-1" aria-label="Candidate mean" aria-valuemin="-3" aria-valuemax="3" aria-valuenow="1.5" aria-disabled="true"/>
+        <rect data-handle="sigma" x={pixelX(3)-9} y="300" width="18" height="18" role="slider" tabindex="-1" aria-label="Candidate standard deviation" aria-valuemin="0.25" aria-valuemax="3.5" aria-valuenow="1.5" aria-disabled="true"/>
+      </svg>
+      <p class="mobile-axis-note">Density vs feature coordinate. Vertical scale adjusts; horizontal scale stays fixed. Tails continue beyond view.</p>
+      <p class="figure-help">Drag the circle to move the mean; drag the square to change the spread. Focus either handle and use arrow keys for small steps.</p>
+      <p class="distribution-values">R: μ = 0, σ = 1 <span>G: μ = <b data-current-mu>1.5000</b>, σ = <b data-current-sigma>1.5000</b>, variance = <b data-variance>2.2500</b></span></p>
+    </section>
+    <section class="control-panel" aria-label="Distance and parameters">
+      <p class="score-label">Squared Gaussian distance · D</p><div class="score" data-total>2.5000</div>
+      <p class="target">Target <strong>4.0000</strong> <span>Residual D − 4: <b data-residual>−1.5000</b></span></p>
+      <dl class="contributions"><div><dt>Mean contribution · μ²</dt><dd data-location>2.2500</dd></div><div><dt>Spread contribution · (σ − 1)²</dt><dd data-spread>0.2500</dd></div></dl>
+      <div class="parameter"><label for="lab-mu">Mean · μ</label><input id="lab-mu" data-number="mu" type="number" min="-3" max="3" step="any" value="1.5" disabled/><input data-range="mu" type="range" min="-3" max="3" step="0.01" value="1.5" aria-label="Adjust mean" disabled/></div>
+      <div class="parameter"><label for="lab-sigma">Standard deviation · σ</label><input id="lab-sigma" data-number="sigma" type="number" min="0.25" max="3.5" step="any" value="1.5" disabled/><input data-range="sigma" type="range" min="0.25" max="3.5" step="0.01" value="1.5" aria-label="Adjust standard deviation" disabled/></div>
+      <label class="side-label" hidden data-side-label>Mean branch <select data-side><option value="1">Positive μ</option><option value="-1">Negative μ</option></select></label>
+      <p class="constraint" data-constraint>Free mode: −3 ≤ μ ≤ 3; 0.25 ≤ σ ≤ 3.5. σ is standard deviation, not variance.</p>
+    </section>
+  </div>
+  <div class="equation" aria-label="Distance equals mean squared plus standard deviation minus one squared">
+    <span>D = μ² + (σ − 1)²</span><span data-substitution>= (1.5000)² + (1.5000 − 1)² = 2.5000</span>
+  </div>
+  <div class="lab-actions"><button data-action="undo" disabled>Undo</button><button data-action="reset" disabled>Reset construction</button><button data-action="pin" disabled>Pin construction</button></div>
+  <p class="lab-feedback" role="status" aria-live="polite">Enable JavaScript to manipulate the construction. The initial values and curves remain readable.</p>
+  <section class="comparisons" aria-labelledby="compare-title"><h2 id="compare-title">Compare your constructions</h2><p data-empty-pins>Pin up to two constructions. Their curves and decomposed scores stay visible while you explore.</p><div data-pins></div></section>
+  <details class="hints"><summary>Hints and a worked pair</summary><ol><li>Match the spread first: set σ = 1. Which means give D = 4?</li><li>Match the mean instead: set μ = 0. Find a positive standard deviation giving D = 4.</li><li>Try (μ, σ) = (2, 1) and (0, 3). Both give 4, but for different reasons. Pin them and compare.</li></ol><p>Keep-score mode follows σ = 1 + √(4 − μ²), with −2 ≤ μ ≤ 2. It deliberately explores the σ ≥ 1 branch; it does not enumerate every positive-σ solution.</p></details>
+</math-lab>
+<script>import './math-lab-controller';</script>
+<style>
+  math-lab {--lab-bg:#fff;--lab-text:#24211c;--lab-muted:#655f56;--lab-rule:#c6bfb3;--lab-gold:#865600;--lab-blue:#17648e;--lab-pin1:#85417e;--lab-pin2:#486824;display:block;background:var(--lab-bg);color:var(--lab-text);border-block:1px solid var(--lab-gold);padding:1.5rem;margin-block:2rem;}
+  :global(html[data-theme=dark]) math-lab {--lab-bg:#030305;--lab-text:#eee8dc;--lab-muted:#c2beb4;--lab-rule:#645b4d;--lab-gold:#eab85b;--lab-blue:#85c7e9;--lab-pin1:#d6a3d8;--lab-pin2:#a6cf8a;color-scheme:dark;}
+  .lab-topline,.lab-actions,.legend {display:flex;flex-wrap:wrap;gap:1rem;align-items:center;}
+  .lab-topline {justify-content:space-between;border-bottom:1px solid var(--lab-rule);padding-bottom:1rem;font:.8rem var(--at-font-mono,monospace);}
+  .lab-topline p {margin:0;}
+  .lock-label {display:flex;gap:.6rem;align-items:center;font-weight:400;cursor:pointer;}
+  input[type=checkbox] {accent-color:var(--lab-gold);width:1.2rem;height:1.2rem;}
+  .lab-grid {display:grid;grid-template-columns:minmax(0,1.65fr) minmax(17rem,1fr);gap:2rem;margin-block:1.5rem;}
+  .lab-grid section {min-width:0;}
+  h2 {font-size:1.25rem;color:var(--lab-text);margin:.5rem 0;}
+  .legend {font-size:.8rem;}
+  [data-pin-legend] {display:flex;gap:1rem;flex-wrap:wrap;}
+  .mobile-axis-note {display:none;}
+  .reference-key {color:var(--lab-blue);}.candidate-key {color:var(--lab-gold);}
+  svg {display:block;width:100%;height:auto;overflow:visible;}
+  svg text {fill:var(--lab-muted);font:13px var(--at-font-mono,monospace);}
+  [data-grid] line {stroke:var(--lab-rule);stroke-width:1;opacity:.45;}
+  .reference-curve,.candidate-curve {fill:none;stroke-width:3;}
+  .reference-curve {stroke:var(--lab-blue);}.candidate-curve {stroke:var(--lab-gold);}
+  .spread-line {stroke:var(--lab-gold);stroke-dasharray:4 4;}
+  [data-handle] {fill:var(--lab-gold);stroke:var(--lab-bg);stroke-width:2;cursor:ew-resize;touch-action:none;}
+  [data-handle]:focus-visible {stroke:var(--lab-text);stroke-width:4;outline:none;}
+  .figure-help,.distribution-values,.constraint {font-size:.8rem;line-height:1.6;color:var(--lab-muted);}
+  .distribution-values {border-top:1px solid var(--lab-rule);padding-top:1rem;}.distribution-values span {display:block;}
+  .score-label {font:.75rem var(--at-font-mono,monospace);margin:.5rem 0;color:var(--lab-muted);}
+  .score {font-size:clamp(2.75rem,5vw,4.4rem);letter-spacing:-.045em;color:var(--lab-gold);line-height:1.2;font-variant-numeric:tabular-nums;}
+  .target {font:.75rem/1.7 var(--at-font-mono,monospace);}.target span {display:block;color:var(--lab-muted);}
+  .contributions {margin:1.25rem 0;border-block:1px solid var(--lab-rule);padding:.8rem 0;}
+  .contributions div {display:flex;justify-content:space-between;gap:1rem;font-size:.8rem;margin:.4rem 0;}.contributions dd {margin:0;font-family:var(--at-font-mono,monospace);}
+  .parameter {display:grid;grid-template-columns:1fr 6rem;gap:.5rem;align-items:center;margin:1.2rem 0;}
+  .parameter label {font-size:.85rem;font-weight:400;}.parameter input[type=range] {grid-column:1/-1;width:100%;accent-color:var(--lab-gold);}
+  input[type=number],select {width:100%;min-width:0;box-sizing:border-box;background:var(--lab-bg);color:var(--lab-text);border:1px solid var(--lab-rule);padding:.5rem;font: .8rem var(--at-font-mono,monospace);}
+  .side-label {font-size:.8rem;font-weight:400;}.side-label select {margin-top:.4rem;}
+  .side-label[hidden] {display:none;}
+  .equation {display:flex;flex-wrap:wrap;gap:.5rem 1rem;border-block:1px solid var(--lab-rule);padding:1rem 0;font-size:1.1rem;}
+  [data-substitution] {font-size:.9rem;color:var(--lab-muted);align-self:center;}
+  .lab-actions {margin-top:1rem;}button {font:.8rem var(--at-font-mono,monospace);padding:.7rem .9rem;border:1px solid var(--lab-gold);background:transparent;color:var(--lab-text);cursor:pointer;}
+  button:disabled {opacity:.5;cursor:default;}:is(button,input,select,summary):focus-visible {outline:2px solid var(--lab-blue);outline-offset:3px;}
+  .lab-feedback {font:.85rem/1.6 var(--at-font-mono,monospace);color:var(--lab-gold);min-height:3em;}
+  .comparisons {border-top:1px solid var(--lab-rule);padding-top:1rem;}.comparisons p {font-size:.85rem;color:var(--lab-muted);}
+  [data-pins] :global(article) {border-left:2px dashed var(--lab-pin1);padding:.5rem 1rem;margin:1rem 0;}
+  [data-pins] :global(article:nth-child(2)) {border-color:var(--lab-pin2);}
+  [data-pins] :global(p) {font:.8rem/1.7 var(--at-font-mono,monospace);margin:.5rem 0;}
+  [data-pins] :global(button) {font:inherit;background:transparent;border:0;border-bottom:1px solid var(--lab-gold);color:var(--lab-text);cursor:pointer;padding:.4rem 0;}
+  .hints {margin-top:1.5rem;font-size:.9rem;line-height:1.7;}.hints summary {cursor:pointer;color:var(--lab-gold);}
+  @media(max-width:800px){math-lab {padding:1rem;}.lab-grid {grid-template-columns:minmax(0,1fr);gap:1rem;}.score {font-size:3.5rem;}.equation {font-size:1rem;}}
+  @media(max-width:500px){svg text {font-size:28px;}.plot-heading,.plot-caption {display:none;}.mobile-axis-note {display:block;font-size:.75rem;line-height:1.6;color:var(--lab-muted);}}
+</style>

@@ -1,4 +1,4 @@
-# STUDIO
+# WORKSPACE
 
 ## Focus
 It focus on a compilable platform with existing data, environment installed, let students to run the code to discover, explore, edit and learn.

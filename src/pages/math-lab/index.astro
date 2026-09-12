@@ -1,0 +1,34 @@
+---
+import BaseLayout from 'astro-theme-university/layouts/BaseLayout.astro';
+import MathLab from '../../components/math-lab/MathLab.astro';
+import MathWorksheet from '../../components/math-lab/MathWorksheet.astro';
+import CorrelationLab from '../../components/math-lab/CorrelationLab.astro';
+import LabNavigation from '../../components/LabNavigation.astro';
+import { siteConfig } from '../../site-config';
+import { withBase } from 'astro-theme-university/url';
+---
+<BaseLayout title="Maths lab" description="See how correlation changes Gaussian distance, write distributions, and solve constraints in a browser-only maths lab." mainAttrs={{class:'math-lab-main'}} {...siteConfig}>
+  <div class="math-lab-page">
+    <LabNavigation current="math-lab" />
+    <header><p class="eyebrow">SLOP8412 / Maths lab</p><h1>One number.<br/>More than one explanation.</h1><p>A single score does not tell you what changed. Construct different explanations for it, then test what the number leaves out.</p></header>
+    <aside><strong>Gaussian models, not image-based FID.</strong> These experiments calculate <em>squared</em> Wasserstein-2 distance from population parameters, not sample estimates. The correlation experiment accepts full 2D covariance matrices. The equation worksheet supports up to 16 independent coordinates with diagonal covariance. Numerical evaluation uses floating-point arithmetic.</aside>
+    <nav aria-label="Maths experiments"><a href="#correlation">2D correlation</a><a href="#worksheet">Equation worksheet</a><a href="#guided">Guided construction</a></nav>
+    <CorrelationLab />
+    <div id="worksheet"><MathWorksheet /></div>
+    <details id="guided" class="guided-lab" open><summary>Guided construction / the original drag-and-compare experiment</summary><p>This separate experiment keeps R fixed at N(0, 1). Its sliders and pins do not change your worksheet.</p><MathLab /></details>
+    <section class="after-lab"><h2>What have you established?</h2><p>Equal scores need not have equal explanations. A displacement in the mean and a change in spread can contribute the same amount. Your constructions demonstrate that ambiguity; they do not establish which distribution a person would prefer.</p><p>Return to <a href={withBase('/sessions/02-frechet-distance/')}>Week 2: The Fréchet distance</a> for the multivariate derivation, or use the <a href={withBase('/workspace/')}>Python workspace</a> to investigate what changes when moments must be estimated.</p><p class="note">All controls run locally in your browser. This lab makes no runtime downloads and has no backend. The worksheet saves its last valid definitions locally; guided constructions and pins last until you leave or refresh the page.</p></section>
+  </div>
+</BaseLayout>
+<style>
+  :global(.at-main.math-lab-main) {grid-column:full;display:block;padding:0;}
+  :global(body:has(.math-lab-main)::after) {display:none;}
+  .math-lab-page {max-width:1440px;margin:auto;padding:2.5rem clamp(1rem,4vw,4rem);box-sizing:border-box;width:100%;}
+  nav[aria-label="Maths experiments"] {display:flex;gap:1.5rem;flex-wrap:wrap;font:.8rem var(--at-font-mono,monospace);margin-bottom:2rem;}
+  header {max-width:56rem;}.eyebrow {font:.75rem var(--at-font-mono,monospace);color:var(--at-primary);letter-spacing:.08em;}
+  h1 {font-size:clamp(2rem,4vw,3.7rem);line-height:1.08;letter-spacing:-.045em;margin-block:1rem;}
+  header>p:last-child {font-size:1.15rem;line-height:1.65;max-width:65ch;}
+  aside {border-left:2px solid var(--at-primary);padding:.5rem 1rem;font-size:.9rem;line-height:1.7;max-width:95ch;}
+  .after-lab {max-width:75ch;line-height:1.75;}h2 {font-size:1.5rem;}.note {font-size:.85rem;color:var(--at-text-muted);}
+  .guided-lab>summary {cursor:pointer;font: .9rem/1.7 var(--at-font-mono,monospace);color:var(--at-primary);padding:1rem 0;}.guided-lab>p {font-size:.85rem;line-height:1.7;}
+  #worksheet,#guided {scroll-margin-top:8rem;}
+</style>

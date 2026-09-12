@@ -1,0 +1,17 @@
+/* Give the additional Workspace destination room without wrapping the fixed
+   university header onto a second row. Keep the theme's mobile menu intact. */
+.lab-navigation {align-items:center;margin-bottom:2rem;font:.8rem/1.6 var(--at-font-mono,monospace);}
+.lab-navigation > a {display:block;flex:0 0 auto;white-space:nowrap;}
+.lab-navigation > a[aria-current="page"] {text-decoration:none;border-bottom:1px solid var(--at-primary);}
+.lab-navigation > a:focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+
+@media (min-width: 640px) {
+  .at-nav-inner {grid-column:full;width:min(72rem,calc(100% - 2 * var(--at-gutter)));justify-self:center;flex-wrap:nowrap;}
+  .at-nav-brand {transform:none;flex-shrink:0;}
+}
+@media (min-width: 640px) and (max-width: 1000px) {
+  .at-nav-inner {gap:.75rem;}
+  .at-nav-brand .at-nav-logo-full {display:none;}
+  .at-nav-brand .at-nav-logo-compact {display:block;}
+  .at-nav-links {gap:.75rem;font-size:.8rem;}
+}

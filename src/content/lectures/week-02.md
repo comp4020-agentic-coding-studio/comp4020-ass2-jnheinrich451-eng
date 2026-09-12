@@ -7,6 +7,8 @@ week: 2
 date: 2026-08-10
 arc: A
 slides: /decks/week-02/
+lecture_format: formal
+lecture_stage: ready
 related:
   - sessions/02-frechet-distance
 ---
@@ -32,10 +34,10 @@ Use the arrow keys to advance through slides and equation reveals. The Week 02 c
 | Derive | Why do Gaussians reduce the search to means and covariances? | 7–12 |
 | Audit | Which choices turn the distance into FID? | 13–17 |
 
-There is one formal lecture in SLOP8412.
-
-The Fréchet distance has to be derived once, carefully. After that the course
-leaves the whiteboard and moves to the measurement bench.
+This is the first of four formal lectures, following the week 1 live
+introduction. The Fréchet distance has to be derived once, carefully.
+Lectures in weeks 5, 8 and 11 return to the measurement bench to question
+the estimate, change the instrument and defend what gets reported.
 
 The lecture is called *Two Gaussians, One Number*. It starts from one
 requirement, to compare two distributions without inventing correspondences
@@ -49,6 +51,12 @@ samples, preprocessing, and a Gaussian fitted to whatever comes out.
 ![Equal spread with shifted centres, followed by equal centres with different spreads.](../../assets/figures/location-vs-spread.svg)
 
 In one dimension, the distance separates a difference in means from a difference in standard deviations. In higher dimensions, covariance also carries orientation and correlation. The second term measures covariance mismatch; it does not recover arbitrary distribution shape.
+
+Test that distinction in the [2D correlation experiment](/math-lab/#correlation).
+Start with the reference match, then change only correlation. Record what
+happens to the full squared distance and to each marginal distance. Explain
+the discrepancy before returning to the bench below. This population model
+has no feature extraction or sampling; it isolates the covariance term.
 
 ## Check the result on the bench
 
@@ -79,5 +87,6 @@ B is closer under the closed form. Keep that ranking: [week 5 asks whether finit
   body:has(.lecture-route) td, body:has(.lecture-route) th { overflow-wrap: anywhere; }
   main:has(.lecture-route) h2 { scroll-margin-top: calc(var(--at-nav-height) + 5rem); }
   main:has(.lecture-route) p { max-width: 68ch; }
+  main:has(.lecture-route) img { max-width: 100%; height: auto; margin-inline: 0; }
   @media (min-width: 901px) { .lecture-route { position: sticky; top: var(--at-nav-height); } }
 </style>

@@ -1,0 +1,56 @@
+---
+import {CORRELATION_INITIAL,correlationFigure,matrixText} from '../../../figures/correlation-lab';
+import {withBase} from 'astro-theme-university/url';
+const figure=correlationFigure(CORRELATION_INITIAL);
+---
+<correlation-lab id="correlation">
+  <header><p class="eyebrow">Experiment 03 / Between coordinates</p><h2>The coordinates agree.<br/>Their relationship does not.</h2><p>Two identical marginal curves do not guarantee identical joint distributions. Change the correlation and watch what the coordinate-by-coordinate view misses.</p></header>
+  <div class="correlation-presets" aria-label="Covariance examples"><button data-corr-preset="0" disabled>Match the reference</button><button data-corr-preset="0.8" disabled>Positive correlation ↗</button><button data-corr-preset="-0.8" disabled>Negative correlation ↘</button></div>
+  <div class="correlation-scores"><div><span>Full 2D squared distance</span><output data-corr-full>{figure.metrics.full.toFixed(6)}</output></div><div><span>Sum of marginal squared distances</span><output data-corr-marginal>0.000000</output></div></div>
+  <p data-corr-verdict class="verdict">Both marginal distances are zero, yet the full distance is positive. The difference is in covariance.</p>
+  <div class="correlation-grid">
+    <section class="matrix-panel" aria-labelledby="corr-matrix-title"><h3 id="corr-matrix-title">Define the relationship</h3><p class="quiet">Both means stay at (0, 0). Reference covariance ΣR = [[1, 0], [0, 1]].</p>
+      <label for="corr-matrix">Candidate covariance ΣG</label><textarea id="corr-matrix" data-corr-matrix maxlength="500" rows="3" spellcheck="false" aria-describedby="corr-matrix-help" disabled>{matrixText(CORRELATION_INITIAL)}</textarea>
+      <p id="corr-matrix-help" class="quiet">Diagonal entries are variances. Off-diagonal entries are covariance and must match. Enter numbers, then apply. Matrix controls here are separate from the diagonal worksheet below.</p>
+      <button data-corr-apply disabled>Apply matrix</button>
+      <label class="rho-label" for="corr-rho">Correlation ρ <input id="corr-rho" data-corr-rho type="number" min="-0.98" max="0.98" step="any" value="0.8" disabled/></label><input data-corr-slider type="range" min="-0.98" max="0.98" step="0.01" value="0.8" aria-label="Adjust correlation, keeping variances fixed" disabled/>
+      <p class="quiet">ρ = covariance / √(variance 1 × variance 2). This control preserves both variances and edits the matrix. Try moving from +0.8 to −0.8.</p>
+      <button data-corr-undo disabled>Undo change</button><p data-corr-status role="status" aria-live="polite">Enable JavaScript to edit the matrix. Initial contours and scores remain visible.</p>
+    </section>
+    <section class="joint-panel" aria-labelledby="corr-joint-title"><h3 id="corr-joint-title">Together / joint contours</h3><p class="legend"><span class="r-key">━ R / reference</span><span class="g-key">┄ G / candidate</span></p>
+      <svg data-corr-joint viewBox="0 0 520 500" role="img" aria-labelledby="corr-joint-desc"><title id="corr-joint-desc">Reference circular contours and positively tilted candidate elliptical contours, at Mahalanobis radii 1 and 2.</title>
+        {[-6,-3,0,3,6].map(v=><g><line x1={260+v*35} x2={260+v*35} y1="30" y2="450" class:list={['grid-line',{'zero-line':v===0}]}/><line x1="50" x2="470" y1={240-v*35} y2={240-v*35} class:list={['grid-line',{'zero-line':v===0}]}/><text x={260+v*35} y="472" text-anchor="middle">{v}</text><text x="37" y={245-v*35} text-anchor="end">{v}</text></g>)}
+        {figure.jointPaths[0].map(path=><path class="r-path" d={path}/>)}{figure.jointPaths[1].map((path,i)=><path data-corr-contour={i} class="g-path" d={path}/>)}
+        <text x="260" y="498" text-anchor="middle">Coordinate 1</text><text transform="translate(14 240) rotate(-90)" text-anchor="middle">Coordinate 2</text>
+      </svg>
+      <p class="quiet">Contours at Mahalanobis radii 1 and 2 enclose approximately 39% and 86% of each 2D Gaussian. Both axes stay fixed at −6 to 6; these are not sampled point clouds.</p>
+    </section>
+    <section class="marginal-panel" aria-labelledby="corr-marginals-title"><h3 id="corr-marginals-title">Separately / marginal curves</h3><p class="quiet">Each curve ignores the other coordinate. Dashed gold overlays solid blue when they agree.</p>
+      {[0,1].map(d=><div class="marginal-card"><h4>Coordinate {d+1} of 2 <span>Squared distance <b data-corr-coordinate={d}>0.000000</b></span></h4><svg viewBox="0 0 400 160" role="img" aria-labelledby={`corr-marginal-${d}`}><title id={`corr-marginal-${d}`}>Coordinate {d+1}: identical standard normal marginal densities.</title><line x1="35" x2="365" y1="125" y2="125" class="grid-line"/><path data-corr-ref-marginal={d} d={figure.marginalPaths[d][0]} class="r-path"/><path data-corr-gen-marginal={d} d={figure.marginalPaths[d][1]} class="g-path"/>{[-6,0,6].map(v=><text x={35+(v+6)*27.5} y="151" text-anchor="middle">{v}</text>)}</svg><p data-corr-marginal-note={d} class="quiet">Mean 0 for both. Reference variance 1; candidate variance 1.</p></div>)}
+      <p class="quiet">Horizontal axes stay at −6 to 6. Vertical density scales adapt to variance; tails continue beyond view.</p>
+    </section>
+  </div>
+  <details class="corr-derivation"><summary>Why the full distance changes</summary><p>The means are equal, so their contribution is zero. Since the reference covariance is the identity, the full squared distance reduces to D = (√λ₁ − 1)² + (√λ₂ − 1)², where λ₁ and λ₂ are the eigenvalues of ΣG.</p><pre data-corr-algebra>Eigenvalues: 0.2, 1.8
+Full D ≈ 0.422291
+Marginal-only sum = 0</pre><p>With both variances equal to 1, the eigenvalues are 1 − ρ and 1 + ρ (possibly in reversed order). Changing the sign of ρ flips the tilt but leaves the distance to the isotropic reference unchanged. This symmetry is specific to this reference; it is not a general rule for FID.</p><p>We evaluate the population Gaussian formula in floating-point arithmetic, not image-based FID. The sum of marginal distances omits cross-coordinate covariance and is not generally the full distance. The editor accepts positive-definite matrices with variances from 0.05 to 4 and |ρ| ≤ 0.98; degenerate limits are excluded.</p></details>
+  <p class="corr-footer">This is the covariance term from <a href={withBase('/sessions/02-frechet-distance/')}>Week 2</a> made visible. <a href={withBase('/sessions/06-blind-spots/')}>Week 6: Blind spots</a> asks a harder question: what if means and covariance both match? All calculations here run locally; this experiment resets when you leave or refresh.</p>
+</correlation-lab>
+<script>import './correlation-controller';</script>
+<style>
+  correlation-lab {--co-bg:#fff;--co-soft:#faf8f3;--co-text:#24211c;--co-muted:#655f56;--co-rule:#c6bfb3;--co-gold:#865600;--co-blue:#17648e;display:block;background:var(--co-bg);color:var(--co-text);padding:clamp(1rem,2.4vw,2rem);margin:2rem 0;border-block:1px solid var(--co-gold);scroll-margin-top:8rem;}
+  :global(html[data-theme=dark]) correlation-lab {--co-bg:#030305;--co-soft:#101012;--co-text:#eee8dc;--co-muted:#c2beb4;--co-rule:#645b4d;--co-gold:#eab85b;--co-blue:#85c7e9;color-scheme:dark;}
+  .eyebrow {font:.72rem var(--at-font-mono,monospace);letter-spacing:.06em;color:var(--co-gold);margin:0 0 1rem;}h2 {color:var(--co-text);font-size:clamp(1.7rem,3vw,2.8rem);line-height:1.1;letter-spacing:-.035em;margin:0;}header>p:last-child {max-width:75ch;line-height:1.7;font-size:1rem;}
+  h3 {font-size:.95rem;color:var(--co-text);border-bottom:1px solid var(--co-rule);padding-bottom:.8rem;margin:0 0 1rem;}.correlation-presets {display:flex;flex-wrap:wrap;gap:.7rem;margin:1.5rem 0;}
+  button {background:transparent;color:var(--co-text);border:1px solid var(--co-gold);font:.78rem/1.5 var(--at-font-mono,monospace);padding:.65rem .8rem;cursor:pointer;min-height:2.75rem;}button:disabled {opacity:.5;cursor:default;}[data-corr-apply] {background:var(--co-gold);color:var(--co-bg);}
+  .correlation-scores {display:flex;gap:clamp(2rem,6vw,6rem);border-block:1px solid var(--co-rule);padding:1rem 0;}.correlation-scores span {display:block;font:.73rem/1.6 var(--at-font-mono,monospace);color:var(--co-muted);}output {display:block;font-size:clamp(2rem,3.5vw,3.2rem);letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--co-gold);}
+  .verdict {font-size:.9rem;line-height:1.65;color:var(--co-gold);margin:1rem 0 1.7rem;}
+  .correlation-grid {display:grid;grid-template-columns:minmax(13rem,.85fr) minmax(0,1.6fr) minmax(12rem,1fr);gap:1.5rem;}.correlation-grid>section {min-width:0;}.quiet {font-size:.75rem;line-height:1.7;color:var(--co-muted);}
+  label {display:block;font-size:.8rem;font-weight:400;margin-top:1rem;}textarea,input[type=number] {box-sizing:border-box;max-width:100%;background:var(--co-soft);color:var(--co-text);border:1px solid var(--co-rule);padding:.7rem;font:.85rem/1.65 var(--at-font-mono,monospace);}
+  textarea {width:100%;resize:vertical;scrollbar-color:var(--co-gold) transparent;margin-top:.5rem;}.rho-label {display:flex;align-items:center;gap:.5rem;justify-content:space-between;}.rho-label input {width:6rem;}input[type=range] {width:100%;accent-color:var(--co-gold);margin-top:1rem;}[data-corr-status] {font:.75rem/1.65 var(--at-font-mono,monospace);color:var(--co-gold);overflow-wrap:anywhere;}
+  svg {display:block;width:100%;height:auto;}svg text {fill:var(--co-muted);font:15px var(--at-font-mono,monospace);}.grid-line {stroke:var(--co-rule);stroke-width:1;opacity:.5;}.zero-line {opacity:1;}.r-path,.g-path {fill:none;stroke-width:3;}.r-path {stroke:var(--co-blue);}.g-path {stroke:var(--co-gold);stroke-dasharray:7 5;}
+  .legend {display:flex;gap:1rem;font-size:.75rem;}.r-key {color:var(--co-blue);}.g-key {color:var(--co-gold);}.marginal-card {padding:.5rem 0;border-bottom:1px solid var(--co-rule);}h4 {font-size:.85rem;font-weight:500;color:var(--co-text);margin:.5rem 0;}h4 span {display:block;font:.65rem/1.7 var(--at-font-mono,monospace);color:var(--co-muted);margin-top:.4rem;}
+  .corr-derivation {margin-top:1.5rem;border-top:1px solid var(--co-rule);padding-top:1rem;font-size:.9rem;line-height:1.7;}.corr-derivation summary {cursor:pointer;color:var(--co-gold);}.corr-derivation pre {background:var(--co-soft);color:var(--co-text);font:.8rem/1.8 var(--at-font-mono,monospace);padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;}.corr-footer {font-size:.8rem;line-height:1.7;margin-top:1.5rem;color:var(--co-muted);}
+  :is(button,input,textarea,summary):focus-visible {outline:2px solid var(--co-blue);outline-offset:3px;}
+  @media(max-width:1100px){.correlation-grid {grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);}.marginal-panel {grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.marginal-panel>h3,.marginal-panel>p {grid-column:1/-1;}.marginal-panel>p {margin:0;}}
+  @media(max-width:650px){.correlation-grid,.marginal-panel {display:block;}.correlation-grid>section+section {margin-top:1.8rem;}.correlation-scores {flex-direction:column;gap:.8rem;}output {font-size:2.5rem;}textarea,input[type=number] {font-size:16px;}.joint-panel svg text {font-size:20px;}.marginal-card svg text {font-size:18px;}}
+</style>
