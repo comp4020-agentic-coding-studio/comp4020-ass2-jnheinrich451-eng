@@ -1,0 +1,572 @@
+---
+/**
+ * The extrapolator: week 5's correction, run in the page.
+ *
+ * Week 1's workbench shows that one estimate disagrees with the truth. This
+ * one asks what the disagreement is made of. It scores the same candidate at
+ * five sample sizes, averages a few draws at each, and fits a straight line
+ * against 1/N. Where that line crosses 1/N = 0 is the score the estimator
+ * would report with unlimited samples.
+ *
+ * The plot is drawn at the scale of the measurements, not at the scale of the
+ * answer, so the true value sits almost on the axis and the correction is a
+ * long reach down the fitted line. The strip below is the zoom: one dot per
+ * completed ladder, at the scale of the true value, so repeated runs show
+ * what a single extrapolated number hides. The intercept is unbiased and
+ * imprecise, and both halves are pinned by the course's reference tests.
+ *
+ * Arithmetic is src/lib/bench.ts. Nothing here leaves the browser.
+ */
+interface Props {
+  heading?: string;
+}
+const { heading } = Astro.props;
+const SIZES = [60, 100, 200, 400, 800];
+---
+
+<section class="extrapolator" data-xp aria-label={heading ?? "The extrapolator"}>
+  {heading && <h2>{heading}</h2>}
+
+  <noscript>
+    <p>
+      The instrument needs JavaScript. It scores the bench at N = {SIZES.join(", ")} and
+      fits the results against 1/N; the session works the same ladder by hand.
+    </p>
+  </noscript>
+
+  <form class="xp-controls" data-xp-controls>
+    <div class="xp-field" role="group" aria-label="Candidate">
+      <span class="xp-label">candidate</span>
+      <div class="xp-toggle">
+        <button type="button" data-xp-candidate="A" aria-pressed="true">A, mean</button>
+        <button type="button" data-xp-candidate="B" aria-pressed="false">B, covariance</button>
+      </div>
+    </div>
+    <div class="xp-field">
+      <label class="xp-label" for="xp-d">dimensions d</label>
+      <select id="xp-d" name="d">
+        <option value="16" selected>16</option>
+        <option value="32">32</option>
+      </select>
+    </div>
+    <div class="xp-field">
+      <label class="xp-label" for="xp-trials">draws per sample size</label>
+      <select id="xp-trials" name="trials">
+        <option value="3">3</option>
+        <option value="6" selected>6</option>
+        <option value="12">12</option>
+      </select>
+    </div>
+    <button type="button" data-xp-run>run the ladder</button>
+    <button type="button" class="xp-ghost" data-xp-clear>clear the strip</button>
+    <p class="xp-status" role="status" data-xp-status>
+      Five sample sizes, one line, one number at the end of it.
+    </p>
+  </form>
+
+  <figure class="xp-plot">
+    <p class="xp-legend" aria-hidden="true">
+      <span class="xp-key xp-key--draw">&#9679;</span> one draw
+      <span class="xp-key xp-key--rung">&#9679;</span> mean at that sample size
+      <span class="xp-key xp-key--fit">&#9472;</span> the fitted line
+      <span class="xp-key xp-key--truth">&#9476;</span> the true value
+    </p>
+    <svg
+      viewBox="0 0 560 330"
+      role="img"
+      data-xp-plot
+      aria-label="Estimated score against one over N, with a line fitted through the sample means and extended to the axis"></svg>
+    <figcaption>
+      Every point is an estimate of the same fixed number. They disagree because of N,
+      not because the candidate changed.
+    </figcaption>
+  </figure>
+
+  <div class="xp-nums" aria-live="polite">
+    <div>
+      <div class="xp-num-label">shortest ladder, N = 60</div>
+      <div class="xp-num xp-est" data-xp-raw>&nbsp;</div>
+    </div>
+    <div>
+      <div class="xp-num-label">extrapolated to 1/N = 0</div>
+      <div class="xp-num xp-fit" data-xp-intercept>&nbsp;</div>
+    </div>
+    <div>
+      <div class="xp-num-label">true FID, closed form</div>
+      <div class="xp-num xp-true" data-xp-truth>&nbsp;</div>
+    </div>
+  </div>
+
+  <figure class="xp-strip">
+    <svg
+      viewBox="0 0 560 150"
+      role="img"
+      data-xp-strip
+      aria-label="Intercepts from every completed ladder, at the scale of the true value"></svg>
+    <figcaption data-xp-strip-caption>
+      Run it again. This strip is the same numbers at the scale of the answer: one dot
+      per ladder, against the true value.
+    </figcaption>
+  </figure>
+</section>
+
+<script>
+  import { fitInverseN, rung, truthOf, type Candidate, type Rung } from "../lib/bench";
+
+  const SIZES = [60, 100, 200, 400, 800];
+  const svgNS = "http://www.w3.org/2000/svg";
+
+  // As on the week 1 bench: the theme runs Astro's ClientRouter, so this
+  // module is not re-executed when a visitor navigates back to the page.
+  function setup() {
+    const section = document.querySelector("[data-xp]");
+    if (!(section instanceof HTMLElement) || section.dataset.xpReady === "true") return;
+    section.dataset.xpReady = "true";
+
+    const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
+    const plot = pick<SVGSVGElement>("[data-xp-plot]");
+    const strip = pick<SVGSVGElement>("[data-xp-strip]");
+    const status = pick<HTMLElement>("[data-xp-status]");
+    const rawOut = pick<HTMLElement>("[data-xp-raw]");
+    const interceptOut = pick<HTMLElement>("[data-xp-intercept]");
+    const truthOut = pick<HTMLElement>("[data-xp-truth]");
+    const stripCaption = pick<HTMLElement>("[data-xp-strip-caption]");
+    const runButton = pick<HTMLButtonElement>("[data-xp-run]");
+    const dSelect = pick<HTMLSelectElement>("#xp-d");
+    const trialsSelect = pick<HTMLSelectElement>("#xp-trials");
+
+    let letter: "A" | "B" = "A";
+    // A visitor's first press should show the correction working rather than
+    // its failure mode, so the opening seed is chosen, not arbitrary: it runs
+    // 0.030, 0.014, 0.018 against a truth of 0.040, and crosses below zero on
+    // the fourth press. Both halves of the lecture, in the order it makes them.
+    let seed = 424242;
+    let intercepts: number[] = [];
+    let running = false;
+
+    const candidate = (): Candidate =>
+      letter === "A"
+        ? { kind: "gaussian", shift: 0.05, v: 1 }
+        : { kind: "gaussian", shift: 0, v: 1.1 };
+    const dimensions = () => Number(dSelect.value);
+    const trials = () => Number(trialsSelect.value);
+
+    const node = (name: string, attrs: Record<string, string | number>) => {
+      const element = document.createElementNS(svgNS, name);
+      for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
+      return element;
+    };
+    const text = (value: string, attrs: Record<string, string | number>) => {
+      const element = node("text", {
+        "font-size": 11,
+        "font-family": "var(--at-font-mono, monospace)",
+        ...attrs,
+      });
+      element.textContent = value;
+      return element;
+    };
+
+    const drawPlot = (
+      rungs: Rung[],
+      fit: { intercept: number; slope: number } | null,
+      truth: number,
+    ) => {
+      plot.replaceChildren();
+      const left = 62;
+      const right = 534;
+      const bottom = 276;
+      const top = 26;
+      const xMax = 1 / SIZES[0];
+      const highest = Math.max(truth, ...rungs.flatMap((r) => r.draws)) * 1.08 + 1e-9;
+      const x = (inverseN: number) => left + ((right - left) * inverseN) / xMax;
+      const y = (value: number) => bottom - (bottom - top) * (value / highest);
+
+      plot.append(
+        node("line", { x1: left, x2: right, y1: bottom, y2: bottom, stroke: "var(--xp-axis)" }),
+      );
+      plot.append(node("line", { x1: left, x2: left, y1: bottom, y2: top, stroke: "var(--xp-axis)" }));
+      plot.append(text("estimated FID", { x: left, y: 16, fill: "var(--xp-axis-ink)" }));
+      // Sits on the row below the N labels: anchored at the axis it names, and
+      // clear of N=800, which lands almost on top of it.
+      plot.append(
+        text("1/N = 0", { x: left - 14, y: bottom + 32, fill: "var(--xp-fit)", "text-anchor": "start" }),
+      );
+      for (const n of SIZES) {
+        const at = x(1 / n);
+        plot.append(
+          node("line", { x1: at, x2: at, y1: bottom, y2: bottom + 4, stroke: "var(--xp-axis)" }),
+        );
+        plot.append(
+          text("N=" + n, {
+            x: at,
+            y: bottom + (n === 400 ? 32 : 18),
+            fill: "var(--xp-axis-ink)",
+            "text-anchor": "middle",
+          }),
+        );
+      }
+      plot.append(
+        text(highest.toFixed(2), {
+          x: left - 6,
+          y: top + 4,
+          fill: "var(--xp-axis-ink)",
+          "text-anchor": "end",
+        }),
+      );
+
+      plot.append(
+        node("line", {
+          x1: left,
+          x2: right,
+          y1: y(truth),
+          y2: y(truth),
+          stroke: "var(--xp-truth)",
+          "stroke-dasharray": "5 4",
+          "stroke-width": 1.5,
+        }),
+      );
+      plot.append(
+        text("true " + truth.toFixed(3), {
+          x: right,
+          y: y(truth) - 7,
+          fill: "var(--xp-truth)",
+          "text-anchor": "end",
+        }),
+      );
+
+      for (const r of rungs) {
+        for (const draw of r.draws) {
+          plot.append(
+            node("circle", {
+              cx: x(1 / r.n),
+              cy: y(draw),
+              r: 2.6,
+              fill: "var(--xp-draw)",
+              opacity: 0.55,
+            }),
+          );
+        }
+      }
+      for (const r of rungs) {
+        plot.append(node("circle", { cx: x(1 / r.n), cy: y(r.mean), r: 5, fill: "var(--xp-rung)" }));
+      }
+
+      if (fit) {
+        plot.append(
+          node("line", {
+            x1: x(0),
+            x2: right,
+            y1: y(fit.intercept),
+            y2: y(fit.intercept + fit.slope * xMax),
+            stroke: "var(--xp-fit)",
+            "stroke-width": 2,
+          }),
+        );
+        plot.append(
+          node("circle", {
+            cx: x(0),
+            cy: y(fit.intercept),
+            r: 6,
+            fill: "none",
+            stroke: "var(--xp-fit)",
+            "stroke-width": 2.5,
+          }),
+        );
+      }
+    };
+
+    const drawStrip = (truth: number) => {
+      strip.replaceChildren();
+      const left = 36;
+      const right = 536;
+      const span = Math.max(
+        Math.abs(truth) * 2.5,
+        ...intercepts.map((b) => Math.abs(b) * 1.2),
+        0.05,
+      );
+      const y = (value: number) => 84 - (52 * value) / span;
+
+      strip.append(node("line", { x1: left, x2: right, y1: y(0), y2: y(0), stroke: "var(--xp-axis)" }));
+      strip.append(text("0", { x: left - 8, y: y(0) + 4, fill: "var(--xp-axis-ink)", "text-anchor": "end" }));
+      strip.append(
+        node("line", {
+          x1: left,
+          x2: right,
+          y1: y(truth),
+          y2: y(truth),
+          stroke: "var(--xp-truth)",
+          "stroke-dasharray": "5 4",
+          "stroke-width": 1.5,
+        }),
+      );
+      strip.append(
+        text("true " + truth.toFixed(3), {
+          x: right,
+          y: y(truth) - 7,
+          fill: "var(--xp-truth)",
+          "text-anchor": "end",
+        }),
+      );
+      intercepts.forEach((value, i) => {
+        strip.append(
+          node("circle", {
+            cx: left + 22 + ((right - left - 44) / 19) * (i % 20),
+            cy: y(value),
+            r: 5,
+            fill: "var(--xp-fit)",
+            opacity: 0.85,
+          }),
+        );
+      });
+    };
+
+    // Every control changes what is being measured, so nothing measured under
+    // the old settings may stay on screen: not the ladder, not the intercepts,
+    // and not the true value, which is the number a stale readout would make a
+    // liar of.
+    const reset = (message: string) => {
+      intercepts = [];
+      const truth = truthOf(candidate(), dimensions());
+      truthOut.textContent = truth.toFixed(3);
+      rawOut.textContent = " ";
+      interceptOut.textContent = " ";
+      status.textContent = message;
+      stripCaption.textContent =
+        "Run it again. This strip is the same numbers at the scale of the answer: one dot per ladder, against the true value.";
+      drawPlot([], null, truth);
+      drawStrip(truth);
+    };
+
+    const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    const run = async () => {
+      if (running) return;
+      running = true;
+      runButton.disabled = true;
+      const c = candidate();
+      const d = dimensions();
+      const t = trials();
+      const truth = truthOf(c, d);
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+
+      truthOut.textContent = truth.toFixed(3);
+      interceptOut.textContent = "—";
+      const rungs: Rung[] = [];
+      drawPlot(rungs, null, truth);
+      for (let i = 0; i < SIZES.length; i++) {
+        status.textContent = "scoring " + t + " draws at N = " + SIZES[i] + "…";
+        await frame();
+        rungs.push(rung(c, d, SIZES[i], t, seed, i));
+        rawOut.textContent = rungs[0].mean.toFixed(3);
+        drawPlot(rungs, null, truth);
+        await frame();
+      }
+      const fit = fitInverseN(rungs);
+      drawPlot(rungs, fit, truth);
+      interceptOut.textContent = fit.intercept.toFixed(3);
+      intercepts.push(fit.intercept);
+      if (intercepts.length > 20) intercepts.shift();
+      drawStrip(truth);
+
+      const closer = Math.abs(rungs[0].mean - truth) / Math.max(Math.abs(fit.intercept - truth), 1e-6);
+      status.textContent =
+        fit.intercept < 0
+          ? "The line crossed below zero. No distance is negative, so this ladder has reported its own uncertainty rather than the score."
+          : "The shortest ladder missed by " +
+            (rungs[0].mean - truth).toFixed(2) +
+            "; the intercept missed by " +
+            (fit.intercept - truth).toFixed(3) +
+            ", about " +
+            (closer < 1000 ? String(Math.round(closer)) : "a thousand") +
+            " times closer.";
+      stripCaption.textContent =
+        intercepts.length < 3
+          ? "Run it again. This strip is the same numbers at the scale of the answer: one dot per ladder, against the true value."
+          : intercepts.length +
+            " ladders. The dots fall either side of the true value rather than above it, which is what removing a bias looks like. Their spread is what the correction does not remove.";
+      running = false;
+      runButton.disabled = false;
+    };
+
+    for (const button of section.querySelectorAll<HTMLButtonElement>("[data-xp-candidate]")) {
+      button.addEventListener("click", () => {
+        letter = button.dataset.xpCandidate === "B" ? "B" : "A";
+        for (const other of section.querySelectorAll<HTMLButtonElement>("[data-xp-candidate]")) {
+          other.setAttribute("aria-pressed", String(other === button));
+        }
+        reset("A different candidate is a different true value. Run the ladder again.");
+      });
+    }
+    for (const control of [dSelect, trialsSelect]) {
+      control.addEventListener("change", () =>
+        reset("Different settings, different ladder. The points from the last one would not belong on this plot."),
+      );
+    }
+    runButton.addEventListener("click", () => void run());
+    pick<HTMLButtonElement>("[data-xp-clear]").addEventListener("click", () =>
+      reset("Strip cleared. Five sample sizes, one line, one number at the end of it."),
+    );
+
+    reset("Five sample sizes, one line, one number at the end of it.");
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .extrapolator {
+    --xp-draw: #d7ab73;
+    --xp-rung: #c9782a;
+    --xp-fit: #b5495b;
+    --xp-truth: #3a7d44;
+    --xp-axis: var(--at-border, #d8d2c6);
+    --xp-axis-ink: var(--at-text-muted, #6f675c);
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+  }
+
+  .xp-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-sm) var(--at-spacing-lg);
+    align-items: end;
+    border-block: 1px solid var(--at-border, #e4ddd0);
+    padding-block: var(--at-spacing-sm);
+    margin-block-end: var(--at-spacing-lg);
+  }
+
+  .xp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .xp-label,
+  .xp-num-label,
+  .xp-controls button,
+  .xp-legend,
+  .xp-status {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.07em;
+  }
+
+  .xp-label,
+  .xp-num-label {
+    text-transform: uppercase;
+  }
+
+  .xp-field select {
+    font: inherit;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+  }
+
+  .xp-toggle {
+    display: flex;
+    gap: var(--at-spacing-xs);
+  }
+
+  .xp-controls button {
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: var(--at-primary);
+    color: var(--at-white, #fff);
+    cursor: pointer;
+  }
+
+  .xp-controls button.xp-ghost,
+  .xp-toggle button[aria-pressed="false"] {
+    background: transparent;
+    color: var(--at-secondary, var(--at-primary));
+  }
+
+  .xp-controls button[disabled] {
+    opacity: 0.5;
+    cursor: progress;
+  }
+
+  .xp-status {
+    flex-basis: 100%;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .extrapolator figure {
+    margin: 0;
+  }
+
+  .extrapolator svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklab, var(--at-primary) 4%, transparent);
+    border: 1px solid var(--at-border, #e4ddd0);
+    border-radius: 4px;
+  }
+
+  .extrapolator figcaption {
+    font-size: var(--at-font-size-sm);
+    margin-block-start: var(--at-spacing-xs);
+    max-width: 68ch;
+  }
+
+  .xp-legend {
+    margin-block: 0 var(--at-spacing-xs);
+  }
+
+  .xp-key {
+    margin-inline-end: 0.2em;
+  }
+
+  .xp-key--draw {
+    color: var(--xp-draw);
+  }
+
+  .xp-key--rung {
+    color: var(--xp-rung);
+    margin-inline-start: 1.1em;
+  }
+
+  .xp-key--fit {
+    color: var(--xp-fit);
+    margin-inline-start: 1.1em;
+  }
+
+  .xp-key--truth {
+    color: var(--xp-truth);
+    margin-inline-start: 1.1em;
+  }
+
+  .xp-nums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-lg) var(--at-spacing-xl);
+    margin-block: var(--at-spacing-lg) var(--at-spacing-sm);
+  }
+
+  .xp-num {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.8rem;
+  }
+
+  .xp-est {
+    color: var(--xp-rung);
+  }
+
+  .xp-fit {
+    color: var(--xp-fit);
+  }
+
+  .xp-true {
+    color: var(--xp-truth);
+  }
+</style>

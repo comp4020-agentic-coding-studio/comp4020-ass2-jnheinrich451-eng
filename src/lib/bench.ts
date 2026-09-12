@@ -224,3 +224,94 @@ export function score(
     candidate2d: sampled.map((row) => [row[0], row[1] ?? 0]),
   };
 }
+
+// --- the week 5 extrapolator ----------------------------------------------
+// Week 1 shows that an estimate at one N disagrees with the truth. Week 5
+// asks what the disagreement is made of, and the answer is a bias that falls
+// like 1/N on top of noise that does not. Averaging several draws at each of
+// several sample sizes and fitting a straight line against 1/N reads the
+// bias off at the intercept: the score the estimator would report with
+// unlimited samples.
+//
+// Both halves of that are pinned in spec/bench-extrapolation.test.ts,
+// including the half a demonstration is tempted to omit - the intercept is
+// unbiased but not precise.
+
+/** Independent seeds for rung i, trial j of a ladder started at `seed`. */
+function ladderSeed(seed: number, rung: number, trial: number): number {
+  let z = (seed + Math.imul(rung + 1, 0x9e3779b9) + Math.imul(trial + 1, 0x85ebca6b)) >>> 0;
+  z = Math.imul(z ^ (z >>> 15), 0x2c1b3c6d);
+  return (z ^ (z >>> 12)) >>> 0;
+}
+
+/** Least squares of `mean` against 1/n: the line the ladder is read from. */
+export function fitInverseN(
+  points: Array<{ n: number; mean: number }>,
+): { intercept: number; slope: number } {
+  const k = points.length;
+  let sx = 0;
+  let sy = 0;
+  let sxx = 0;
+  let sxy = 0;
+  for (const { n, mean } of points) {
+    const x = 1 / n;
+    sx += x;
+    sy += mean;
+    sxx += x * x;
+    sxy += x * mean;
+  }
+  const denominator = k * sxx - sx * sx;
+  const slope = denominator === 0 ? 0 : (k * sxy - sx * sy) / denominator;
+  return { intercept: (sy - slope * sx) / k, slope };
+}
+
+export interface Rung {
+  n: number;
+  /** Mean of `trials` independent estimates at this sample size. */
+  mean: number;
+  /** The individual estimates, so the page can show the spread it averaged. */
+  draws: number[];
+}
+
+export interface LadderResult {
+  rungs: Rung[];
+  intercept: number;
+  slope: number;
+  truth: number;
+}
+
+/** One rung: `trials` independent scorings at sample size `n`. */
+export function rung(
+  candidate: Candidate,
+  d: number,
+  n: number,
+  trials: number,
+  seed: number,
+  index = 0,
+): Rung {
+  const draws: number[] = [];
+  for (let j = 0; j < trials; j++) {
+    draws.push(score(candidate, d, n, ladderSeed(seed, index, j)).estimate);
+  }
+  return { n, mean: draws.reduce((a, b) => a + b, 0) / trials, draws };
+}
+
+/** The true score of a candidate, with no sampling in it. */
+export function truthOf(candidate: Candidate, d: number): number {
+  return candidate.kind === "mixture"
+    ? 0
+    : closedForm({ shift: candidate.shift, v: candidate.v, d });
+}
+
+/** A full ladder: every rung, and the line fitted through them. */
+export function ladder(
+  candidate: Candidate,
+  d: number,
+  sizes: number[],
+  trials: number,
+  seed: number,
+): LadderResult {
+  const rungs = sizes.map((n, index) => rung(candidate, d, n, trials, seed, index));
+  const { intercept, slope } = fitInverseN(rungs);
+  return { rungs, intercept, slope, truth: truthOf(candidate, d) };
+}

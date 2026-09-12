@@ -15,6 +15,15 @@ cannot hide inside it.
 
 Candidates follow the bench: a candidate is N(shift*1, v*I), and C is the
 week 6 mixture with a = 0.9, whose true score is exactly zero.
+
+The last block pins the week 5 extrapolator: a ladder of sample sizes, the
+mean estimate at each rung, a least-squares line through the rungs against
+1/N, and the intercept that line reads off at 1/N = 0. The intercept is the
+quantity the lecture is about, so its envelope is measured the same way as
+the estimator's: many independent ladders, mean plus/minus six standard
+deviations. That envelope is wide on purpose. It is wide because the
+intercept genuinely scatters about as far as the true value it estimates,
+which is the lecture's point and not a defect of the fixture.
 """
 
 from __future__ import annotations
@@ -93,9 +102,71 @@ c_mean, c_sd = float(np.mean(c_runs)), float(np.std(c_runs, ddof=1))
 c_env = {"d": 16, "n": 500, "lo": c_mean - 6 * c_sd, "hi": c_mean + 6 * c_sd, "mean": c_mean}
 print(f"\ncandidate C, d=16 N=500: mean {c_mean:.3f} sd {c_sd:.3f} (true value is exactly 0)")
 
+# --- the week 5 extrapolator ------------------------------------------------
+# One ladder is: TRIALS_PER_RUNG estimates at each sample size, averaged, then
+# a least-squares line through (1/N, mean) read off at 1/N = 0. LADDERS of
+# them give the intercept's own spread, which is the number the lecture asks
+# students to report and the page refuses to hide.
+
+SIZES = [60, 100, 200, 400, 800]
+TRIALS_PER_RUNG = 6
+LADDERS = 30
+
+
+def ladder(rng, shift, v, d):
+    rungs = [
+        float(np.mean([estimate(rng, shift, v, d, n) for _ in range(TRIALS_PER_RUNG)]))
+        for n in SIZES
+    ]
+    design = np.vstack([np.ones(len(SIZES)), 1.0 / np.array(SIZES, dtype=float)]).T
+    intercept, slope = np.linalg.lstsq(design, np.array(rungs), rcond=None)[0]
+    return rungs, float(intercept), float(slope)
+
+
+extrapolation = []
+print()
+print(f"extrapolator, {LADDERS} ladders of {TRIALS_PER_RUNG} trials at N = {SIZES}")
+print(f"{'shift':>7}{'v':>6}{'d':>5}{'truth':>9}{'raw@60':>9}{'b mean':>9}{'b sd':>8}{'lo':>9}{'hi':>9}")
+for shift, v, d in [(0.05, 1.0, 16), (0.0, 1.1, 16), (0.05, 1.0, 32)]:
+    runs = [ladder(rng, shift, v, d) for _ in range(LADDERS)]
+    rung_stack = np.array([r[0] for r in runs])
+    betas = np.array([r[1] for r in runs])
+    rung_mean = rung_stack.mean(0)
+    rung_sd = rung_stack.std(0, ddof=1)
+    b_mean, b_sd = float(betas.mean()), float(betas.std(ddof=1))
+    extrapolation.append(
+        {
+            "shift": shift,
+            "v": v,
+            "d": d,
+            "sizes": SIZES,
+            "trials": TRIALS_PER_RUNG,
+            "truth": closed_form(shift, v, d),
+            "rungs": [
+                {"n": n, "lo": float(m - 6 * sd), "hi": float(m + 6 * sd), "mean": float(m)}
+                for n, m, sd in zip(SIZES, rung_mean, rung_sd)
+            ],
+            "intercept": {"mean": b_mean, "sd": b_sd, "lo": b_mean - 6 * b_sd, "hi": b_mean + 6 * b_sd},
+        }
+    )
+    print(
+        f"{shift:>7.2f}{v:>6.2f}{d:>5}{closed_form(shift, v, d):>9.4f}"
+        f"{rung_mean[0]:>9.3f}{b_mean:>9.4f}{b_sd:>8.4f}{b_mean - 6 * b_sd:>9.4f}{b_mean + 6 * b_sd:>9.4f}"
+    )
+    print("        rung means: " + "  ".join(f"N={n}:{m:.3f}" for n, m in zip(SIZES, rung_mean)))
+
+
 out = Path(__file__).resolve().parent.parent / "spec" / "bench-reference.json"
 out.write_text(
-    json.dumps({"closedForm": closed, "estimator": envelopes, "candidateC": c_env}, indent=1),
+    json.dumps(
+        {
+            "closedForm": closed,
+            "estimator": envelopes,
+            "candidateC": c_env,
+            "extrapolation": extrapolation,
+        },
+        indent=1,
+    ),
     encoding="utf-8",
 )
 print(f"\nwrote {out.relative_to(out.parent.parent)}")

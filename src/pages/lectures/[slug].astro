@@ -4,6 +4,7 @@ import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
 import { withBase } from "astro-theme-university/url";
+import BenchExtrapolator from "../../components/BenchExtrapolator.astro";
 import BenchWorkbench from "../../components/BenchWorkbench.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
 import { formatCourseDate } from "../../lib/dates";
@@ -16,17 +17,29 @@ export async function getStaticPaths() {
 
 const { lecture } = Astro.props;
 const { Content } = await render(lecture);
-// `workbench` is a loose key, like `arc` on sessions: the schema passes it
-// through undeclared, and this page is the only consumer.
-const wantsWorkbench = (lecture.data as Record<string, unknown>).workbench === true;
+// `workbench` and `extrapolator` are loose keys, like `arc` on sessions: the
+// schema passes them through undeclared, and this page is the only consumer.
+// A lecture names the instrument it hands the room, and gets only that one.
+const loose = lecture.data as Record<string, unknown>;
+const wantsWorkbench = loose.workbench === true;
+const wantsExtrapolator = loose.extrapolator === true;
+const isOutline = lecture.data.lecture_stage === 'outline';
 const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
 ---
 
 <ContentLayout title={title} description={lecture.data.description} {...siteConfig}>
   <p><strong>{formatCourseDate(lecture.data.date)}</strong></p>
+  {isOutline && <aside class="lecture-preview" aria-label="Lecture development status"><strong>Outline preview</strong><p>This lecture is in development. The route and linked preparation are available below; a slide deck has not been published yet.</p></aside>}
   {lecture.data.slides && <p><a href={withBase(lecture.data.slides)}>Open the slides</a></p>}
   <Content />
   {wantsWorkbench && <BenchWorkbench />}
+  {wantsExtrapolator && <BenchExtrapolator />}
   <TeachingTeam teachers={lecture.data.teachers} />
   <RelatedContent entry={lecture} collections={graphCollections} />
 </ContentLayout>
+
+<style>
+  .lecture-preview {border-left:2px solid var(--at-primary);padding:.9rem 1.2rem;margin-block:1.5rem;background:var(--at-bg);}
+  .lecture-preview strong {color:var(--at-primary);font:.8rem var(--at-font-mono,monospace);}
+  .lecture-preview p {font-size:.9rem;line-height:1.7;margin:.5rem 0 0;}
+</style>
