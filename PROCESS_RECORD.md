@@ -1660,3 +1660,54 @@ consistency rule in this repo has a test, and none of them can see a
 sentence that is true for the builder and false for the reader. Grepping
 course-facing content for repository paths would catch the class; noted as
 a candidate check rather than built, since the author is mid-review.
+
+## 2026-09-13 06:15 — Week 5 stops being an outline
+
+**Asked:**
+
+> Ty, and I here think if we build the lectures, every 3 weeks a lecture,
+> will be better than one solitary week 2 lecture? And for the numbers are
+> less than 12, I think we can design them elaborately?
+
+**Result:**
+The rhythm was already there: five lecture pages, a live introduction in
+week 1 and formal lectures in weeks 2, 5, 8 and 11, which is every three
+weeks. What was solitary was the substance. Week 2 had a deck; weeks 5, 8
+and 11 were outline previews of themselves. So the question was really the
+second one, and the answer is that four lectures can each carry an
+instrument a twelve-week set never could.
+
+Week 5 went first. Its session already describes the repair - score at
+several sample sizes, fit a line in 1/N, read the intercept - so the
+lecture now runs it: five rungs, a fitted line, and the number the line
+gives at zero.
+
+Measuring it in numpy before designing the page changed what the page is
+allowed to claim. The intercept is unbiased, and its spread is about as
+wide as the true value it estimates. A demonstration that showed only the
+tidy half would be lying by omission, so the page names the price first,
+the status line says it when a run lands below zero, and a strip keeps
+every intercept at the scale of the answer. The opening seed is chosen so
+a visitor sees the correction work three times and fail on the fourth.
+
+**Verified:**
+Fixture written by numpy, spec written before the engine existed and failing
+for the right reason, then passing; falsified by fitting against N instead
+of 1/N, which fails three of the five. The new rhythm assertion - a lecture
+marked ready must carry a deck that exists or an instrument - falsified by
+unsetting week 5's key. Driven over the devtools protocol at 1440 and 390:
+four ladders, a candidate change, a dimension change, and a navigate-away
+and back, which the instrument survives. Read the render as a picture twice;
+the first read found "1/N = 0" sitting on top of "N=800" and an intercept
+label covering the N=800 rung. Build clean, 104 of 104 tests.
+
+**Commit:** [`df3ef05`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/df3ef05)
+
+**What happened:**
+Two defects came from driving the page rather than reading the code.
+Changing the candidate left the previous ladder and the previous true value
+on screen, so the label and the number disagreed - the same class of defect
+the author caught last time, found this time by clicking. And the fiction
+breach from the previous entry had a second instance I had not looked for:
+the week 1 workbench's noscript still named repository paths. One fix is a
+page; the class needs the grep that is still not built.
