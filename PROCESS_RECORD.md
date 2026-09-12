@@ -1711,3 +1711,53 @@ the author caught last time, found this time by clicking. And the fiction
 breach from the previous entry had a second instance I had not looked for:
 the week 1 workbench's noscript still named repository paths. One fix is a
 page; the class needs the grep that is still not built.
+
+## 2026-09-13 07:20 — Week 8 stops being an outline
+
+**Asked:**
+
+> Go! The next week 8
+
+**Result:**
+Week 3 argued that a score can only see what the instrument was built to
+tell apart. Week 8 now runs that as an experiment rather than repeating it.
+One set of recordings, three instruments, nine numbers.
+
+The recordings are sequences whose neighbouring frames are correlated, which
+is the single property of video the argument needs and all the page claims
+they are. Candidate E raises every frame by a constant and leaves the order
+alone. F keeps every frame value R produced and destroys only the order. The
+picture makes that instantly: smooth grey lines beside jagged orange ones,
+built from the same numbers.
+
+Frame marginals report F at their own floor. Frame to frame report E at
+theirs, because differencing removes any constant. And the two instruments
+that can see both candidates rank them in opposite orders, at the same N,
+from the same recordings, through the same closed form. That is week 11's
+problem arriving early and honestly.
+
+**Verified:**
+numpy measured the grid first and wrote down the blindness and the flip, so
+the spec holds the page's claims and not only its arithmetic. Written before
+the engine existed and failing on the missing function; falsified afterwards
+with a temporal lens that forgets to difference, which fails three of five
+including both teaching claims. Driven over the devtools protocol: measure,
+switch the drawn candidate, set the correlation to zero, navigate away and
+back. Build clean, 109 of 109 tests.
+
+**Commit:** [`c05dd3e`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c05dd3e)
+
+**What happened:**
+Driving the page found the two defects that mattered, and both were in the
+case the prose promises. At correlation zero a column's floor rounds to
+zero, and the display rule "blind if under twice the floor" then called a
+cell that also rounds to zero a detection; the threshold now comes from two
+independent floor draws rather than one. And the ranking sentence fired
+whenever the two orders differed, including when both numbers being ordered
+were floor readings, so it now reports an ordering only when the candidate
+it puts on top is one that instrument can actually see.
+
+The third defect was a platform fact worth keeping: Astro stamps scope
+attributes at build time, so a span created by the script never matched its
+own scoped rule and the note ran into the number. Runtime-created elements
+need :global, or styling through inherited custom properties.
