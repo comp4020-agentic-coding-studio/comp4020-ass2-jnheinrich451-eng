@@ -11,7 +11,7 @@ const formal = lectures.filter(lecture=>lecture.data.lecture_format==='formal');
 // does not have.
 const carriesInstrument = (lecture: (typeof lectures)[number]) => {
   const loose = lecture.data as Record<string, unknown>;
-  return loose.workbench === true || loose.extrapolator === true || loose.instruments === true;
+  return [loose.workbench, loose.extrapolator, loose.instruments, loose.report].includes(true);
 };
 ---
 

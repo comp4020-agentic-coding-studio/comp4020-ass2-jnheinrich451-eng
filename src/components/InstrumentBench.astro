@@ -129,7 +129,7 @@ const { heading } = Astro.props;
 </section>
 
 <script>
-  import { ar1, instrumentTable, recordings, type SequenceCandidate } from "../lib/bench";
+  import { ar1, belowFloor, instrumentTable, recordings, type SequenceCandidate } from "../lib/bench";
 
   const svgNS = "http://www.w3.org/2000/svg";
   const SHIFT = 1;
@@ -260,14 +260,11 @@ const { heading } = Astro.props;
 
       for (const lens of lenses) {
         const floors = [table.plain[lens], second.plain[lens]];
-        // Above the higher floor by more than the two floors differ, and by
-        // more than the precision the grid prints.
-        const ceiling =
-          Math.max(...floors) * 1.6 + Math.abs(floors[0] - floors[1]) * 4 + 1e-3;
         for (const kind of kinds) {
           const value = table[kind][lens];
           const cell = pick<HTMLElement>(`[data-xi-cell="${kind}/${lens}"]`);
-          const blind = kind !== "plain" && value < ceiling;
+          // One floor rule for the whole course, in src/lib/bench.ts.
+          const blind = kind !== "plain" && belowFloor(value, floors);
           if (!blind && kind !== "plain") seen[lens].add(kind);
           if (blind) blindTo[lens].push(kind === "shift" ? "E" : "F");
           cell.textContent = value.toFixed(3);

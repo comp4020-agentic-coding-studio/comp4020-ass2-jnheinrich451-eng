@@ -87,5 +87,88 @@
   ],
   "joint": []
  },
- "rankingFlips": true
+ "rankingFlips": true,
+ "verdictSizes": [
+  100,
+  400,
+  800
+ ],
+ "repeats": 20,
+ "verdicts": {
+  "frame/100": {
+   "lens": "frame",
+   "n": 100,
+   "verdict": "shift",
+   "share": 1.0
+  },
+  "temporal/100": {
+   "lens": "temporal",
+   "n": 100,
+   "verdict": "shuffle",
+   "share": 1.0
+  },
+  "joint/100": {
+   "lens": "joint",
+   "n": 100,
+   "verdict": "shift",
+   "share": 1.0
+  },
+  "frame/400": {
+   "lens": "frame",
+   "n": 400,
+   "verdict": "shift",
+   "share": 1.0
+  },
+  "temporal/400": {
+   "lens": "temporal",
+   "n": 400,
+   "verdict": "shuffle",
+   "share": 1.0
+  },
+  "joint/400": {
+   "lens": "joint",
+   "n": 400,
+   "verdict": "shift",
+   "share": 1.0
+  },
+  "frame/800": {
+   "lens": "frame",
+   "n": 800,
+   "verdict": "shift",
+   "share": 1.0
+  },
+  "temporal/800": {
+   "lens": "temporal",
+   "n": 800,
+   "verdict": "shuffle",
+   "share": 1.0
+  },
+  "joint/800": {
+   "lens": "joint",
+   "n": 800,
+   "verdict": "shift",
+   "share": 1.0
+  }
+ },
+ "reversalHoldsAtEverySize": true,
+ "verdictsZeroCorrelation": {
+  "frame": {
+   "lens": "frame",
+   "n": 400,
+   "verdict": "shift",
+   "share": 1.0
+  },
+  "temporal": {
+   "lens": "temporal",
+   "n": 400,
+   "verdict": "neither",
+   "share": 1.0
+  },
+  "joint": {
+   "lens": "joint",
+   "n": 400,
+   "verdict": "shift",
+   "share": 1.0
+  }
+ }
 }

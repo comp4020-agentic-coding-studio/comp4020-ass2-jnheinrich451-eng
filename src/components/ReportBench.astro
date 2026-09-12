@@ -1,0 +1,461 @@
+---
+/**
+ * The claim checker: week 11's exercise, run in the page.
+ *
+ * Weeks 1 to 8 measured the bench. This one measures the reader. A claim is
+ * declared together with the protocol behind it, the protocol is run twelve
+ * times, and the page reports what those runs support rather than what the
+ * claim asserts.
+ *
+ * Three outcomes are possible and all three are real. The protocol backs the
+ * claim and another protocol, equally honest, reverses it. The protocol
+ * contradicts the claim outright. Or the instrument reports both candidates
+ * at its own floor, in which case there is no ordering in the evidence at
+ * all and the honest page says so instead of ranking two floor readings.
+ *
+ * The last panel is the point of the lecture: the sentence the evidence
+ * actually supports, assembled from what was measured, for a reader to carry
+ * into the final report.
+ *
+ * Verdicts and the floor rule are src/lib/bench.ts, measured first in
+ * figures/instruments-reference.py and held by spec/report.test.ts. Nothing
+ * here leaves the browser.
+ */
+interface Props {
+  heading?: string;
+}
+const { heading } = Astro.props;
+---
+
+<section class="report" data-rp aria-label={heading ?? "The claim checker"}>
+  {heading && <h2>{heading}</h2>}
+
+  <noscript>
+    <p>
+      The instrument needs JavaScript. It runs a declared protocol twelve times
+      and reports what those runs support; the session works the same argument
+      from the semester's measurement log.
+    </p>
+  </noscript>
+
+  <form class="rp-claim" data-rp-controls>
+    <p class="rp-sentence">
+      <label class="rp-inline" for="rp-worse">
+        <span class="rp-label">the claim</span>
+        <select id="rp-worse" name="worse">
+          <option value="shift" selected>E, a level shift</option>
+          <option value="shuffle">F, frames reordered</option>
+        </select>
+      </label>
+      <span class="rp-said">is the worse candidate, on the evidence of</span>
+      <label class="rp-inline" for="rp-lens">
+        <span class="rp-label">instrument</span>
+        <select id="rp-lens" name="lens">
+          <option value="frame">frame marginals</option>
+          <option value="temporal">frame to frame</option>
+          <option value="joint" selected>whole sequence</option>
+        </select>
+      </label>
+      <label class="rp-inline" for="rp-n">
+        <span class="rp-label">at N</span>
+        <select id="rp-n" name="n">
+          <option value="100">100</option>
+          <option value="400" selected>400</option>
+          <option value="800">800</option>
+        </select>
+      </label>
+      <span class="rp-said">on recordings whose frames are</span>
+      <label class="rp-inline" for="rp-rho">
+        <span class="rp-label">structure</span>
+        <select id="rp-rho" name="rho">
+          <option value="0.9" selected>correlated</option>
+          <option value="0">independent</option>
+        </select>
+      </label>
+      <span class="rp-said">, repeated twelve times.</span>
+    </p>
+    <button type="button" data-rp-run>test the claim</button>
+    <p class="rp-status" role="status" data-rp-status>
+      State a claim and the protocol behind it. The page will run that protocol.
+    </p>
+  </form>
+
+  <div class="rp-runs">
+    <p class="rp-label">your protocol, run by run</p>
+    <p class="rp-strip" data-rp-strip aria-live="polite">
+      <span class="rp-empty">not run yet</span>
+    </p>
+    <p class="rp-legend" aria-hidden="true">
+      <span class="rp-key rp-key--supports">&#9679;</span> supports the claim
+      <span class="rp-key rp-key--against">&#9679;</span> says the opposite
+      <span class="rp-key rp-key--none">&#9679;</span> no ordering in this run
+    </p>
+  </div>
+
+  <div class="rp-counter">
+    <p class="rp-label">the same recordings, at the same N, through the others</p>
+    <ul data-rp-counter>
+      <li class="rp-empty">The other two instruments report here once the claim is tested.</li>
+    </ul>
+  </div>
+
+  <p class="rp-floors" data-rp-floors></p>
+
+  <blockquote class="rp-publish">
+    <p class="rp-label">the sentence this evidence supports</p>
+    <p data-rp-publish>Test a claim, and the line you could defend appears here.</p>
+  </blockquote>
+</section>
+
+<script>
+  import {
+    belowFloor,
+    instrumentTable,
+    reportRuns,
+    verdictFor,
+    type Lens,
+    type SequenceCandidate,
+  } from "../lib/bench";
+
+  const REPEATS = 12;
+  const SIZES = [100, 400, 800];
+  const LENS_NAME: Record<Lens, string> = {
+    frame: "frame marginals",
+    temporal: "frame-to-frame differences",
+    joint: "whole-sequence scoring",
+  };
+  const LETTER: Record<SequenceCandidate, string> = {
+    plain: "R",
+    shift: "E",
+    shuffle: "F",
+  };
+
+  // As on the other three benches: the theme runs Astro's ClientRouter, so
+  // this module is not re-executed when a visitor navigates back.
+  function setup() {
+    const section = document.querySelector("[data-rp]");
+    if (!(section instanceof HTMLElement) || section.dataset.rpReady === "true") return;
+    section.dataset.rpReady = "true";
+
+    const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
+    const strip = pick<HTMLElement>("[data-rp-strip]");
+    const counter = pick<HTMLElement>("[data-rp-counter]");
+    const floorsOut = pick<HTMLElement>("[data-rp-floors]");
+    const publish = pick<HTMLElement>("[data-rp-publish]");
+    const status = pick<HTMLElement>("[data-rp-status]");
+    const runButton = pick<HTMLButtonElement>("[data-rp-run]");
+    const worseSelect = pick<HTMLSelectElement>("#rp-worse");
+    const lensSelect = pick<HTMLSelectElement>("#rp-lens");
+    const nSelect = pick<HTMLSelectElement>("#rp-n");
+    const rhoSelect = pick<HTMLSelectElement>("#rp-rho");
+
+    let seed = 20261019;
+
+    const claimed = () => worseSelect.value as SequenceCandidate;
+    const declared = () => lensSelect.value as Lens;
+    const params = () => ({
+      n: Number(nSelect.value),
+      d: 24,
+      rho: Number(rhoSelect.value),
+      shift: 1,
+      seed,
+    });
+
+    const mark = (kind: "supports" | "against" | "none", letter: string) => {
+      const span = document.createElement("span");
+      span.className = `rp-mark rp-mark--${kind}`;
+      span.textContent = letter;
+      return span;
+    };
+
+    const tally = (calls: string[], value: string) => calls.filter((call) => call === value).length;
+    /** Instrument names are lower case in running prose and capitalised when
+        they open a sentence, which several of these lines do. */
+    const opens = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
+    const run = async () => {
+      runButton.disabled = true;
+      const claim = claimed();
+      const lens = declared();
+      const { n } = params();
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      strip.replaceChildren();
+      counter.replaceChildren();
+      floorsOut.textContent = "";
+      publish.textContent = " ";
+      status.textContent = `running your protocol, repeat 1 of ${REPEATS}…`;
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+      const results = reportRuns({ ...params(), seed }, REPEATS);
+      const calls = results.verdicts[lens];
+      for (let i = 0; i < calls.length; i++) {
+        const call = calls[i];
+        const kind = call === "neither" ? "none" : call === claim ? "supports" : "against";
+        strip.append(mark(kind, call === "neither" ? "–" : LETTER[call]));
+      }
+
+      const supporting = tally(calls, claim);
+      const none = tally(calls, "neither");
+      const against = REPEATS - supporting - none;
+
+      // The other two instruments, on the same recordings at the same N.
+      const others = (["frame", "temporal", "joint"] as Lens[]).filter((other) => other !== lens);
+      const reversals: Lens[] = [];
+      for (const other of others) {
+        const otherCalls = results.verdicts[other];
+        const top = otherCalls[0];
+        const agreed = otherCalls.every((call) => call === top);
+        const item = document.createElement("li");
+        if (top === "neither") {
+          item.textContent = opens(`${LENS_NAME[other]} reports both candidates on its own floor: no ordering to give.`);
+        } else {
+          item.textContent = opens(`${LENS_NAME[other]} calls ${LETTER[top]} the worse candidate in ${tally(otherCalls, top)} of ${REPEATS} runs.`);
+          if (top !== claim && agreed) reversals.push(other);
+        }
+        counter.append(item);
+      }
+
+      // What this instrument's floor does across the sample sizes on offer,
+      // measured rather than described: the numbers move, the verdict does not.
+      const floorAt = SIZES.map((size) => {
+        const table = instrumentTable({ ...params(), n: size, seed: (seed ^ (size * 7919)) >>> 0 });
+        return { size, floor: table.plain[lens], verdict: verdictFor(lens, table) };
+      });
+      const verdictHeld = floorAt.every((entry) => entry.verdict === floorAt[0].verdict);
+      floorsOut.textContent =
+        opens(`${LENS_NAME[lens]} reports `) +
+        floorAt.map((entry) => `${entry.floor.toFixed(3)} at N = ${entry.size}`).join(", ") +
+        " when nothing changed at all. Those numbers move with N. Run once at each of those sample sizes, " +
+        (verdictHeld
+          ? "this instrument returned the same verdict at all three, so what moved is what you would print and not what you would conclude."
+          : `it returned ${floorAt.map((entry) => `${entry.verdict === "neither" ? "no ordering" : LETTER[entry.verdict]} at N = ${entry.size}`).join(", ")}, so the sample size is doing part of the work here.`);
+
+      if (none === REPEATS) {
+        status.textContent = "Your instrument had nothing to say.";
+        publish.textContent = opens(`${LENS_NAME[lens]} at N = ${n} reports both candidates at its own floor, so this evidence supports no ordering between them at all.`);
+      } else if (supporting > against) {
+        status.textContent = `Your protocol supports the claim in ${supporting} of ${REPEATS} runs.`;
+        publish.textContent =
+          `${LETTER[claim]} is the worse candidate under ${LENS_NAME[lens]} at N = ${n}, in ${supporting} of ${REPEATS} repeats` +
+          (reversals.length
+            ? `. ${opens(reversals.map((other) => LENS_NAME[other]).join(" and "))} at the same N, on the same recordings, ${reversals.length > 1 ? "reverse" : "reverses"} this.`
+            : ", and the other instruments that can see both candidates agree.");
+      } else {
+        // Not seeing a candidate and ranking it low are different failures,
+        // and only one of them is an argument about the candidate.
+        const onFloor = belowFloor(results.last[claim][lens], results.floors[lens].slice(0, 2));
+        status.textContent = `Your own protocol contradicts the claim in ${against} of ${REPEATS} runs.`;
+        publish.textContent =
+          opens(`${LENS_NAME[lens]} at N = ${n} calls ${LETTER[claim === "shift" ? "shuffle" : "shift"]} the worse candidate, not ${LETTER[claim]}.`) +
+          (onFloor
+            ? ` It reports ${LETTER[claim]} at its own floor, so it is not ranking ${LETTER[claim]} low: it cannot see ${LETTER[claim]} at all.`
+            : " The claim is not one this evidence can carry.");
+      }
+      runButton.disabled = false;
+    };
+
+    const reset = () => {
+      strip.replaceChildren();
+      const empty = document.createElement("span");
+      empty.className = "rp-empty";
+      empty.textContent = "not run yet";
+      strip.append(empty);
+      counter.replaceChildren();
+      const item = document.createElement("li");
+      item.className = "rp-empty";
+      item.textContent = "The other two instruments report here once the claim is tested.";
+      counter.append(item);
+      floorsOut.textContent = "";
+      publish.textContent = "Test a claim, and the line you could defend appears here.";
+      status.textContent = "State a claim and the protocol behind it. The page will run that protocol.";
+    };
+
+    for (const control of [worseSelect, lensSelect, nSelect, rhoSelect]) {
+      control.addEventListener("change", reset);
+    }
+    runButton.addEventListener("click", () => void run());
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .report {
+    --rp-supports: #3a7d44;
+    --rp-against: #b5495b;
+    --rp-none: #9d968b;
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+  }
+
+  .rp-claim {
+    border-block-end: 1px solid var(--at-border, #e4ddd0);
+    padding-block-end: var(--at-spacing-md, 1rem);
+    margin-block-end: var(--at-spacing-lg);
+  }
+
+  .rp-sentence {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--at-spacing-sm) var(--at-spacing-md, 1rem);
+    margin: 0 0 var(--at-spacing-md, 1rem);
+  }
+
+  .rp-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .rp-said {
+    padding-block-end: 0.35rem;
+    font-size: var(--at-font-size-sm);
+  }
+
+  .rp-label,
+  .rp-status,
+  .rp-legend,
+  .rp-strip,
+  .report button {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.07em;
+  }
+
+  .rp-label {
+    text-transform: uppercase;
+    color: var(--at-text-muted, #6f675c);
+    margin: 0 0 0.3rem;
+  }
+
+  .rp-inline select {
+    font: inherit;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+  }
+
+  .report button {
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: var(--at-primary);
+    color: var(--at-white, #fff);
+    cursor: pointer;
+  }
+
+  .report button[disabled] {
+    opacity: 0.5;
+    cursor: progress;
+  }
+
+  .rp-status {
+    margin: var(--at-spacing-sm) 0 0;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .rp-runs,
+  .rp-counter {
+    margin-block-end: var(--at-spacing-lg);
+  }
+
+  .rp-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0 0 var(--at-spacing-xs);
+    min-height: 2rem;
+  }
+
+  /* Global: these marks are built by the script, after the build has stamped
+     its scope attributes on the markup, so a scoped rule never matches them. */
+  :global(.rp-mark) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 4px;
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    color: var(--at-white, #fff);
+  }
+
+  :global(.rp-mark--supports) {
+    background: #3a7d44;
+  }
+
+  :global(.rp-mark--against) {
+    background: #b5495b;
+  }
+
+  :global(.rp-mark--none) {
+    background: #9d968b;
+  }
+
+  .rp-key--supports {
+    color: var(--rp-supports);
+  }
+
+  .rp-key--against {
+    color: var(--rp-against);
+    margin-inline-start: 1.1em;
+  }
+
+  .rp-key--none {
+    color: var(--rp-none);
+    margin-inline-start: 1.1em;
+  }
+
+  .rp-key {
+    margin-inline-end: 0.2em;
+  }
+
+  .rp-legend {
+    margin: 0;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .rp-counter ul {
+    margin: 0;
+    padding-inline-start: 1.1rem;
+  }
+
+  .rp-counter li {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+  }
+
+  :global(.rp-empty) {
+    color: var(--at-text-muted, #6f675c);
+    font-size: var(--at-font-size-sm);
+  }
+
+  .rp-floors {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .rp-publish {
+    border-inline-start: 2px solid var(--at-primary);
+    padding: 0.8rem 0 0.8rem 1.2rem;
+    margin: var(--at-spacing-lg) 0 0;
+  }
+
+  .rp-publish p:last-child {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

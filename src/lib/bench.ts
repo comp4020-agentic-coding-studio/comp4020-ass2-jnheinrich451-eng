@@ -424,3 +424,65 @@ export function instrumentTable(
   });
   return out;
 }
+
+// --- week 11: what a declared protocol actually supports -------------------
+// Week 11 asks a reader to state a claim and the protocol behind it, then
+// runs that protocol repeatedly and reports what it supports. Two rules do
+// the work, and both live here rather than in the page so the week 8 grid,
+// the week 11 checker and the test suite cannot disagree about them.
+
+/**
+ * Is this score indistinguishable from the instrument's own floor?
+ *
+ * A floor reading says where a column sits. Two of them say how far it moves
+ * between draws, and a cell has to clear both to count as a detection. The
+ * last term is the precision the pages print, so a column whose floor rounds
+ * to zero cannot call another rounding-to-zero cell a detection.
+ */
+export function belowFloor(value: number, floors: number[]): boolean {
+  const highest = Math.max(...floors);
+  const spread = Math.max(...floors) - Math.min(...floors);
+  return value < highest * 1.6 + spread * 4 + 1e-3;
+}
+
+/** Which candidate an instrument calls worse in one run, if either. */
+export type Verdict = SequenceCandidate | "neither";
+
+export function verdictFor(
+  lens: Lens,
+  table: Record<SequenceCandidate, Record<Lens, number>>,
+  floors: number[] = [table.plain[lens]],
+): Verdict {
+  const e = table.shift[lens];
+  const f = table.shuffle[lens];
+  const eBlind = belowFloor(e, floors);
+  const fBlind = belowFloor(f, floors);
+  if (eBlind && fBlind) return "neither";
+  if (eBlind) return "shuffle";
+  if (fBlind) return "shift";
+  return e > f ? "shift" : "shuffle";
+}
+
+export interface ReportRuns {
+  verdicts: Record<Lens, Verdict[]>;
+  floors: Record<Lens, number[]>;
+  /** The scores from the last repeat, for a page that wants to show one. */
+  last: Record<SequenceCandidate, Record<Lens, number>>;
+}
+
+/** Run the whole protocol `repeats` times, independently each time. */
+export function reportRuns(params: RecordingParams, repeats: number): ReportRuns {
+  const lenses: Lens[] = ["frame", "temporal", "joint"];
+  const verdicts = { frame: [], temporal: [], joint: [] } as Record<Lens, Verdict[]>;
+  const floors = { frame: [], temporal: [], joint: [] } as Record<Lens, number[]>;
+  let last = {} as Record<SequenceCandidate, Record<Lens, number>>;
+  for (let i = 0; i < repeats; i++) {
+    const table = instrumentTable({ ...params, seed: (params.seed + 104729 * (i + 1)) >>> 0 });
+    for (const lens of lenses) {
+      floors[lens].push(table.plain[lens]);
+      verdicts[lens].push(verdictFor(lens, table));
+    }
+    last = table;
+  }
+  return { verdicts, floors, last };
+}

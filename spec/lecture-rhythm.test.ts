@@ -28,8 +28,13 @@ describe('4+1 lecture rhythm',()=>{
     }
     for(const week of [5,8,11]){
       const html=readFileSync(`dist/lectures/week-${String(week).padStart(2,'0')}/index.html`,'utf8');
+      // Both directions, because every lecture is now ready and a one-sided
+      // assertion would have nothing left to test.
       if(lectures.find(n=>n.meta.week===week)?.meta.lecture_stage==='outline'){
-        expect(html).toContain('Outline preview');expect(html).not.toContain('Open the slides');
+        expect(html,`week ${week} is an outline and does not say so`).toContain('Outline preview');
+        expect(html).not.toContain('Open the slides');
+      } else {
+        expect(html,`week ${week} is ready and still calls itself a preview`).not.toContain('Outline preview');
       }
     }
   });
@@ -39,7 +44,7 @@ describe('4+1 lecture rhythm',()=>{
     // had slides and has never needed them. A page marked ready with neither
     // is an outline wearing the wrong label.
     for(const lecture of lectures.filter(n=>n.meta.lecture_stage==='ready')){
-      const instrument=lecture.meta.workbench===true||lecture.meta.extrapolator===true||lecture.meta.instruments===true;
+      const instrument=[lecture.meta.workbench,lecture.meta.extrapolator,lecture.meta.instruments,lecture.meta.report].includes(true);
       expect(Boolean(lecture.meta.slides)||instrument,`week ${lecture.meta.week} is marked ready with no deck and no instrument`).toBe(true);
     }
   });

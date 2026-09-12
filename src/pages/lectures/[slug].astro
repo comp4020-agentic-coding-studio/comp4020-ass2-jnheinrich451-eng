@@ -7,6 +7,7 @@ import { withBase } from "astro-theme-university/url";
 import BenchExtrapolator from "../../components/BenchExtrapolator.astro";
 import BenchWorkbench from "../../components/BenchWorkbench.astro";
 import InstrumentBench from "../../components/InstrumentBench.astro";
+import ReportBench from "../../components/ReportBench.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
 import { formatCourseDate } from "../../lib/dates";
 import { graphCollections, siteConfig } from "../../site-config";
@@ -25,6 +26,7 @@ const loose = lecture.data as Record<string, unknown>;
 const wantsWorkbench = loose.workbench === true;
 const wantsExtrapolator = loose.extrapolator === true;
 const wantsInstruments = loose.instruments === true;
+const wantsReport = loose.report === true;
 const isOutline = lecture.data.lecture_stage === 'outline';
 const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
 ---
@@ -37,6 +39,7 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
   {wantsWorkbench && <BenchWorkbench />}
   {wantsExtrapolator && <BenchExtrapolator />}
   {wantsInstruments && <InstrumentBench />}
+  {wantsReport && <ReportBench />}
   <TeachingTeam teachers={lecture.data.teachers} />
   <RelatedContent entry={lecture} collections={graphCollections} />
 </ContentLayout>

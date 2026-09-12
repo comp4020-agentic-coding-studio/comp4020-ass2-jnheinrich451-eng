@@ -33,6 +33,13 @@ The two facts the lecture asserts in words are written into the fixture so
 the test suite can hold them: each instrument is blind to one candidate
 (a cell inside its own column's floor envelope), and the last two
 instruments rank E and F in opposite orders.
+
+The final block is week 11's. It asks the question a report has to answer:
+if someone claims one candidate is worse, does the evidence behind the claim
+support it, and would an equally honest protocol have said the opposite? The
+verdict of one instrument at one sample size is recorded over many repeats,
+at every sample size the page offers, so the page can say how stable each
+verdict is instead of implying stability from a single run.
 """
 
 from __future__ import annotations
@@ -85,8 +92,8 @@ def ar1(rng, n: int, d: int, rho: float) -> np.ndarray:
     return x
 
 
-def candidate(rng, kind: str, n: int, d: int) -> np.ndarray:
-    x = ar1(rng, n, d, RHO)
+def candidate(rng, kind: str, n: int, d: int, rho: float = RHO) -> np.ndarray:
+    x = ar1(rng, n, d, rho)
     if kind == "shift":
         return x + SHIFT
     if kind == "shuffle":
@@ -148,6 +155,75 @@ for lens in LENSES:
     print(f"{lens:>14}: cannot distinguish {', '.join(seen)} from no change at all")
 print(f"\nframe-to-frame and whole-sequence rank E and F in opposite orders: {flip}")
 
+# --- week 11: what a declared protocol returns, repeatedly -----------------
+# A verdict is which candidate an instrument calls worse in one run, or
+# neither when both sit on that instrument's floor. Repeats say whether the
+# verdict is a property of the protocol or of the draw; sample sizes say
+# whether it is a property of N. Here it is neither: every column returns the
+# same verdict every time, at every N, which is why the disagreement between
+# columns cannot be resolved by measuring harder.
+
+VERDICT_SIZES = [100, 400, 800]
+REPEATS = 20
+
+
+def floor_ceiling(floor: float) -> float:
+    """The display rule the page uses, kept identical here."""
+    return floor * 1.6 + 1e-3
+
+
+def verdict(rng, lens: str, n: int, rho: float = RHO) -> str:
+    ref = ar1(rng, n, D, rho)
+    seen = through(lens, ref)
+    floor = fid(seen, through(lens, candidate(rng, "plain", n, D, rho)))
+    e = fid(seen, through(lens, candidate(rng, "shift", n, D, rho)))
+    f = fid(seen, through(lens, candidate(rng, "shuffle", n, D, rho)))
+    ceiling = floor_ceiling(floor)
+    if e < ceiling and f < ceiling:
+        return "neither"
+    if e < ceiling:
+        return "shuffle"
+    if f < ceiling:
+        return "shift"
+    return "shift" if e > f else "shuffle"
+
+
+verdicts = {}
+print()
+print(f"verdicts over {REPEATS} repeats: which candidate each instrument calls worse")
+print(f"{'N':>6} | " + " | ".join(f"{lens:>26}" for lens in LENSES))
+for n in VERDICT_SIZES:
+    row = []
+    for lens in LENSES:
+        calls = [verdict(rng, lens, n) for _ in range(REPEATS)]
+        top = max(set(calls), key=calls.count)
+        share = calls.count(top) / REPEATS
+        verdicts[f"{lens}/{n}"] = {"lens": lens, "n": n, "verdict": top, "share": share}
+        row.append(f"{top:>10} in {share:6.0%} of runs")
+    print(f"{n:>6} | " + " | ".join(row))
+
+# With independent frames there is no order for F to destroy, so an
+# instrument that only looks at order has nothing to report about either
+# candidate. That is the page's "no ordering to defend" state, pinned here so
+# it cannot quietly stop happening.
+zero_rho = {}
+print()
+for lens in LENSES:
+    calls = [verdict(rng, lens, 400, 0.0) for _ in range(REPEATS)]
+    top = max(set(calls), key=calls.count)
+    zero_rho[lens] = {"lens": lens, "n": 400, "verdict": top, "share": calls.count(top) / REPEATS}
+    print(f"correlation 0, {lens:>9}: {top} in {calls.count(top) / REPEATS:.0%} of runs")
+
+reversal = all(
+    verdicts[f"temporal/{n}"]["verdict"] != verdicts[f"joint/{n}"]["verdict"]
+    and verdicts[f"temporal/{n}"]["share"] == 1.0
+    and verdicts[f"joint/{n}"]["share"] == 1.0
+    for n in VERDICT_SIZES
+)
+print()
+print(f"every sample size: the two seeing instruments disagree, both unanimously: {reversal}")
+
+
 out = Path(__file__).resolve().parent.parent / "spec" / "instruments-reference.json"
 out.write_text(
     json.dumps(
@@ -160,6 +236,11 @@ out.write_text(
             "cells": cells,
             "blind": blind,
             "rankingFlips": flip,
+            "verdictSizes": VERDICT_SIZES,
+            "repeats": REPEATS,
+            "verdicts": verdicts,
+            "reversalHoldsAtEverySize": reversal,
+            "verdictsZeroCorrelation": zero_rho,
         },
         indent=1,
     ),
