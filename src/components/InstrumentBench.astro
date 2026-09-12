@@ -1,0 +1,541 @@
+---
+/**
+ * The instrument bench: week 8's argument, run in the page.
+ *
+ * Week 3 named the instrument and claimed a score can only see what the
+ * instrument was built to tell apart. This puts the claim on the bench. The
+ * same recordings are scored through three instruments at once, and the grid
+ * shows what each of them reports.
+ *
+ * The first row is the one that makes the rest readable: R against a second
+ * independent draw of R, so every column carries the number it produces when
+ * nothing changed at all. A cell near its column's floor is a cell that
+ * instrument cannot distinguish from no change, and both candidates are
+ * invisible to one instrument each.
+ *
+ * The numbers and the two claims are measured in
+ * figures/instruments-reference.py and held by spec/instruments.test.ts.
+ * Arithmetic is src/lib/bench.ts. Nothing here leaves the browser.
+ */
+interface Props {
+  heading?: string;
+}
+const { heading } = Astro.props;
+---
+
+<section class="instruments" data-xi aria-label={heading ?? "The instrument bench"}>
+  {heading && <h2>{heading}</h2>}
+
+  <noscript>
+    <p>
+      The instrument needs JavaScript. It scores one set of recordings through
+      three instruments at once; the session works the same comparison from the
+      reading.
+    </p>
+  </noscript>
+
+  <form class="xi-controls" data-xi-controls>
+    <div class="xi-field">
+      <label class="xi-label" for="xi-d">frames per sequence</label>
+      <select id="xi-d" name="d">
+        <option value="16">16</option>
+        <option value="24" selected>24</option>
+        <option value="32">32</option>
+      </select>
+    </div>
+    <div class="xi-field">
+      <label class="xi-label" for="xi-n">sequences N</label>
+      <select id="xi-n" name="n">
+        <option value="400">400</option>
+        <option value="800" selected>800</option>
+      </select>
+    </div>
+    <div class="xi-field">
+      <label class="xi-label" for="xi-rho">frame correlation</label>
+      <select id="xi-rho" name="rho">
+        <option value="0">0, independent frames</option>
+        <option value="0.5">0.5</option>
+        <option value="0.9" selected>0.9</option>
+      </select>
+    </div>
+    <button type="button" data-xi-run>measure</button>
+    <p class="xi-status" role="status" data-xi-status>
+      One set of recordings, three instruments, nine numbers.
+    </p>
+  </form>
+
+  <figure class="xi-plot">
+    <div class="xi-toggle" role="group" aria-label="Which candidate to draw">
+      <span class="xi-label">showing</span>
+      <button type="button" data-xi-candidate="shift" aria-pressed="false">E, a level shift</button>
+      <button type="button" data-xi-candidate="shuffle" aria-pressed="true">F, frames reordered</button>
+    </div>
+    <svg
+      viewBox="0 0 560 240"
+      role="img"
+      data-xi-sequences
+      aria-label="Five reference sequences beside five sequences from the selected candidate"></svg>
+    <figcaption data-xi-plot-caption>
+      Five recordings of each. Every frame value in F is a frame value R produced;
+      only the order is gone.
+    </figcaption>
+  </figure>
+
+  <p class="xi-tablenote">
+    Every cell is a score at the same N, from the same recordings, through one
+    instrument. The first row is what that instrument reports when nothing
+    changed at all. A cell is marked when it does not rise above that floor by
+    more than the floor itself moves between draws, which is the point at which
+    the instrument has told you nothing.
+  </p>
+
+  <div class="xi-scroll">
+  <table class="xi-table">
+    <caption>Nine scores, one set of recordings.</caption>
+    <thead>
+      <tr>
+        <th scope="col">what changed</th>
+        <th scope="col">frame marginals</th>
+        <th scope="col">frame to frame</th>
+        <th scope="col">whole sequence</th>
+      </tr>
+    </thead>
+    <tbody data-xi-body>
+      <tr>
+        <th scope="row">nothing, R drawn again</th>
+        <td data-xi-cell="plain/frame">&nbsp;</td>
+        <td data-xi-cell="plain/temporal">&nbsp;</td>
+        <td data-xi-cell="plain/joint">&nbsp;</td>
+      </tr>
+      <tr>
+        <th scope="row">E, a level shift</th>
+        <td data-xi-cell="shift/frame">&nbsp;</td>
+        <td data-xi-cell="shift/temporal">&nbsp;</td>
+        <td data-xi-cell="shift/joint">&nbsp;</td>
+      </tr>
+      <tr>
+        <th scope="row">F, frames reordered</th>
+        <td data-xi-cell="shuffle/frame">&nbsp;</td>
+        <td data-xi-cell="shuffle/temporal">&nbsp;</td>
+        <td data-xi-cell="shuffle/joint">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="xi-verdict" aria-live="polite" data-xi-verdict>
+    Press measure. Then decide which column you would put in a paper.
+  </p>
+</section>
+
+<script>
+  import { ar1, instrumentTable, recordings, type SequenceCandidate } from "../lib/bench";
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const SHIFT = 1;
+
+  // As on the week 1 and week 5 benches: the theme runs Astro's ClientRouter,
+  // so this module is not re-executed when a visitor navigates back.
+  function setup() {
+    const section = document.querySelector("[data-xi]");
+    if (!(section instanceof HTMLElement) || section.dataset.xiReady === "true") return;
+    section.dataset.xiReady = "true";
+
+    const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
+    const sequences = pick<SVGSVGElement>("[data-xi-sequences]");
+    const status = pick<HTMLElement>("[data-xi-status]");
+    const verdict = pick<HTMLElement>("[data-xi-verdict]");
+    const plotCaption = pick<HTMLElement>("[data-xi-plot-caption]");
+    const runButton = pick<HTMLButtonElement>("[data-xi-run]");
+    const dSelect = pick<HTMLSelectElement>("#xi-d");
+    const nSelect = pick<HTMLSelectElement>("#xi-n");
+    const rhoSelect = pick<HTMLSelectElement>("#xi-rho");
+
+    let showing: SequenceCandidate = "shuffle";
+    let seed = 20260928;
+
+    const params = () => ({
+      n: Number(nSelect.value),
+      d: Number(dSelect.value),
+      rho: Number(rhoSelect.value),
+      shift: SHIFT,
+      seed,
+    });
+
+    const node = (name: string, attrs: Record<string, string | number>) => {
+      const element = document.createElementNS(svgNS, name);
+      for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
+      return element;
+    };
+    const label = (value: string, attrs: Record<string, string | number>) => {
+      const element = node("text", {
+        "font-size": 11,
+        "font-family": "var(--at-font-mono, monospace)",
+        ...attrs,
+      });
+      element.textContent = value;
+      return element;
+    };
+
+    const drawSequences = () => {
+      const { n, d, rho } = params();
+      const reference = ar1(Math.min(n, 5), d, rho, seed);
+      const candidate = recordings(showing, { ...params(), n: Math.min(n, 5), seed: seed + 9973 });
+      sequences.replaceChildren();
+
+      const panels = [
+        { x0: 34, x1: 268, rows: reference, colour: "var(--xi-ref)", name: "R, the reference" },
+        {
+          x0: 300,
+          x1: 534,
+          rows: candidate,
+          colour: "var(--xi-cand)",
+          name: showing === "shift" ? "E, a level shift" : "F, frames reordered",
+        },
+      ];
+      const all = [...reference, ...candidate].flat();
+      const lo = Math.min(...all);
+      const hi = Math.max(...all);
+      const y = (value: number) => 210 - (170 * (value - lo)) / (hi - lo || 1);
+
+      for (const panel of panels) {
+        sequences.append(
+          label(panel.name, { x: panel.x0, y: 18, fill: panel.colour }),
+        );
+        sequences.append(
+          node("line", {
+            x1: panel.x0,
+            x2: panel.x1,
+            y1: y(0),
+            y2: y(0),
+            stroke: "var(--xi-axis)",
+            "stroke-dasharray": "3 4",
+          }),
+        );
+        panel.rows.forEach((row, index) => {
+          const step = (panel.x1 - panel.x0) / Math.max(row.length - 1, 1);
+          sequences.append(
+            node("polyline", {
+              points: row.map((value, t) => `${panel.x0 + step * t},${y(value).toFixed(1)}`).join(" "),
+              fill: "none",
+              stroke: panel.colour,
+              "stroke-width": 1.4,
+              opacity: 0.35 + 0.13 * index,
+            }),
+          );
+        });
+        sequences.append(
+          label("frame 1", { x: panel.x0, y: 230, fill: "var(--xi-axis-ink)" }),
+        );
+        sequences.append(
+          label(`frame ${params().d}`, { x: panel.x1, y: 230, fill: "var(--xi-axis-ink)", "text-anchor": "end" }),
+        );
+      }
+      plotCaption.textContent =
+        showing === "shift"
+          ? "Five recordings of each. E has the shape R produced, raised by the same amount at every frame."
+          : "Five recordings of each. Every frame value in F is a frame value R produced; only the order is gone.";
+    };
+
+    const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    const measure = async () => {
+      runButton.disabled = true;
+      status.textContent = "scoring nine cells…";
+      await frame();
+      const table = instrumentTable(params());
+      // A second, independent R-against-R draw. One floor says where a column
+      // sits; two say how much it moves, which is what "cannot distinguish"
+      // has to mean. Without it a column whose floor rounds to zero calls a
+      // cell that also rounds to zero a detection.
+      const second = instrumentTable({ ...params(), seed: (seed ^ 0x7f4a7c15) >>> 0 });
+      const lenses = ["frame", "temporal", "joint"] as const;
+      const kinds = ["plain", "shift", "shuffle"] as const;
+      const blindTo: Record<string, string[]> = { frame: [], temporal: [], joint: [] };
+      const seen: Record<string, Set<string>> = {
+        frame: new Set(),
+        temporal: new Set(),
+        joint: new Set(),
+      };
+
+      for (const lens of lenses) {
+        const floors = [table.plain[lens], second.plain[lens]];
+        // Above the higher floor by more than the two floors differ, and by
+        // more than the precision the grid prints.
+        const ceiling =
+          Math.max(...floors) * 1.6 + Math.abs(floors[0] - floors[1]) * 4 + 1e-3;
+        for (const kind of kinds) {
+          const value = table[kind][lens];
+          const cell = pick<HTMLElement>(`[data-xi-cell="${kind}/${lens}"]`);
+          const blind = kind !== "plain" && value < ceiling;
+          if (!blind && kind !== "plain") seen[lens].add(kind);
+          if (blind) blindTo[lens].push(kind === "shift" ? "E" : "F");
+          cell.textContent = value.toFixed(3);
+          cell.classList.toggle("xi-blind", blind);
+          cell.classList.toggle("xi-seen", !blind && kind !== "plain");
+          if (blind) {
+            const note = document.createElement("span");
+            note.className = "xi-note";
+            note.textContent = "indistinguishable from no change";
+            cell.append(note);
+          }
+        }
+      }
+
+      const named = lenses
+        .filter((lens) => blindTo[lens].length > 0)
+        .map((lens) => {
+          const name =
+            lens === "frame" ? "Frame marginals" : lens === "temporal" ? "Frame to frame" : "Whole sequence";
+          return `${name} cannot tell ${blindTo[lens].join(" or ")} from no change.`;
+        });
+      // A ranking is only worth reporting when the candidate it puts on top
+      // is one that instrument can actually see. Two floor readings in a
+      // column are not an ordering, however they happen to fall.
+      const worst = (lens: "frame" | "temporal" | "joint") =>
+        table.shift[lens] > table.shuffle[lens] ? "shift" : "shuffle";
+      const ranks = (lens: "temporal" | "joint") =>
+        seen[lens].has(worst(lens)) ? worst(lens) : null;
+      const byChange = ranks("temporal");
+      const byWhole = ranks("joint");
+      const letter = (kind: string) => (kind === "shift" ? "E" : "F");
+      verdict.textContent =
+        (named.length ? named.join(" ") + " " : "Every instrument registered both candidates. ") +
+        (byChange && byWhole && byChange !== byWhole
+          ? `Frame to frame calls ${letter(byChange)} the worse candidate and whole sequence calls ${letter(byWhole)} the worse one, at the same N, from the same recordings.`
+          : byChange && byWhole
+            ? "The two instruments that can see both candidates agree on the order, this time."
+            : "One of these instruments reported nothing above its own floor for either candidate, so it has no ordering to give.");
+      status.textContent = "Nine numbers, one set of recordings. None of them is the score.";
+      runButton.disabled = false;
+    };
+
+    const reset = (message: string) => {
+      for (const cell of section.querySelectorAll<HTMLElement>("[data-xi-cell]")) {
+        cell.textContent = " ";
+        cell.classList.remove("xi-blind", "xi-seen");
+      }
+      status.textContent = message;
+      verdict.textContent = "Press measure. Then decide which column you would put in a paper.";
+      drawSequences();
+    };
+
+    for (const button of section.querySelectorAll<HTMLButtonElement>("[data-xi-candidate]")) {
+      button.addEventListener("click", () => {
+        showing = button.dataset.xiCandidate === "shift" ? "shift" : "shuffle";
+        for (const other of section.querySelectorAll<HTMLButtonElement>("[data-xi-candidate]")) {
+          other.setAttribute("aria-pressed", String(other === button));
+        }
+        drawSequences();
+      });
+    }
+    for (const control of [dSelect, nSelect, rhoSelect]) {
+      control.addEventListener("change", () =>
+        reset("Different recordings. The last grid measured something else."),
+      );
+    }
+    runButton.addEventListener("click", () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      void measure();
+    });
+
+    reset("One set of recordings, three instruments, nine numbers.");
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .instruments {
+    --xi-ref: #9d968b;
+    --xi-cand: #c9782a;
+    --xi-seen: #b5495b;
+    --xi-axis: var(--at-border, #d8d2c6);
+    --xi-axis-ink: var(--at-text-muted, #6f675c);
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+  }
+
+  .xi-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-sm) var(--at-spacing-lg);
+    align-items: end;
+    border-block: 1px solid var(--at-border, #e4ddd0);
+    padding-block: var(--at-spacing-sm);
+    margin-block-end: var(--at-spacing-lg);
+  }
+
+  .xi-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .xi-label,
+  .xi-controls button,
+  .xi-toggle button,
+  .xi-status,
+  .xi-table th,
+  .xi-table td {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.07em;
+  }
+
+  .xi-label {
+    text-transform: uppercase;
+  }
+
+  .xi-field select {
+    font: inherit;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+  }
+
+  .xi-controls button,
+  .xi-toggle button {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: var(--at-primary);
+    color: var(--at-white, #fff);
+    cursor: pointer;
+  }
+
+  .xi-toggle button[aria-pressed="false"] {
+    background: transparent;
+    color: var(--at-secondary, var(--at-primary));
+  }
+
+  .xi-controls button[disabled] {
+    opacity: 0.5;
+    cursor: progress;
+  }
+
+  .xi-status {
+    flex-basis: 100%;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .xi-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--at-spacing-sm);
+    flex-wrap: wrap;
+    margin-block-end: var(--at-spacing-xs);
+  }
+
+  .instruments figure {
+    margin: 0;
+  }
+
+  .instruments svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklab, var(--at-primary) 4%, transparent);
+    border: 1px solid var(--at-border, #e4ddd0);
+    border-radius: 4px;
+  }
+
+  .instruments figcaption {
+    font-size: var(--at-font-size-sm);
+    margin-block-start: var(--at-spacing-xs);
+    max-width: 68ch;
+  }
+
+  /* The table scrolls inside its own box on a narrow screen; the prose that
+     explains it must not, so it lives outside the scroller. */
+  .xi-tablenote {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    margin-block: var(--at-spacing-lg) var(--at-spacing-sm);
+  }
+
+  .xi-scroll {
+    overflow-x: auto;
+  }
+
+  .xi-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .xi-table caption {
+    caption-side: top;
+    text-align: start;
+    font-size: var(--at-font-size-xs);
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    letter-spacing: 0.06em;
+    color: var(--at-text-muted, #6f675c);
+    margin-block-end: var(--at-spacing-xs);
+  }
+
+  .xi-table th,
+  .xi-table td {
+    border-block-end: 1px solid var(--at-border, #e4ddd0);
+    padding: 0.6rem 0.8rem;
+    text-align: start;
+    vertical-align: top;
+  }
+
+  /* The theme paints the header band itself; naming the brand colour here
+     put gold text on gold. */
+  .xi-table thead th {
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .xi-table tbody th {
+    font-weight: normal;
+    white-space: nowrap;
+  }
+
+  .xi-table td {
+    font-variant-numeric: tabular-nums;
+    font-size: 1rem;
+  }
+
+  .xi-table tbody tr:first-child td,
+  .xi-table tbody tr:first-child th {
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .xi-seen {
+    color: var(--xi-seen);
+  }
+
+  .xi-blind {
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  /* Global, because this span is created by the script after the build has
+     stamped its scope attributes on everything in the template, so a scoped
+     rule would never match it. */
+  :global(.xi-note) {
+    display: block;
+    font-size: var(--at-font-size-xs);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    margin-block-start: 0.25rem;
+    max-width: 9rem;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .xi-verdict {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    margin-block-start: var(--at-spacing-lg);
+  }
+</style>

@@ -315,3 +315,112 @@ export function ladder(
   const { intercept, slope } = fitInverseN(rungs);
   return { rungs, intercept, slope, truth: truthOf(candidate, d) };
 }
+
+// --- the week 8 instrument bench ------------------------------------------
+// Week 3 named the instrument and argued that a score can only see what the
+// instrument was built to tell apart. Week 8 puts that on the bench: the same
+// recordings, scored through three instruments at once, each of which throws
+// away something different before the arithmetic begins.
+//
+// Recordings are sequences of d frames from an AR(1) process, so neighbouring
+// frames are correlated the way frames of a video are. The claims this makes
+// about the resulting numbers are measured in figures/instruments-reference.py
+// and held in spec/instruments.test.ts, including the two that matter most:
+// each instrument is blind to one candidate, and two of them rank the
+// candidates in opposite orders.
+
+/** N sequences of d frames each. */
+export type Recording = number[][];
+
+export type SequenceCandidate =
+  /** R itself, drawn again: what an instrument reports when nothing changed. */
+  | "plain"
+  /** E: every frame raised by the same constant. Order untouched. */
+  | "shift"
+  /** F: each sequence's frames permuted. Every frame value survives. */
+  | "shuffle";
+
+export type Lens =
+  /** Every frame of every sequence, pooled into one distribution. */
+  | "frame"
+  /** Differences between consecutive frames. Constants cancel. */
+  | "temporal"
+  /** All d frames jointly, the instrument the bench has used since week 1. */
+  | "joint";
+
+export interface RecordingParams {
+  n: number;
+  d: number;
+  rho: number;
+  shift: number;
+  seed: number;
+}
+
+/** Sequences whose neighbouring frames are correlated, marginals N(0, 1). */
+export function ar1(n: number, d: number, rho: number, seed: number): Recording {
+  const normal = gaussian(rng(seed));
+  const innovation = Math.sqrt(1 - rho * rho);
+  const out: Recording = [];
+  for (let i = 0; i < n; i++) {
+    const row = new Array<number>(d);
+    row[0] = normal();
+    for (let t = 1; t < d; t++) row[t] = rho * row[t - 1] + innovation * normal();
+    out.push(row);
+  }
+  return out;
+}
+
+/** R, or one of the two week 8 candidates built from it. */
+export function recordings(
+  kind: SequenceCandidate,
+  { n, d, rho, shift, seed }: RecordingParams,
+): Recording {
+  const base = ar1(n, d, rho, seed);
+  if (kind === "shift") return base.map((row) => row.map((value) => value + shift));
+  if (kind === "plain") return base;
+  const random = rng((seed ^ 0x5417f1e) >>> 0);
+  return base.map((row) => {
+    const shuffled = row.slice();
+    for (let i = d - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      const swap = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = swap;
+    }
+    return shuffled;
+  });
+}
+
+/** What one instrument passes through to the arithmetic. */
+export function through(lens: Lens, x: Recording): number[][] {
+  if (lens === "frame") return x.flatMap((row) => row.map((value) => [value]));
+  if (lens === "temporal") return x.map((row) => row.slice(1).map((value, i) => value - row[i]));
+  return x;
+}
+
+/** Score two sets of recordings as one instrument sees them. */
+export function lensScore(lens: Lens, reference: Recording, candidate: Recording): number {
+  const a = through(lens, reference);
+  const b = through(lens, candidate);
+  const left = meanAndCov(a);
+  const right = meanAndCov(b);
+  return frechet(left.mean, left.cov, right.mean, right.cov);
+}
+
+/** Every candidate through every instrument, the grid the lecture shows. */
+export function instrumentTable(
+  params: RecordingParams,
+): Record<SequenceCandidate, Record<Lens, number>> {
+  const reference = ar1(params.n, params.d, params.rho, params.seed);
+  const out = {} as Record<SequenceCandidate, Record<Lens, number>>;
+  const kinds: SequenceCandidate[] = ["plain", "shift", "shuffle"];
+  const lenses: Lens[] = ["frame", "temporal", "joint"];
+  kinds.forEach((kind, index) => {
+    // Every candidate is drawn independently of the reference, so a cell
+    // never borrows luck from the draw it is compared against.
+    const drawn = recordings(kind, { ...params, seed: (params.seed + 9973 * (index + 1)) >>> 0 });
+    out[kind] = {} as Record<Lens, number>;
+    for (const lens of lenses) out[kind][lens] = lensScore(lens, reference, drawn);
+  });
+  return out;
+}

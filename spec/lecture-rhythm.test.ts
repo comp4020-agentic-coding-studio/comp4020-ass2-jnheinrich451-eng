@@ -39,7 +39,7 @@ describe('4+1 lecture rhythm',()=>{
     // had slides and has never needed them. A page marked ready with neither
     // is an outline wearing the wrong label.
     for(const lecture of lectures.filter(n=>n.meta.lecture_stage==='ready')){
-      const instrument=lecture.meta.workbench===true||lecture.meta.extrapolator===true;
+      const instrument=lecture.meta.workbench===true||lecture.meta.extrapolator===true||lecture.meta.instruments===true;
       expect(Boolean(lecture.meta.slides)||instrument,`week ${lecture.meta.week} is marked ready with no deck and no instrument`).toBe(true);
     }
   });
