@@ -177,6 +177,16 @@ aborted the build before they ran:
   `**/*.{test,spec}.?(c|m)[jt]s?(x)`, and there is no vitest config overriding
   it, so a file called `test.ts` is silently collected by nothing.
 
+A third, found while building the week 8 grid:
+
+- **A scoped style never reaches an element the script created.** Astro stamps
+  its `data-astro-cid-*` attribute on the markup at build time, so a `<span>`
+  built in the component's own `<script>` matches no rule in its own `<style>`
+  block. Style runtime-created elements with `:global(...)`, or through custom
+  properties inherited from a parent that does carry the attribute. It fails
+  silently and only in the render, which is why it was found by looking at a
+  screenshot rather than by any check.
+
 ## These rules become checks
 
 The brief asks for checks in `spec/` "protecting the promises your course makes
