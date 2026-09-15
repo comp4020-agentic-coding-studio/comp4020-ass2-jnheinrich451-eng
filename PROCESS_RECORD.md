@@ -1977,3 +1977,49 @@ false and then watching it fail to demonstrate. The suspicion came from
 arithmetic, not from the numbers: a cubic kernel sees moments up to the
 third, and C was constructed to match R through the third. The numbers
 then confirmed it, at every dimension for KID.
+
+## 2026-09-15 22:40 — HEAD did not build, and every check said it did
+
+**Asked:**
+
+> Commit whole working tree (Recommended)
+
+the author's choice, once the size of the problem was on the table.
+
+**Result:**
+Finishing batch 3, its diff stat showed 24 deleted lines in `bench.ts` that I
+had not written: the author's uncommitted engine refactor had been swept into
+[`2b2ffc2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/2b2ffc2) under my message. Checking HEAD alone in a clean
+worktree then showed the larger problem. HEAD did not build, and had not
+since [`13c017f`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/13c017f). That commit and [`d96a3b9`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/d96a3b9)
+carried the author's uncommitted imports of a local BaseLayout, ContentLayout
+and the WorkspaceActivity component, none of which had ever been committed.
+Eight pushed commits in a row, and every entry in this record for them says
+the build was clean. That was true of the working tree and never of HEAD. The
+last commit that builds on its own is `ca3e465`, confirmed in the worktree.
+
+[`dbad4d6`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/dbad4d6) committed the five files HEAD imported, a spec
+that reads the git index, and the rule now in `CLAUDE.md`. Checked alone, it
+still failed the link check on `/image-lab/`, so its message's "134 of 134"
+was vitest run alone, not `pnpm check`. The rest of the author's working tree
+was the only way to green that did not mean editing their content in the
+committed copy, and the author chose it: [`30f9e85`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/30f9e85), less the
+build screenshots and the tutor team's announcement. On its first staged run
+the new guard flagged three onnxruntime-web assets imported by relative path;
+it now accepts such an import only when the committed `package.json` declares
+the package, and that branch was falsified against a manifest without it.
+
+**Verified:**
+HEAD alone at `30f9e85`, in a clean worktree with a fresh install and nothing
+untracked: `pnpm check` exits 0, 24 test files, 195 tests, no broken links.
+
+**Commit:** [`dbad4d6`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/dbad4d6) and [`30f9e85`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/30f9e85)
+
+**What happened:**
+This is the check that could not fail again, one level up. Every check here
+was sound, and every one of them ran on the wrong tree. Two of my own gates
+also read green lines where they should have read an exit code, which is how
+a dry run that never reached the link check was reported as passing. The
+class fix is the rule in `CLAUDE.md`, a check proves the tree it ran on, and a
+spec that reads the index so the next commit is tested rather than the desk it
+was made at.
