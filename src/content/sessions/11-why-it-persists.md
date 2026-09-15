@@ -55,9 +55,15 @@ number, and coordination is what the row supplies.
 
 ## The bench, unchanged
 
-Score A and B once more. They are 5.12 and 4.88, as in week 1, and the
-ordering is the one the closed form gives. Nothing measured in between moved
-either number, and nothing moved the reason a researcher would report them.
+Score A and B once more. The true values are still 5.12 and 4.88, fixed
+since week 2, and B is still the closer candidate. Your estimates are not
+those numbers, and at the sample sizes week 5 examined they need not even keep
+that order. Ten weeks changed what you know about the estimate. They changed
+nothing about the reason a researcher would report it.
+
+The [week 11 lecture](/lectures/week-11/) makes you state the protocol behind a
+claim like that one, runs it, and writes the sentence the evidence will
+carry.
 
 ## Exercise
 

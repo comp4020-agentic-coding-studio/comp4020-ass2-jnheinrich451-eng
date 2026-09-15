@@ -65,6 +65,10 @@ claim about an ordering.
 
 ## Exercise
 
+The [week 1 lecture](/lectures/week-01/) runs a small version of this bench in
+your browser. Press draw again there first, and watch the estimate move while
+the true value does not.
+
 Score A and B against R at N = 10,000, through whatever implementation you
 reach for first. Record both numbers, the sample size, and the name and
 version of the implementation. That is entry one of your measurement log, and

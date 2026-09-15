@@ -85,6 +85,11 @@ an exact correction. Inspect fit residuals and sensitivity to the N range.
 A finite reference set held fixed does not become a population reference
 merely because generated-sample N is extrapolated to infinity.
 
+The [week 5 lecture](/lectures/week-05/) runs this ladder in the page on a
+smaller bench, and shows the price as well as the repair: repeated ladders
+land either side of the true value, and move by about as much as the value
+they estimate.
+
 We will use it on the bench from week 6 onwards. Week 4's numbers are now
 retired.
 

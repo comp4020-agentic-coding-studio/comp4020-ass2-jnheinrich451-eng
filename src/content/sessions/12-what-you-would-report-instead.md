@@ -55,8 +55,8 @@ Score A, B and C under every score this course has used: FID, FID∞, KID,
 density and coverage, and whatever you are proposing. N-honestly, at a sample
 size you state, through the implementation pinned in week 4.
 
-Under the closed form A is 5.12, B is 4.88 and C is 0. Those three are fixed
-and were fixed in week 2. Every other number in that table is a claim about
+Under the closed form A is 5.12, B is 4.88 and C is 0. Those three are fixed:
+A and B since week 2, C since you built it in week 6. Every other number in that table is a claim about
 the score in its column, and this is the only page of your log where the
 columns can be set against each other, because for once every entry was
 computed the same way.

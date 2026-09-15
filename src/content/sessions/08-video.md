@@ -53,6 +53,11 @@ Notice the shape of that claim. It is not that FVD ignores time. It is that
 the burden of proof sits with the instrument, and Unterthiner's sensitivity
 experiments are where you go to discharge it for a failure you care about.
 
+The [week 8 lecture](/lectures/week-08/) puts the claim on a bench of its own.
+Three instruments score the same recordings, each discards something
+different before the arithmetic starts, and at the default settings two of
+them rank the candidates in opposite orders.
+
 ## Before the session
 
 Bring one temporal failure you believe these features would not register, and
