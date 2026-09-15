@@ -1856,3 +1856,46 @@ sat beside. The harness change names that: a new component triggers a
 re-check of its neighbours. It was also a check no test could have made,
 because "the same four distributions" was internally consistent with every
 fixture in `spec/`; it was only false against the course.
+
+## 2026-09-15 21:30 — Are the sessions enough? Sessions, batch 1
+
+**Asked:**
+
+> for content check, if in sessions, those contents are few, in your sense if
+> they are adequate?
+
+and then, on hearing the plan:
+
+> if there will be a huge process to modify them? If so you can process in
+> batch, and can record the handles of each session in a temporal files
+
+**Result:**
+Read all twelve against each other. By length they are adequate: 375 to 691
+words, a two-minute read each, and the marker gives the whole site ten
+minutes. By coherence they are the strongest part of the site: coined terms
+recur weeks later, C is built in week 6 and scored again in 7 and 12, and week
+10 names week 3's term to use it. They feel few for two other reasons. All
+twelve share one skeleton, and the last third of the course gives the reader
+nothing to do in the page.
+
+Batch 1 fixed what was wrong before anything was added. Week 11 conflated the
+closed-form values with scores, which contradicts week 5 and the home page's
+figure; week 12 put C's zero in week 2, four weeks before C exists. Weeks 1,
+5, 8 and 11 now say, where their exercise is, that their lecture's instrument
+runs it. The author's handles file idea became `build/SESSION_HANDLES.md`,
+untracked: the facts every page must agree on, and what each week takes and
+hands on.
+
+**Verified:**
+Every edit asserted its exact anchor text before replacing it, because the
+author's side was editing sessions at the same time; session 06 had edits in
+flight and was left alone, and the commit names its five files by path. Build
+clean, 173 of 173 tests.
+
+**Commit:** [`c1a4933`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c1a4933)
+
+**What happened:**
+Both slips were statements that were true of one page and false of the
+course, the same class as the home page's "same four distributions". No test
+in `spec/` can see that class, and reading non-adjacent weeks side by side is
+what found both, which is also exactly how the marker reads.
