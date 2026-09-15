@@ -5,6 +5,40 @@ the [course website](https://comp.anu.edu.au/courses/comp4020-agentic-coding-stu
 Neither is restated here. This file is the part that is mine: the rules I hold
 the agent to while it writes a course.
 
+## The refined response — check it every time
+
+> I'm building a sincere, persuasive course website that argues a reported
+> FID is a claim about a protocol, not a property of a model. It is aimed at
+> postgraduates who have read a results table without asking what N was, and
+> who assume a lower score means a better model. I make the case with one
+> bench whose true scores are known, re-scored every week, and with
+> instruments in the page that let the reader produce each failure with their
+> own clicks before the prose names it.
+
+The course team's advice for the response criterion is to turn the open brief
+into one specific sentence, then judge every decision by it. This is that
+sentence. The wording is the author's; the agent does not rephrase it.
+
+Before accepting any page, component, figure, label or visual treatment, ask
+**does this make the site more persuasive to that reader?** Not whether it
+looks good, and not whether it meets the spec. Each clause is a question:
+
+- **The claim.** Does this help show that a reported FID is a claim about a
+  protocol?
+- **The reader.** Would a postgraduate who trusts a lower score need this, or
+  is it for someone already convinced?
+- **The means.** Does the reader produce the failure, or only get told about
+  it?
+
+Something that answers none of them is mood (Rule 1): rewrite it or cut it.
+Decorative styling is not exempt. A status light, an index number or an
+animation answers one of the three or goes. When a new component arrives, it
+is checked against this sentence before it is checked against the build, and
+the older pages it now sits beside are checked again, because a new increment
+can make a page that was fine read as outdated.
+
+The three rules below are how this sentence is enforced across twenty pages.
+
 ## Why these three rules
 
 Assignment 1 scored process 86 and artefact 84, but **response 77** — the only
@@ -199,6 +233,19 @@ in the platform can see it. Rules 2 and 3 are testable and must be tested:
   period
 
 A rule I keep having to re-apply by hand is a rule that should be a test.
+
+For interactive lectures, a settings change invalidates any pending result.
+Plots and scores must consume the same generated samples. A demonstration
+threshold must be labelled as a heuristic unless its statistical calibration
+is established; a few agreeing repeats do not prove certainty or unbiasedness.
+Reports retain all parameters, the seed and observed counts in every outcome.
+Check live controls in both themes; a clean static accessibility scan is not
+evidence that dark-mode inputs are readable after interaction.
+
+Distinguish population moments from empirical moments in every exact-zero
+example. State the construction that guarantees equality; drawing from the
+same distribution or taking a subsample does not guarantee identical sample
+means and covariances. Protect this distinction in the teaching precision tests.
 
 # Instructions on SLOP8412
 
