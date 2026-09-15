@@ -3,11 +3,14 @@ import { render } from "astro:content";
 import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
 import SpecList from "astro-course-university/components/SpecList.astro";
-import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import ContentLayout from "../../layouts/ContentLayout.astro";
 import EntryMeta from "../../components/EntryMeta.astro";
+import RatingCost from "../../components/RatingCost.astro";
 import Readings from "../../components/Readings.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
 import SessionScale from "../../components/SessionScale.astro";
+import WorkspaceActivity from "../../components/WorkspaceActivity.astro";
+import { workspaceActivities } from "../../data/workspace-activities";
 import { graphCollections, sessionLabels, siteConfig } from "../../site-config";
 
 export async function getStaticPaths() {
@@ -16,6 +19,7 @@ export async function getStaticPaths() {
 }
 
 const { session } = Astro.props;
+const activity = workspaceActivities[`sessions/${session.id}`];
 const { Content, headings } = await render(session);
 
 // `arc`, `required_reading` and `further_reading` are loose keys: the schema
@@ -23,6 +27,9 @@ const { Content, headings } = await render(session);
 // generated types and are read from an untyped view of the same data.
 const loose = session.data as Record<string, unknown>;
 const arc = typeof loose.arc === "string" ? loose.arc : undefined;
+// `instrument` is another loose key: a session names the in-page instrument
+// it hands the reader, and the page renders only that one.
+const wantsRatingCost = loose.instrument === "rating-cost";
 ---
 
 <ContentLayout
@@ -35,8 +42,12 @@ const arc = typeof loose.arc === "string" ? loose.arc : undefined;
   <nav class="session-toc" aria-label="On this page">
     <span>On this page</span>
     {headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text.replace(/#$/, '').trim()}</a>)}
+    {wantsRatingCost && <a href="#rating-cost">Cost a rating study</a>}
+    {activity && <a href="#workspace-activity">Try it in the workspace</a>}
   </nav>
   <div class="session-reading"><Content /></div>
+  {wantsRatingCost && <RatingCost />}
+  {activity && <WorkspaceActivity activity={activity} />}
   <Readings required={loose.required_reading} further={loose.further_reading} />
   <SpecList spec={session.data.spec}>
     What you bring to the session. Written so a reader can tell whether it has

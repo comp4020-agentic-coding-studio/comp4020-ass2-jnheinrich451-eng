@@ -1,0 +1,432 @@
+---
+/**
+ * The rating-cost calculator: week 9's price, run in the page.
+ *
+ * Week 9 argues that human evaluation lost to the score on cost, and states
+ * the cost once, for one difference. This lets the reader move the
+ * difference and watch the bill. The difference only takes powers of two, so
+ * "halve it" stays on the list, and each press reports the exact factor it
+ * multiplied the trials by. That factor is close to four everywhere and
+ * exactly four nowhere, because the pooled rate moves with the difference;
+ * reporting it measured rather than asserting "quadruples" is the point.
+ *
+ * The arithmetic is src/lib/rating-cost.ts, pinned to Python's inverse normal
+ * and to a simulation of the experiment it sizes, in
+ * figures/rating-cost-reference.py and spec/rating-cost.test.ts. The same
+ * suite holds the session's own sentences to this calculator.
+ */
+const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
+---
+
+<section class="rating-cost" id="rating-cost" data-rc aria-label="What a rating study costs">
+  <noscript>
+    <p>
+      The calculator needs JavaScript. The worked example above is its default
+      setting: half a point apart around 30 percent, at five percent
+      significance and eighty percent power.
+    </p>
+  </noscript>
+
+  <form class="rc-controls" data-rc-controls>
+    <div class="rc-field">
+      <label class="rc-label" for="rc-rate">human error rate</label>
+      <div class="rc-range">
+        <input id="rc-rate" name="rate" type="range" min="10" max="50" step="1" value="30" />
+        <output for="rc-rate" data-rc-rate-out>30%</output>
+      </div>
+    </div>
+    <div class="rc-field">
+      <label class="rc-label" for="rc-difference">difference to detect</label>
+      <div class="rc-step">
+        <button type="button" class="rc-ghost" data-rc-halve>halve it</button>
+        <select id="rc-difference" name="difference">
+          {DIFFERENCES.map((d) => (
+            <option value={d} selected={d === 0.5}>{d} points</option>
+          ))}
+        </select>
+        <button type="button" class="rc-ghost" data-rc-double>double it</button>
+      </div>
+    </div>
+    <div class="rc-field">
+      <label class="rc-label" for="rc-alpha">significance</label>
+      <select id="rc-alpha" name="alpha">
+        <option value="0.05" selected>5%</option>
+        <option value="0.01">1%</option>
+      </select>
+    </div>
+    <div class="rc-field">
+      <label class="rc-label" for="rc-power">power</label>
+      <select id="rc-power" name="power">
+        <option value="0.8" selected>80%</option>
+        <option value="0.9">90%</option>
+      </select>
+    </div>
+    <div class="rc-field">
+      <label class="rc-label" for="rc-seconds">seconds per trial</label>
+      <input id="rc-seconds" name="seconds" type="number" min="1" max="60" step="1" value="4" />
+    </div>
+    <div class="rc-field">
+      <label class="rc-label" for="rc-wage">dollars per hour</label>
+      <input id="rc-wage" name="wage" type="number" min="1" max="200" step="1" value="25" />
+    </div>
+  </form>
+
+  <p class="rc-status" role="status" data-rc-status>
+    The default is the session's worked example. Press halve it.
+  </p>
+
+  <dl class="rc-bill" aria-live="polite">
+    <div><dt>trials per candidate</dt><dd data-rc-per>&nbsp;</dd></div>
+    <div><dt>trials in total</dt><dd data-rc-total>&nbsp;</dd></div>
+    <div><dt>hours of paid attention</dt><dd data-rc-hours>&nbsp;</dd></div>
+    <div class="rc-dollars"><dt>dollars, before screening</dt><dd data-rc-dollars>&nbsp;</dd></div>
+  </dl>
+  <p class="rc-versus">The number it competes with: one score, about a minute of compute.</p>
+
+  <figure class="rc-plot">
+    <svg
+      viewBox="0 0 560 270"
+      role="img"
+      data-rc-plot
+      aria-label="Cost in dollars against the difference to detect, on logarithmic axes, with the current setting marked"></svg>
+    <figcaption>
+      Both axes are logarithmic, so the line is close to straight: each
+      halving of the difference multiplies the cost by close to four. Press
+      halve it for the exact factor at your settings.
+    </figcaption>
+  </figure>
+
+  <div class="rc-budget">
+    <label class="rc-label" for="rc-budget">your budget, in dollars</label>
+    <input id="rc-budget" name="budget" type="number" min="100" step="100" value="1000" />
+    <p aria-live="polite" data-rc-budget-out>&nbsp;</p>
+  </div>
+</section>
+
+<script>
+  import { costOf, smallestDetectable, trialsPerCandidate, type Design } from "../lib/rating-cost";
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
+
+  // The theme runs Astro's ClientRouter, so this module is not re-executed
+  // when a visitor navigates back; everything lives in setup().
+  function setup() {
+    const section = document.querySelector("[data-rc]");
+    if (!(section instanceof HTMLElement) || section.dataset.rcReady === "true") return;
+    section.dataset.rcReady = "true";
+
+    const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
+    const rate = pick<HTMLInputElement>("#rc-rate");
+    const rateOut = pick<HTMLOutputElement>("[data-rc-rate-out]");
+    const difference = pick<HTMLSelectElement>("#rc-difference");
+    const alpha = pick<HTMLSelectElement>("#rc-alpha");
+    const power = pick<HTMLSelectElement>("#rc-power");
+    const seconds = pick<HTMLInputElement>("#rc-seconds");
+    const wage = pick<HTMLInputElement>("#rc-wage");
+    const budget = pick<HTMLInputElement>("#rc-budget");
+    const status = pick<HTMLElement>("[data-rc-status]");
+    const plot = pick<SVGSVGElement>("[data-rc-plot]");
+
+    const whole = (value: number) => Math.round(value).toLocaleString("en-US");
+    const clamp = (value: number, lo: number, hi: number, fallback: number) =>
+      Number.isFinite(value) ? Math.min(hi, Math.max(lo, value)) : fallback;
+
+    const design = (points = Number(difference.value)): Design => ({
+      rate: clamp(Number(rate.value), 10, 50, 30) / 100,
+      difference: points / 100,
+      alpha: alpha.value === "0.01" ? 0.01 : 0.05,
+      power: power.value === "0.9" ? 0.9 : 0.8,
+    });
+    const costing = () => ({
+      secondsPerTrial: clamp(Number(seconds.value), 1, 60, 4),
+      dollarsPerHour: clamp(Number(wage.value), 1, 200, 25),
+    });
+
+    const node = (name: string, attrs: Record<string, string | number>) => {
+      const element = document.createElementNS(svgNS, name);
+      for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
+      return element;
+    };
+    const label = (text: string, attrs: Record<string, string | number>) => {
+      const element = node("text", { "font-size": 11, "font-family": "var(--at-font-mono, monospace)", ...attrs });
+      element.textContent = text;
+      return element;
+    };
+    // Axis ticks are exact powers of ten and read cleanly without decimals;
+    // the marker keeps one, so "$7.4k" agrees with the readout beside it.
+    const money = (value: number) => {
+      const one = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
+      if (value >= 1e6) return `$${one(Math.round(value / 1e5) / 10)}M`;
+      if (value >= 1e3) return value < 1e4 ? `$${one(Math.round(value / 100) / 10)}k` : `$${Math.round(value / 1e3)}k`;
+      return `$${Math.round(value)}`;
+    };
+
+    const drawPlot = () => {
+      plot.replaceChildren();
+      const left = 64;
+      const right = 530;
+      const top = 20;
+      const bottom = 226;
+      const lo = Math.log10(0.1);
+      const hi = Math.log10(10);
+      const curve = [] as Array<[number, number]>;
+      for (let i = 0; i <= 60; i++) {
+        const points = 10 ** (lo + ((hi - lo) * i) / 60);
+        curve.push([points, costOf(design(points), costing()).dollars]);
+      }
+      const yLo = Math.floor(Math.log10(Math.min(...curve.map(([, d]) => d))));
+      const yHi = Math.ceil(Math.log10(Math.max(...curve.map(([, d]) => d))));
+      const x = (points: number) => left + ((right - left) * (Math.log10(points) - lo)) / (hi - lo);
+      const y = (dollars: number) => bottom - ((bottom - top) * (Math.log10(dollars) - yLo)) / (yHi - yLo || 1);
+
+      plot.append(node("line", { x1: left, x2: right, y1: bottom, y2: bottom, stroke: "var(--rc-axis)" }));
+      plot.append(node("line", { x1: left, x2: left, y1: top, y2: bottom, stroke: "var(--rc-axis)" }));
+      for (const points of [0.125, 0.25, 0.5, 1, 2, 4, 8]) {
+        plot.append(node("line", { x1: x(points), x2: x(points), y1: bottom, y2: bottom + 4, stroke: "var(--rc-axis)" }));
+        plot.append(label(String(points), { x: x(points), y: bottom + 17, "text-anchor": "middle", fill: "var(--rc-ink)" }));
+      }
+      plot.append(label("difference to detect, percentage points", { x: (left + right) / 2, y: bottom + 36, "text-anchor": "middle", fill: "var(--rc-ink)" }));
+      for (let power10 = yLo; power10 <= yHi; power10++) {
+        plot.append(label(money(10 ** power10), { x: left - 8, y: y(10 ** power10) + 4, "text-anchor": "end", fill: "var(--rc-ink)" }));
+        plot.append(node("line", { x1: left, x2: right, y1: y(10 ** power10), y2: y(10 ** power10), stroke: "var(--rc-grid)" }));
+      }
+      plot.append(
+        node("polyline", {
+          points: curve.map(([p, d]) => `${x(p).toFixed(1)},${y(d).toFixed(1)}`).join(" "),
+          fill: "none",
+          stroke: "var(--rc-line)",
+          "stroke-width": 2,
+        }),
+      );
+      const current = costOf(design(), costing());
+      const cx = x(Number(difference.value));
+      const cy = y(current.dollars);
+      plot.append(node("circle", { cx, cy, r: 6, fill: "var(--rc-mark)" }));
+      plot.append(
+        label(money(current.dollars), {
+          x: cx + (cx > right - 60 ? -10 : 10),
+          y: cy - 10,
+          "text-anchor": cx > right - 60 ? "end" : "start",
+          fill: "var(--rc-mark)",
+          "font-size": 13,
+        }),
+      );
+    };
+
+    const render = (message?: string) => {
+      rateOut.textContent = `${clamp(Number(rate.value), 10, 50, 30)}%`;
+      const bill = costOf(design(), costing());
+      pick<HTMLElement>("[data-rc-per]").textContent = whole(bill.perCandidate);
+      pick<HTMLElement>("[data-rc-total]").textContent = whole(bill.total);
+      pick<HTMLElement>("[data-rc-hours]").textContent = whole(bill.hours);
+      pick<HTMLElement>("[data-rc-dollars]").textContent = `$${whole(bill.dollars)}`;
+
+      const { secondsPerTrial, dollarsPerHour } = costing();
+      const affordable = clamp(Number(budget.value), 100, 1e9, 1000);
+      const trials = ((affordable / dollarsPerHour) * 3600) / secondsPerTrial / 2;
+      const d = design();
+      const reach = smallestDetectable(trials, d.rate, d.alpha, d.power);
+      pick<HTMLElement>("[data-rc-budget-out]").textContent =
+        `$${whole(affordable)} buys ${whole(trials)} trials per candidate, enough to separate candidates about ` +
+        `${(reach * 100).toFixed(reach * 100 < 1 ? 2 : 1)} points apart at these settings.`;
+
+      if (message) status.textContent = message;
+      drawPlot();
+    };
+
+    const step = (direction: -1 | 1) => {
+      const index = DIFFERENCES.indexOf(Number(difference.value));
+      const next = index + direction;
+      if (next < 0 || next >= DIFFERENCES.length) {
+        status.textContent =
+          direction < 0 ? "That is as small as this calculator goes." : "That is as large as this calculator goes.";
+        return;
+      }
+      const before = trialsPerCandidate(design());
+      difference.value = String(DIFFERENCES[next]);
+      const ratio = trialsPerCandidate(design()) / before;
+      render(
+        direction < 0
+          ? `Half the difference, ${ratio.toFixed(2)} times the trials.`
+          : `Twice the difference, ${(1 / ratio).toFixed(2)} times fewer trials.`,
+      );
+    };
+
+    pick<HTMLButtonElement>("[data-rc-halve]").addEventListener("click", () => step(-1));
+    pick<HTMLButtonElement>("[data-rc-double]").addEventListener("click", () => step(1));
+    // Any other control changes what the status line was describing, so it
+    // may not keep describing it: a "that is as small as it goes" left beside a
+    // difference of two points is a label disagreeing with its number.
+    const unsaid = "Settings changed. Press halve it to see what the next step of precision costs.";
+    section.addEventListener("input", () => render(unsaid));
+    section.addEventListener("change", () => render(unsaid));
+    render();
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .rating-cost {
+    --rc-axis: var(--at-border, #d8d2c6);
+    --rc-grid: color-mix(in oklab, var(--at-border, #d8d2c6) 45%, transparent);
+    --rc-ink: var(--at-text-muted, #6f675c);
+    --rc-line: #c9782a;
+    --rc-mark: #b5495b;
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+    scroll-margin-top: calc(var(--at-nav-height, 4rem) + 7rem);
+  }
+
+  .rc-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-sm) var(--at-spacing-lg);
+    align-items: end;
+    border-block-end: 1px solid var(--at-border, #e4ddd0);
+    padding-block-end: var(--at-spacing-sm);
+  }
+
+  .rc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .rc-label,
+  .rc-bill dt,
+  .rc-status,
+  .rating-cost button,
+  .rc-range output {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.07em;
+  }
+
+  .rc-label,
+  .rc-bill dt {
+    text-transform: uppercase;
+  }
+
+  .rc-range,
+  .rc-step {
+    display: flex;
+    align-items: center;
+    gap: var(--at-spacing-xs);
+  }
+
+  /* Only the difference buttons wrap on a phone; the rate's readout stays
+     beside its slider at every width. */
+  .rc-step {
+    flex-wrap: wrap;
+  }
+
+  .rating-cost select,
+  .rating-cost input[type="number"] {
+    font: inherit;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+    width: 6.5rem;
+  }
+
+  .rating-cost button {
+    white-space: nowrap;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: transparent;
+    color: var(--at-secondary, var(--at-primary));
+    cursor: pointer;
+  }
+
+  .rc-status {
+    margin: var(--at-spacing-sm) 0 0;
+    color: var(--at-text-muted, #6f675c);
+    letter-spacing: 0.02em;
+  }
+
+  .rc-bill {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--at-spacing-md, 1rem);
+    margin: var(--at-spacing-lg) 0 var(--at-spacing-xs);
+  }
+
+  .rc-bill div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .rc-bill dt {
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .rc-bill dd {
+    margin: 0.3rem 0 0;
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.5rem;
+    white-space: nowrap;
+  }
+
+  .rc-dollars dd {
+    color: var(--rc-mark);
+  }
+
+  .rc-versus {
+    font-size: var(--at-font-size-sm);
+    color: var(--at-text-muted, #6f675c);
+    margin: 0 0 var(--at-spacing-lg);
+  }
+
+  .rc-plot {
+    margin: 0;
+  }
+
+  .rc-plot svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklab, var(--at-primary) 4%, transparent);
+    border: 1px solid var(--at-border, #e4ddd0);
+    border-radius: 4px;
+  }
+
+  .rc-plot figcaption {
+    font-size: var(--at-font-size-sm);
+    margin-block-start: var(--at-spacing-xs);
+    max-width: 68ch;
+  }
+
+  .rc-budget {
+    margin-block-start: var(--at-spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .rc-budget p {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    margin: 0.2rem 0 0;
+  }
+
+  @media (max-width: 640px) {
+    .rc-bill {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Ten-figure totals at 1% and 90% power still fit a phone column. */
+    .rc-bill dd {
+      font-size: 1.2rem;
+    }
+  }
+</style>

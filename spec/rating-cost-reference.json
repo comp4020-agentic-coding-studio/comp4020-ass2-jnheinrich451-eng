@@ -1,0 +1,466 @@
+{
+ "constants": {
+  "alpha": {
+   "0.05": 1.9599639845400536,
+   "0.01": 2.5758293035489
+  },
+  "power": {
+   "0.8": 0.8416212335729144,
+   "0.9": 1.2815515655446008
+  }
+ },
+ "grid": [
+  {
+   "rate": 0.1,
+   "difference": 0.0025,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 228554.27448403413
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.005,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 57762.65145412935
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.01,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 14750.790469044938
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.02,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 3840.847482436272
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.05,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 685.5968583253606
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.0025,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 528695.4355275531
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.005,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 132483.98653303392
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.01,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 33274.146672649775
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.02,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 8393.197842663087
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.05,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 1376.2988682907185
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.0025,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 627905.2753699675
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.005,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 156972.49130515585
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.01,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 39239.29527445221
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.02,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 9805.99620873869
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.05,
+   "alpha": 0.05,
+   "power": 0.8,
+   "perCandidate": 1564.6720527749524
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.0025,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 305968.82874756504
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.005,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 77327.3029146763
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.01,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 19746.624475776523
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.02,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 5141.306183038052
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.05,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 917.3206339283632
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.0025,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 707772.686620115
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.005,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 177357.9704716224
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.01,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 44544.1429472817
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.02,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 11235.61173272686
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.05,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 1841.974766828487
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.0025,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 840586.5141170926
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.005,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 210141.130424768
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.01,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 52529.78447960627
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.02,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 13126.947904940936
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.05,
+   "alpha": 0.05,
+   "power": 0.9,
+   "perCandidate": 2094.15302820262
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.0025,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 340084.27562918386
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.005,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 85949.92815627561
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.01,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 21949.182510853254
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.02,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 5715.4165446068755
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.05,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 1020.4700628075785
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.0025,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 786688.0185931261
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.005,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 197133.7051800378
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.01,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 49511.54744086199
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.02,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 12489.218235559274
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.05,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 2048.220041875313
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.0025,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 934310.1763086853
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.005,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 233572.0858831535
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.01,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 58387.563257713206
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.02,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 14591.432525078815
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.05,
+   "alpha": 0.01,
+   "power": 0.8,
+   "perCandidate": 2328.51537116913
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.0025,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 433277.84295160155
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.005,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 109502.37812780378
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.01,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 27963.336358570352
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.02,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 7280.9878814025005
+  },
+  {
+   "rate": 0.1,
+   "difference": 0.05,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 1299.4722964037658
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.0025,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 1002265.6083076876
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.005,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 251154.1439948617
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.01,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 63078.69013911521
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.02,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 15911.032668311393
+  },
+  {
+   "rate": 0.3,
+   "difference": 0.05,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 2608.859554689171
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.0025,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 1190341.062127473
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.005,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 297577.83196482394
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.01,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 74387.02439514277
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.02,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 18589.322386578202
+  },
+  {
+   "rate": 0.5,
+   "difference": 0.05,
+   "alpha": 0.01,
+   "power": 0.9,
+   "perCandidate": 2965.964988555192
+  }
+ ],
+ "workedExample": {
+  "rate": 0.3,
+  "difference": 0.005,
+  "alpha": 0.05,
+  "power": 0.8,
+  "secondsPerTrial": 4,
+  "dollarsPerHour": 25,
+  "perCandidate": 132483.98653303392,
+  "total": 264968,
+  "hours": 294.4088888888889,
+  "dollars": 7360.222222222223
+ },
+ "simulated": [
+  {
+   "difference": 0.005,
+   "n": 132484,
+   "achieved": 0.8,
+   "nominal": 0.8
+  },
+  {
+   "difference": 0.02,
+   "n": 8394,
+   "achieved": 0.7981,
+   "nominal": 0.8
+  },
+  {
+   "difference": 0.05,
+   "n": 1377,
+   "achieved": 0.8017,
+   "nominal": 0.8
+  }
+ ]
+}

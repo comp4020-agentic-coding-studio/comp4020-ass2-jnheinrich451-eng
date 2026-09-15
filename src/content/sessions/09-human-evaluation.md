@@ -6,6 +6,7 @@ description:
 week: 9
 date: 2026-10-05
 arc: C
+instrument: rating-cost
 required_reading: stein-2023
 spec:
   - you have designed a rating protocol for the bench and costed it in
@@ -52,12 +53,16 @@ percentage point in human error rate, around a rate of 30 percent. At eighty
 percent power and the usual five percent significance level, separating them
 needs roughly 130,000 trials each, so about 260,000 in total. At four seconds
 a trial that is around 290 hours of paid attention, and at 25 dollars an hour
-about 7,200 dollars, before screening, training, attention checks or rejected
+about 7,400 dollars, before screening, training, attention checks or rejected
 work.
 
 Halve the difference you want to detect and every one of those numbers
 quadruples. That is the whole reason a number you can compute in a minute won
 the argument.
+
+The calculator below runs this arithmetic for any difference, error rate and
+budget. Halve the difference a few times before the session, and bring the
+number at which you would stop paying.
 
 ## Exercise
 
