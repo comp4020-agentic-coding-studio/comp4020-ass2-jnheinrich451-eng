@@ -1814,3 +1814,45 @@ One check was quietly dying too. The outline-labelling assertion is inside an
 `if` on a stage no lecture has any more, so it had nothing left to exercise.
 It now asserts both directions, and was falsified by forcing every lecture
 page to call itself a preview.
+
+## 2026-09-15 21:00 — The refined response, and the home page it failed
+
+**Asked:**
+
+> Yes please put on CLAUDE.md, as an instruction needed to be checked
+> everytime. And how should I respond to Wording of the sentence? And the
+> home page fix you can act on.
+
+**Result:**
+The course team published a note on the response criterion: deconstruct the
+brief, answer questions about it, and compress the answers into one refined
+response sentence that every later decision is judged against. The repo had
+the subject and three coherence rules, and no such sentence. I drafted it
+entirely from phrases the site already used, the author approved putting it
+at the top of `CLAUDE.md` as a standing check, and the wording stays theirs
+to revise.
+
+Running the new question on the home page - does this make the site more
+persuasive to that reader? - failed it in the places a marker reads first.
+The worst was a claim that every week measures "the same four
+distributions", false since weeks 6 and 8 added D, E and F. The true story
+argues better: the bench grows by one candidate each time the score is
+caught out, which is Rule 3's accumulation, and the home page had been
+stating the opposite of it. The Lectures card also named three of the four
+lectures, and the destination cards read like any course's catalogue.
+
+**Verified:**
+Build clean, 173 of 173 tests. Both marking viewports read as pictures: at
+1920 the longer hero claim still ends above the fold; at 390 it wraps inside
+the hero. No horizontal overflow at either width.
+
+**Commit:** [`ca3e465`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/ca3e465) (harness) and [`13c017f`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/13c017f) (home page)
+
+**What happened:**
+The home page did not break; it went stale. Each increment - the workspace,
+the restyle, the four instruments - was checked against the build and
+against its own page, and none was checked against the older pages it now
+sat beside. The harness change names that: a new component triggers a
+re-check of its neighbours. It was also a check no test could have made,
+because "the same four distributions" was internally consistent with every
+fixture in `spec/`; it was only false against the course.
