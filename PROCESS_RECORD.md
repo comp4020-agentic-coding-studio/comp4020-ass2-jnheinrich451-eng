@@ -1935,3 +1935,45 @@ the setting it described, a total that broke mid-figure on a phone, and a
 chart marker rounding $7,360 to "$7k" beside a readout and a sentence that
 both said otherwise. Each was a number disagreeing with its own label, the
 class this record keeps returning to.
+
+## 2026-09-15 22:10 — Sessions, batch 3: the week that measured itself wrong
+
+**Asked:**
+
+> Yes please continue
+
+and, when the measurement came back against the page, the author chose
+"Nobody sees C" from the three ways the week could go.
+
+**Result:**
+Batch 3 was meant to demonstrate a claim: that KID and coverage catch C,
+which FID cannot. Measured first, the claim was false on the bench as built.
+KID's kernel is cubic and C matches R through the third moment, so KID is
+blind to C at any sample size; density and coverage see C only while its one
+bimodal coordinate is a large part of the distance, at d = 2 and not by
+d = 16. What the three scores disagree about at the bench's own dimension is
+A against B, in three different directions.
+
+That is a better week than the one it replaced, and it is the course's
+thesis again - the instrument decides what counts as a difference - but it
+rewrote the week's argument, which is the author's call under `CLAUDE.md`, so
+the choice went to the author before a line of the instrument was written.
+
+**Verified:**
+The spec was written before the engine and failed on the missing functions;
+with the engine it failed only on the old sentence it exists to catch, until
+the prose was corrected. Falsified two ways, both caught, both only at
+d = 2, and the reason is recorded rather than smoothed over. Driven at both
+viewports; 194 of 194 tests.
+
+**Commit:** [`2b2ffc2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/2b2ffc2)
+
+**What happened:**
+This is the strongest case yet for measuring before building. The plan I
+described to the author said "KID and coverage both see its two lumps"; I
+had repeated the session's claim without checking it, and building the
+instrument first would have meant building a demonstration of something
+false and then watching it fail to demonstrate. The suspicion came from
+arithmetic, not from the numbers: a cubic kernel sees moments up to the
+third, and C was constructed to match R through the third. The numbers
+then confirmed it, at every dimension for KID.
