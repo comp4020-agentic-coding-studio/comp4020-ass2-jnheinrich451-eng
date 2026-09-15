@@ -1,0 +1,112 @@
+---
+import {withBase} from 'astro-theme-university/url';
+const base=withBase('/image-lab/');
+---
+<image-lab data-base={base}>
+  <section class="il-upload" aria-labelledby="il-upload-title">
+    <h2 id="il-upload-title">Bring your own images</h2>
+    <p class="il-upload-guide" id="il-upload-guide"><strong>Select 2–8 images together</strong><br/>Choose JPEG or PNG files in one selection. A single image is not enough to estimate the sample covariance.</p>
+    <p id="il-upload-help">In the file picker, use Ctrl-click (Windows), Command-click (Mac), or Shift-click to select multiple files. These form the reference set; candidate copies are created automatically. Nothing is sent to a server.</p>
+    <div class="il-actions"><button type="button" data-upload aria-describedby="il-upload-guide il-upload-feedback">Choose 2–8 local images ↑</button><button type="button" data-demo>Remove local images / use demo</button></div>
+    <p class="il-upload-feedback" id="il-upload-feedback" data-upload-status data-state="idle" role="status" aria-atomic="true">Ready for one selection of 2–8 images.</p>
+    <input type="file" data-files multiple accept="image/jpeg,image/png" aria-label="Choose 2–8 local reference images together" aria-describedby="il-upload-help il-upload-limits il-upload-feedback" hidden />
+    <p class="il-small" id="il-upload-limits">Limits: 5 MB per file, 20 MB total; 4096 pixels per side, 16 MP per image, 32 MP total. Static JPEG/PNG pixels only. Transparency is composited on white. Originals are not modified or saved.</p>
+    <p class="il-small" data-source-note>Using the supplied eight-crop example.</p>
+  </section>
+  <div class="il-controls">
+    <label for="image-candidate">Change only the candidate pixels
+      <select id="image-candidate" data-mode><option value="jpeg">JPEG compression / quality 10</option><option value="reference">Identity control / identical pixels</option><option value="custom" disabled>Local images / crop and filter</option></select>
+    </label>
+    <p class="il-question" data-question>Can compression move FID even when the photographed subject has not changed?</p>
+  </div>
+  <fieldset class="il-editor" data-editor hidden>
+    <legend>Candidate processing / applies to every local image</legend>
+    <p>The reference is a fixed centre-square crop. Adjust the candidate crop below, then apply it to update the actual measured pixels. Both sets become 128 × 128 images after a working resize to at most 1024 pixels per side.</p>
+    <div class="il-edit-grid">
+      <label>Crop zoom <output data-output="zoom">1×</output><input data-edit="zoom" type="range" min="1" max="3" step=".1" value="1" /></label>
+      <label>Crop position / horizontal <output data-output="x">50%</output><input data-edit="x" type="range" min="0" max="100" value="50" /></label>
+      <label>Crop position / vertical <output data-output="y">50%</output><input data-edit="y" type="range" min="0" max="100" value="50" /></label>
+      <label>Pixel filter<select data-edit="filter"><option value="none">None / identity pixels</option><option value="grayscale">Grayscale</option><option value="blur">Box blur / 5 × 5</option><option value="brighten">Brightness / × 1.3</option><option value="darken">Brightness / × 0.7</option></select></label>
+    </div>
+    <div class="il-actions"><button type="button" data-apply>Apply crop and filter</button><button type="button" data-reset-edits>Reset to identity</button></div>
+    <p class="il-small" data-edit-note>Identity settings applied. The two sets contain the same pixels.</p>
+  </fieldset>
+  <div class="il-actions il-order"><button type="button" data-shuffle>Shuffle candidate order ⇄</button><button type="button" data-restore>Restore original order</button></div>
+  <p class="il-small" data-order-note>Pairing is by displayed position. Shuffling changes the pairing, not the collection or its FID. Measure once, then shuffle without rerunning Inception.</p>
+  <div class="il-sets">
+    <section aria-labelledby="il-reference"><header><h2 id="il-reference">Reference</h2><span data-reference-count>01 / 8 crops</span></header>
+      <div class="il-grid">{Array.from({length:8},(_,i)=><figure><img data-reference={i+1} src={`${base}reference-${i+1}.png`} width="128" height="128" alt={`Reference crop ${i+1} of the astronaut photograph`} /><figcaption>{String(i+1).padStart(2,'0')}</figcaption></figure>)}</div>
+      <p data-reference-note>Eight fixed crops of one photograph. The same inputs are used every run.</p>
+    </section>
+    <section aria-labelledby="il-candidate"><header><h2 id="il-candidate">Candidate</h2><span data-candidate-count>02 / matched crops</span></header>
+      <div class="il-grid">{Array.from({length:8},(_,i)=><figure><img data-candidate={i+1} src={`${base}jpeg-${i+1}.png`} width="128" height="128" alt={`JPEG-compressed crop ${i+1} of the same photograph`} /><figcaption>{String(i+1).padStart(2,'0')}</figcaption></figure>)}</div>
+      <p data-candidate-note>JPEG quality 10, decoded and saved as PNG. Compression changes the pixels; saving as PNG does not undo it.</p>
+    </section>
+  </div>
+  <div class="il-run">
+    <div><button type="button" data-run>Measure these images ↗</button><button type="button" data-stop disabled>Stop</button></div>
+    <p>First run downloads an <strong>87 MB model + approximately 11 MB runtime</strong>. Runs on your device, without uploads or an inference server. Desktop recommended. Allow up to three minutes.</p>
+    <p class="il-status" data-status role="status">Ready. No model is loaded until you choose Measure.</p>
+  </div>
+  <section class="il-results" aria-labelledby="il-result-title" hidden data-results>
+    <header><h2 id="il-result-title">The measured difference</h2><span>03 / live browser result</span></header>
+    <div class="il-numbers">
+      <div><span>Empirical FID</span><strong data-value="total"></strong></div>
+      <div><span>Mean contribution</span><strong data-value="mean"></strong></div>
+      <div><span>Covariance contribution</span><strong data-value="covariance"></strong></div>
+    </div>
+    <p data-interpretation></p>
+    <div class="il-paired"><h3>Mean paired feature distance <small>/ not FID</small></h3><strong data-paired></strong><p>Average squared feature distance between reference i and the candidate displayed at position i. Summed across all 2,048 coordinates, then averaged across pairs. Unlike FID, this depends on the pairing; it is not a perceptual-quality verdict.</p><p data-pairing-status role="status"></p></div>
+    <p class="il-small" data-runtime></p>
+    <button type="button" data-export>Download measurement record ↓</button>
+  </section>
+  <details class="il-method"><summary>What exactly is being measured?</summary>
+    <p>Each image becomes a vector of 2,048 Inception features. We estimate a mean and a <strong>full sample covariance</strong> for each set, with divisor n − 1. The score is the squared Gaussian distance between those estimated moments.</p>
+    <ol><li>Read the supplied 128 × 128 RGB pixels as values between 0 and 1.</li><li>The FID-specific Inception model resizes to 299 × 299, normalises to [−1, 1], and extracts pool3 features.</li><li>Compare both means and covariances. All 2,048 coordinates are retained; correlations are not discarded.</li></ol>
+    <p>With n images the sample covariance has rank at most n − 1: seven for the eight-image demo. We use an exact sample-factor identity to evaluate its cross term through a small matrix, without reducing the feature space. Floating-point rounding still applies.</p>
+    <pre aria-label="Equivalent calculation"><code>X = (reference_features - reference_mean) / sqrt(n_reference - 1)
+Y = (candidate_features - candidate_mean) / sqrt(n_candidate - 1)
+
+mean_term = sum((reference_mean - candidate_mean) ** 2)
+covariance_term = sum(X ** 2) + sum(Y ** 2)
+                  - 2 * sum(singular_values(X @ Y.T))
+FID = mean_term + covariance_term</code></pre>
+    <p>This calculation uses freshly extracted browser features, not a stored score. Shuffling reuses those features: the collection-level FID stays fixed, while the paired readout is recalculated. The record includes processing settings, candidate order and feature vectors in original order. Local filenames and original files are not exported, but the feature vectors are derived from your images; treat the record as private.</p>
+  </details>
+  <noscript><p>JavaScript is required for local image inference. The supplied images and method remain readable without it.</p></noscript>
+</image-lab>
+<script>
+  import './image-lab';
+</script>
+<style>
+  image-lab{display:block;margin-top:2.5rem;color:var(--at-text);}
+  /* Theme input styles must not reveal the custom chooser's hidden input. */
+  input[data-files][hidden]{display:none !important;}
+  .il-upload-guide strong{font-size:1.15rem;color:var(--at-link);}.il-upload-feedback{min-height:1.7em;color:var(--at-link);margin:.8rem 0;}.il-upload-feedback[data-state=error]{border-left:2px solid var(--at-link);padding-left:.8rem;font-weight:700;}
+  .il-upload{border-block:1px solid var(--at-primary);padding:1.5rem 0;margin-bottom:2rem;}.il-upload>p{max-width:85ch;}.il-actions{display:flex;gap:.75rem;flex-wrap:wrap;}.il-order{margin:1.5rem 0 .5rem;}
+  .il-editor{padding:1.5rem;border:1px solid var(--at-primary);margin:0 0 2rem;min-width:0;}.il-editor[hidden]{display:none;}.il-editor legend{font:.8rem var(--at-font-mono,monospace);color:var(--at-link);}.il-editor>p{font-size:.9rem;}.il-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem 2rem;margin:1.5rem 0;}.il-edit-grid label{min-width:0;}input[type=range]{width:100%;accent-color:var(--at-link);}output{color:var(--at-link);font-family:var(--at-font-mono,monospace);}
+  .il-paired{border-left:2px solid var(--at-primary);padding:.5rem 1rem;margin:1.5rem 0;}.il-paired h3{font-size:1rem;color:var(--at-link);margin:0 0 1rem;}.il-paired small{white-space:nowrap;}.il-paired>strong{font:2rem var(--at-font-mono,monospace);color:var(--at-link);}.il-paired>p{font-size:.9rem;max-width:80ch;}figure[hidden]{display:none;}
+  .il-controls{display:flex;align-items:end;gap:2rem;flex-wrap:wrap;margin-bottom:2rem;}
+  label{display:grid;gap:.6rem;font-size:.9rem;flex:1;min-width:min(100%,20rem);}
+  select{width:100%;padding:.8rem;font: .85rem var(--at-font-mono,monospace);background:var(--at-bg);color:var(--at-text);border:1px solid var(--at-text-muted);border-radius:0;}
+  .il-question{flex:1;min-width:min(100%,20rem);color:var(--at-link);margin:0;line-height:1.6;}
+  .il-sets{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;}
+  section{min-width:0;}header{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--at-primary);padding-bottom:.8rem;margin-bottom:1rem;}
+  h2{font-size:1.2rem;color:var(--at-link);margin:0;}
+  header>span,.il-small,figcaption{font:.75rem/1.6 var(--at-font-mono,monospace);}
+  header>span{color:var(--at-link);text-align:right;}
+  .il-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;}
+  figure{margin:0;min-width:0;}img{display:block;width:100%;height:auto;aspect-ratio:1;image-rendering:auto;}figcaption{padding-top:.35rem;color:var(--at-text-muted);}
+  p{line-height:1.7;}section>p{font-size:.9rem;}.il-run{margin:2rem 0;border-block:1px solid var(--at-primary);padding:1.5rem 0;}
+  .il-run>div{display:flex;flex-wrap:wrap;gap:.75rem;}.il-run>p{max-width:80ch;font-size:.9rem;}
+  button{border:1px solid var(--at-link);background:var(--at-bg);color:var(--at-link);padding:.8rem 1rem;font:.8rem/1.5 var(--at-font-mono,monospace);cursor:pointer;}
+  button[data-run]{background:var(--at-link);color:var(--at-bg);}button:disabled{opacity:.5;cursor:not-allowed;}
+  button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--at-link);outline-offset:4px;}
+  .il-status{font-family:var(--at-font-mono,monospace);color:var(--at-link);margin-bottom:0;min-height:1.7em;}
+  .il-results{margin-bottom:2rem;}.il-results[hidden]{display:none;}
+  .il-numbers{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:1.5rem;padding:1rem 0;}
+  .il-numbers>div{display:grid;gap:.75rem;align-content:start;}.il-numbers span{font-size:.85rem;min-height:3em;line-height:1.5;}.il-numbers strong{font-size:clamp(1.6rem,3vw,2.6rem);font-weight:400;color:var(--at-link);font-variant-numeric:tabular-nums;}.il-numbers>div:first-child strong{font-size:clamp(2.4rem,4vw,3.7rem);line-height:1;}
+  .il-method{border-top:1px solid var(--at-primary);padding:1.25rem 0;max-width:90ch;font-size:.9rem;}.il-method summary{cursor:pointer;color:var(--at-link);}.il-method li{line-height:1.7;margin-bottom:.6rem;}
+  pre{white-space:pre-wrap;overflow-wrap:anywhere;font:.75rem/1.8 var(--at-font-mono,monospace);padding:1rem;border-left:1px solid var(--at-primary);background:transparent;color:var(--at-text);}
+  @media(max-width:650px){.il-sets,.il-edit-grid{grid-template-columns:1fr;gap:1.5rem;}.il-editor{padding:1rem;}.il-controls{gap:1rem;}.il-numbers{grid-template-columns:1fr 1fr;}.il-numbers>div:first-child{grid-column:1/-1;}header>span{font-size:.65rem;}}
+</style>

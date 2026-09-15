@@ -36,9 +36,11 @@ The bench below is not video. It is the one property of video this lecture
 needs: sequences whose neighbouring frames are related, so that the order of
 the frames carries information. Set how many frames each sequence has, how
 many sequences are drawn, and how strongly neighbouring frames are
-correlated. Two candidates differ from the reference R in one way each. E
-raises every frame by the same amount and leaves the order alone. F keeps
-every frame value R produced and destroys only their order.
+correlated. Each candidate starts from an independent draw of R's process.
+E raises every frame by the same amount and leaves the order alone. F
+permutes the frames within each sequence. It preserves the values in its own
+draw, not those in the separate reference set. Each scored set is reused
+across the three instruments, and the plot shows its first five sequences.
 
 Then three instruments score them. **Frame marginals** pools every frame of
 every sequence and fits one distribution to the values, which is what a
@@ -48,29 +50,32 @@ what the bench has done since week 1.
 
 ## Read the first row first
 
-The first row scores R against a second independent draw of R. Nothing
-changed, and none of the three instruments reports zero, because week 5's
-bias arrives here unaltered. That row is each instrument's floor, and no
-other cell in its column means anything until you have read it.
+The first row scores R against a second independent draw of R. Although the
+population distributions match, sample estimates generally do not report
+zero. Read this baseline before comparing the candidate scores; it is a
+random baseline, not a lower bound on every possible score.
 
-Now read down. Frame marginals report F at its own floor: not a small
-number, but the number that instrument produces when nothing changed at all.
-Frame to frame does the same for E, because differencing removes any constant
-and E is a constant. Each instrument is not merely less sensitive to one
-candidate. It is blind to it.
+The labels use two independent baseline draws and an explicitly stated
+demonstration threshold. A cell below that threshold is not flagged by the
+heuristic. That is not a significance test or proof of blindness.
+
+There are also exact properties we can establish from the construction:
+pooling frame values discards their order, and taking consecutive differences
+removes a constant shift. These operations lose information regardless of
+where a particular finite-sample score lands.
 
 ## The disagreement
 
-Frame to frame says F is the serious failure and E is not a failure at all.
-Whole sequence says E is worse than F by a factor of three. Both comparisons
-are N-honest. Both are computed from the same recordings, through the same
-closed form. They disagree because they are not measuring the same thing, and
-nothing in the score announces which one you are holding.
+At the default settings, look for frame-to-frame scoring to rank F higher
+and whole-sequence scoring to rank E higher. Record the actual scores rather
+than assuming a fixed ratio or verdict for every draw. The same recordings
+can support different rankings because the feature maps preserve different
+properties before the Gaussian formula is applied.
 
-Set the correlation to zero and run it again. F becomes invisible to every
-instrument, because with independent frames there is no order left to destroy.
-The failure existed only because the recordings had something for it to
-damage.
+Set the correlation to zero and run it again. Permuting independent,
+identically distributed frames preserves their population distribution.
+Finite samples can still produce nonzero scores and occasional flags; the
+population invariance is not a promise about every displayed verdict.
 
 ## Carry it forward
 

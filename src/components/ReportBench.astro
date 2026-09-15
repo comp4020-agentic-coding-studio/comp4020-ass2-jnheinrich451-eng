@@ -7,28 +7,35 @@
  * times, and the page reports what those runs support rather than what the
  * claim asserts.
  *
- * Three outcomes are possible and all three are real. The protocol backs the
- * claim and another protocol, equally honest, reverses it. The protocol
- * contradicts the claim outright. Or the instrument reports both candidates
- * at its own floor, in which case there is no ordering in the evidence at
- * all and the honest page says so instead of ranking two floor readings.
+ * Report every observed count, including ties and mixed outcomes. A heuristic
+ * abstention is not proof of equivalence, and unanimity is not certainty.
  *
  * The last panel is the point of the lecture: the sentence the evidence
  * actually supports, assembled from what was measured, for a reader to carry
  * into the final report.
  *
- * Verdicts and the floor rule are src/lib/bench.ts, measured first in
- * figures/instruments-reference.py and held by spec/report.test.ts. Nothing
- * here leaves the browser.
+ * The shared heuristic is in src/lib/bench.ts. Reference tests check its
+ * implementation, not its statistical calibration. Nothing leaves the browser.
  */
+import '../styles/lecture-instruments.css';
+import ReportMethod from './ReportMethod.astro';
 interface Props {
   heading?: string;
 }
 const { heading } = Astro.props;
 ---
 
-<section class="report" data-rp aria-label={heading ?? "The claim checker"}>
+<section class="report lecture-instrument" data-rp aria-label={heading ?? "The claim checker"}>
   {heading && <h2>{heading}</h2>}
+  <header class="rp-intro">
+    <p class="rp-label">Claim → evidence → conclusion</p>
+    <h3>What can this experiment support?</h3>
+    <p>Choose which candidate you expect to score higher, then test that claim across twelve repeats. These are synthetic numerical sequences, not real images or videos.</p>
+    <dl class="rp-candidates">
+      <div><dt>E / Level shift</dt><dd>Every value is raised by 1. The sequence order is preserved.</dd></div>
+      <div><dt>F / Reordered frames</dt><dd>The values are preserved, but their order within each sequence is shuffled.</dd></div>
+    </dl>
+  </header>
 
   <noscript>
     <p>
@@ -39,15 +46,15 @@ const { heading } = Astro.props;
   </noscript>
 
   <form class="rp-claim" data-rp-controls>
-    <p class="rp-sentence">
+    <h3>1. Set the experiment</h3>
+    <div class="rp-sentence">
       <label class="rp-inline" for="rp-worse">
-        <span class="rp-label">the claim</span>
+        <span class="rp-label">I expect a higher score for</span>
         <select id="rp-worse" name="worse">
           <option value="shift" selected>E, a level shift</option>
           <option value="shuffle">F, frames reordered</option>
         </select>
       </label>
-      <span class="rp-said">is the worse candidate, on the evidence of</span>
       <label class="rp-inline" for="rp-lens">
         <span class="rp-label">instrument</span>
         <select id="rp-lens" name="lens">
@@ -55,34 +62,48 @@ const { heading } = Astro.props;
           <option value="temporal">frame to frame</option>
           <option value="joint" selected>whole sequence</option>
         </select>
+        <small data-rp-lens-help>Whole sequence: compares values and their joint relationships.</small>
       </label>
       <label class="rp-inline" for="rp-n">
-        <span class="rp-label">at N</span>
+        <span class="rp-label">Sequences per set / N</span>
         <select id="rp-n" name="n">
           <option value="100">100</option>
           <option value="400" selected>400</option>
           <option value="800">800</option>
         </select>
       </label>
-      <span class="rp-said">on recordings whose frames are</span>
       <label class="rp-inline" for="rp-rho">
-        <span class="rp-label">structure</span>
+        <span class="rp-label">Relationship between frames</span>
         <select id="rp-rho" name="rho">
           <option value="0.9" selected>correlated</option>
           <option value="0">independent</option>
         </select>
       </label>
-      <span class="rp-said">, repeated twelve times.</span>
-    </p>
+    </div>
+    <p class="rp-hint">Each sequence has 24 frames. Every experiment runs 12 repeats.</p>
+    <details class="rp-replay" data-rp-replay>
+      <summary>Reproduce this experiment</summary>
+      <p>The seed is a replay code, not a quality setting. Keep it fixed to compare instruments on the same recordings. A new seed produces fresh draws, not necessarily a different ranking.</p>
+      <label class="rp-inline" for="rp-seed"><span class="rp-label">Base seed</span><input id="rp-seed" type="number" min="0" max="4294967295" step="1" value="20261019" required /></label>
+      <button type="button" data-rp-new-seed>Use a new seed</button>
+    </details>
     <button type="button" data-rp-run>test the claim</button>
     <p class="rp-status" role="status" data-rp-status>
       State a claim and the protocol behind it. The page will run that protocol.
     </p>
   </form>
-
+  <section class="rp-results" data-rp-publish aria-labelledby="rp-summary-title">
+    <h3 id="rp-summary-title">2. Experiment summary</h3>
+    <p class="rp-hint">A calculated summary using fixed wording, not an AI-written report.</p>
+    <p class="rp-outcome" data-rp-outcome>Test a claim to see which conclusion the evidence supports.</p>
+    <div class="rp-counts" aria-label="Observed repeat counts">
+      <div><strong data-rp-support>—</strong><span>support the claim</span></div>
+      <div><strong data-rp-against>—</strong><span>contradict it</span></div>
+      <div><strong data-rp-none>—</strong><span>give no ordering</span></div>
+    </div>
   <div class="rp-runs">
     <p class="rp-label">your protocol, run by run</p>
-    <p class="rp-strip" data-rp-strip aria-live="polite">
+    <p class="rp-strip" data-rp-strip>
       <span class="rp-empty">not run yet</span>
     </p>
     <p class="rp-legend" aria-hidden="true">
@@ -92,370 +113,203 @@ const { heading } = Astro.props;
     </p>
   </div>
 
-  <div class="rp-counter">
-    <p class="rp-label">the same recordings, at the same N, through the others</p>
-    <ul data-rp-counter>
-      <li class="rp-empty">The other two instruments report here once the claim is tested.</li>
-    </ul>
-  </div>
-
-  <p class="rp-floors" data-rp-floors></p>
-
-  <blockquote class="rp-publish">
-    <p class="rp-label">the sentence this evidence supports</p>
-    <p data-rp-publish>Test a claim, and the line you could defend appears here.</p>
-  </blockquote>
+    <div class="rp-table-wrap" role="region" aria-label="Instrument comparison" tabindex="0">
+      <table class="rp-table">
+        <caption>Same recordings. Three instruments. Counts out of 12 repeats.</caption>
+        <thead><tr><th scope="col">Instrument</th><th scope="col">E higher</th><th scope="col">F higher</th><th scope="col">No ordering</th></tr></thead>
+        <tbody data-rp-counter><tr><td colspan="4">Run the experiment to compare instruments.</td></tr></tbody>
+      </table>
+    </div>
+    <p class="rp-limit">These counts describe the observed repeats. They do not establish certainty or instrument-independent quality. “No ordering” is a heuristic outcome, not proof of equivalence.</p>
+    <details class="rp-details">
+      <summary>Recorded protocol and numerical method</summary>
+      <dl class="rp-protocol" data-rp-protocol><div><dt>Protocol</dt><dd>Not run yet.</dd></div></dl>
+      <ReportMethod />
+    </details>
+    <details class="rp-details">
+      <summary>Additional sample-size checks</summary>
+      <p>One additional trial at each sample size, using the selected instrument. These individual trials do not establish a trend in expectation.</p>
+      <div class="rp-table-wrap" role="region" aria-label="Sample-size checks" tabindex="0">
+        <table class="rp-table"><caption>Baseline scores and heuristic outcomes</caption><thead><tr><th scope="col">N</th><th scope="col">Baseline 1</th><th scope="col">Baseline 2</th><th scope="col">Outcome</th></tr></thead><tbody data-rp-floors><tr><td colspan="4">Not run yet.</td></tr></tbody></table>
+      </div>
+    </details>
+  </section>
 </section>
 
 <script>
-  import {
-    belowFloor,
-    instrumentTable,
-    reportRuns,
-    verdictFor,
-    type Lens,
-    type SequenceCandidate,
-  } from "../lib/bench";
+  import { instrumentMeasurement, reportRuns, type Lens } from "../lib/bench";
+  import { LENS_NAME, reportOutcome, tallyVerdicts } from "../lib/bench-report";
 
   const REPEATS = 12;
   const SIZES = [100, 400, 800];
-  const LENS_NAME: Record<Lens, string> = {
-    frame: "frame marginals",
-    temporal: "frame-to-frame differences",
-    joint: "whole-sequence scoring",
-  };
-  const LETTER: Record<SequenceCandidate, string> = {
-    plain: "R",
-    shift: "E",
-    shuffle: "F",
-  };
-
-  // As on the other three benches: the theme runs Astro's ClientRouter, so
-  // this module is not re-executed when a visitor navigates back.
   function setup() {
     const section = document.querySelector("[data-rp]");
     if (!(section instanceof HTMLElement) || section.dataset.rpReady === "true") return;
     section.dataset.rpReady = "true";
-
     const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
     const strip = pick<HTMLElement>("[data-rp-strip]");
     const counter = pick<HTMLElement>("[data-rp-counter]");
     const floorsOut = pick<HTMLElement>("[data-rp-floors]");
-    const publish = pick<HTMLElement>("[data-rp-publish]");
+    const outcome = pick<HTMLElement>("[data-rp-outcome]");
+    const protocol = pick<HTMLElement>("[data-rp-protocol]");
+    const countOutputs = ['support','against','none'].map(name=>pick<HTMLElement>(`[data-rp-${name}]`));
     const status = pick<HTMLElement>("[data-rp-status]");
     const runButton = pick<HTMLButtonElement>("[data-rp-run]");
     const worseSelect = pick<HTMLSelectElement>("#rp-worse");
     const lensSelect = pick<HTMLSelectElement>("#rp-lens");
     const nSelect = pick<HTMLSelectElement>("#rp-n");
     const rhoSelect = pick<HTMLSelectElement>("#rp-rho");
-
-    let seed = 20261019;
-
-    const claimed = () => worseSelect.value as SequenceCandidate;
-    const declared = () => lensSelect.value as Lens;
-    const params = () => ({
-      n: Number(nSelect.value),
-      d: 24,
-      rho: Number(rhoSelect.value),
-      shift: 1,
-      seed,
-    });
-
-    const mark = (kind: "supports" | "against" | "none", letter: string) => {
-      const span = document.createElement("span");
-      span.className = `rp-mark rp-mark--${kind}`;
-      span.textContent = letter;
-      return span;
-    };
-
-    const tally = (calls: string[], value: string) => calls.filter((call) => call === value).length;
-    /** Instrument names are lower case in running prose and capitalised when
-        they open a sentence, which several of these lines do. */
-    const opens = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
-
-    const run = async () => {
-      runButton.disabled = true;
-      const claim = claimed();
-      const lens = declared();
-      const { n } = params();
-      seed = (seed * 1664525 + 1013904223) >>> 0;
+    const seedInput = pick<HTMLInputElement>("#rp-seed");
+    let generation = 0;
+    const cell = (tag:string,text:string) => {const el=document.createElement(tag);el.textContent=text;return el;};
+    const emptyRow = (body:HTMLElement,message:string) => {const row=document.createElement('tr');const td=cell('td',message);td.setAttribute('colspan','4');row.append(td);body.replaceChildren(row);};
+    const clearResults = () => {
       strip.replaceChildren();
-      counter.replaceChildren();
-      floorsOut.textContent = "";
-      publish.textContent = " ";
-      status.textContent = `running your protocol, repeat 1 of ${REPEATS}…`;
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-
-      const results = reportRuns({ ...params(), seed }, REPEATS);
-      const calls = results.verdicts[lens];
-      for (let i = 0; i < calls.length; i++) {
-        const call = calls[i];
-        const kind = call === "neither" ? "none" : call === claim ? "supports" : "against";
-        strip.append(mark(kind, call === "neither" ? "–" : LETTER[call]));
-      }
-
-      const supporting = tally(calls, claim);
-      const none = tally(calls, "neither");
-      const against = REPEATS - supporting - none;
-
-      // The other two instruments, on the same recordings at the same N.
-      const others = (["frame", "temporal", "joint"] as Lens[]).filter((other) => other !== lens);
-      const reversals: Lens[] = [];
-      for (const other of others) {
-        const otherCalls = results.verdicts[other];
-        const top = otherCalls[0];
-        const agreed = otherCalls.every((call) => call === top);
-        const item = document.createElement("li");
-        if (top === "neither") {
-          item.textContent = opens(`${LENS_NAME[other]} reports both candidates on its own floor: no ordering to give.`);
-        } else {
-          item.textContent = opens(`${LENS_NAME[other]} calls ${LETTER[top]} the worse candidate in ${tally(otherCalls, top)} of ${REPEATS} runs.`);
-          if (top !== claim && agreed) reversals.push(other);
-        }
-        counter.append(item);
-      }
-
-      // What this instrument's floor does across the sample sizes on offer,
-      // measured rather than described: the numbers move, the verdict does not.
-      const floorAt = SIZES.map((size) => {
-        const table = instrumentTable({ ...params(), n: size, seed: (seed ^ (size * 7919)) >>> 0 });
-        return { size, floor: table.plain[lens], verdict: verdictFor(lens, table) };
-      });
-      const verdictHeld = floorAt.every((entry) => entry.verdict === floorAt[0].verdict);
-      floorsOut.textContent =
-        opens(`${LENS_NAME[lens]} reports `) +
-        floorAt.map((entry) => `${entry.floor.toFixed(3)} at N = ${entry.size}`).join(", ") +
-        " when nothing changed at all. Those numbers move with N. Run once at each of those sample sizes, " +
-        (verdictHeld
-          ? "this instrument returned the same verdict at all three, so what moved is what you would print and not what you would conclude."
-          : `it returned ${floorAt.map((entry) => `${entry.verdict === "neither" ? "no ordering" : LETTER[entry.verdict]} at N = ${entry.size}`).join(", ")}, so the sample size is doing part of the work here.`);
-
-      if (none === REPEATS) {
-        status.textContent = "Your instrument had nothing to say.";
-        publish.textContent = opens(`${LENS_NAME[lens]} at N = ${n} reports both candidates at its own floor, so this evidence supports no ordering between them at all.`);
-      } else if (supporting > against) {
-        status.textContent = `Your protocol supports the claim in ${supporting} of ${REPEATS} runs.`;
-        publish.textContent =
-          `${LETTER[claim]} is the worse candidate under ${LENS_NAME[lens]} at N = ${n}, in ${supporting} of ${REPEATS} repeats` +
-          (reversals.length
-            ? `. ${opens(reversals.map((other) => LENS_NAME[other]).join(" and "))} at the same N, on the same recordings, ${reversals.length > 1 ? "reverse" : "reverses"} this.`
-            : ", and the other instruments that can see both candidates agree.");
-      } else {
-        // Not seeing a candidate and ranking it low are different failures,
-        // and only one of them is an argument about the candidate.
-        const onFloor = belowFloor(results.last[claim][lens], results.floors[lens].slice(0, 2));
-        status.textContent = `Your own protocol contradicts the claim in ${against} of ${REPEATS} runs.`;
-        publish.textContent =
-          opens(`${LENS_NAME[lens]} at N = ${n} calls ${LETTER[claim === "shift" ? "shuffle" : "shift"]} the worse candidate, not ${LETTER[claim]}.`) +
-          (onFloor
-            ? ` It reports ${LETTER[claim]} at its own floor, so it is not ranking ${LETTER[claim]} low: it cannot see ${LETTER[claim]} at all.`
-            : " The claim is not one this evidence can carry.");
-      }
-      runButton.disabled = false;
+      emptyRow(counter,'Run the experiment to compare instruments.');
+      emptyRow(floorsOut,'Not run yet.');
+      protocol.replaceChildren();
+      countOutputs.forEach(el=>el.textContent='—');
+    };
+    const lensHelp = () => {
+      const descriptions={frame:'Frame marginals: compares pooled values, ignoring their order.',temporal:'Frame to frame: compares differences between neighbouring values.',joint:'Whole sequence: compares values and their joint relationships.'};
+      pick<HTMLElement>('[data-rp-lens-help]').textContent=descriptions[lensSelect.value as Lens];
     };
 
     const reset = () => {
-      strip.replaceChildren();
-      const empty = document.createElement("span");
-      empty.className = "rp-empty";
-      empty.textContent = "not run yet";
-      strip.append(empty);
-      counter.replaceChildren();
-      const item = document.createElement("li");
-      item.className = "rp-empty";
-      item.textContent = "The other two instruments report here once the claim is tested.";
-      counter.append(item);
-      floorsOut.textContent = "";
-      publish.textContent = "Test a claim, and the line you could defend appears here.";
-      status.textContent = "State a claim and the protocol behind it. The page will run that protocol.";
+      generation++;
+      runButton.disabled = false;
+      clearResults();
+      lensHelp();
+      outcome.textContent = "Settings changed. Run the experiment again; the previous conclusion no longer applies.";
+      status.textContent = "Settings changed. Test this protocol; the previous result no longer applies.";
     };
-
-    for (const control of [worseSelect, lensSelect, nSelect, rhoSelect]) {
-      control.addEventListener("change", reset);
-    }
-    runButton.addEventListener("click", () => void run());
+    const run = async () => {
+      if (!seedInput.validity.valid) {
+        pick<HTMLDetailsElement>('[data-rp-replay]').open=true;
+        seedInput.reportValidity();return;
+      }
+      const current = ++generation;
+      const claim = worseSelect.value as 'shift'|'shuffle';
+      const lens = lensSelect.value as Lens;
+      // Snapshot every setting before yielding. Later edits invalidate this run.
+      const snapshot = {n:Number(nSelect.value), d:24, rho:Number(rhoSelect.value), shift:1, seed:Number(seedInput.value)};
+      runButton.disabled = true;
+      clearResults();
+      outcome.textContent = "Running; no completed result for this protocol yet.";
+      status.textContent = "Running twelve repeats with two baseline draws per repeat…";
+      try {
+        await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));
+        if (current !== generation || !section.isConnected) return;
+        const results = reportRuns(snapshot, REPEATS);
+        const calls = results.verdicts[lens];
+        for (const [index,call] of calls.entries()) {
+          const kind = call === 'neither' ? 'none' : call === claim ? 'supports' : 'against';
+          const mark = document.createElement('span');
+          mark.className = `rp-mark rp-mark--${kind}`;
+          mark.textContent = call === 'neither' ? '–' : call === 'shift' ? 'E' : 'F';
+          const label=`Repeat ${index+1}: ${call==='neither'?'no ordering under the heuristic':`${call==='shift'?'E':'F'} ranked higher; ${kind==='supports'?'supports':'contradicts'} the claim`}`;
+          mark.setAttribute('role','img');mark.setAttribute('aria-label',label);mark.title=label;
+          strip.append(mark);
+        }
+        counter.replaceChildren();
+        for (const other of ['frame','temporal','joint'] as Lens[]) {
+          const counts=tallyVerdicts(results.verdicts[other]);
+          const row=document.createElement('tr');
+          const name=cell('th',LENS_NAME[other]+(other===lens?' · selected':''));name.setAttribute('scope','row');
+          row.append(name,...[counts.shift,counts.shuffle,counts.neither].map(value=>cell('td',String(value))));
+          counter.append(row);
+        }
+        floorsOut.replaceChildren();
+        for(const n of SIZES){
+          const measured = instrumentMeasurement({...snapshot,n,seed:(snapshot.seed^(n*7919))>>>0});
+          const row=document.createElement('tr');
+          row.append(...[String(n),...measured.floors[lens].map(v=>v.toFixed(3)),measured.verdicts[lens]==='neither'?'No ordering':measured.verdicts[lens]==='shift'?'E higher':'F higher'].map(value=>cell('td',value)));
+          floorsOut.append(row);
+        }
+        const counts = tallyVerdicts(calls);
+        status.textContent = `${counts[claim]}/${REPEATS} runs support the claim; ${REPEATS-counts[claim]-counts.neither} contradict it; ${counts.neither} give no ordering under the heuristic.`;
+        outcome.textContent = reportOutcome(claim,calls);
+        [counts[claim],REPEATS-counts[claim]-counts.neither,counts.neither].forEach((value,i)=>countOutputs[i].textContent=String(value));
+        const fields=[['Claim',`${claim==='shift'?'E':'F'} scores higher`],['Instrument',LENS_NAME[lens]],['Data','Synthetic AR(1) recordings'],['Sample size',`N = ${snapshot.n} independent sequences per set`],['Sequence length',`d = ${snapshot.d} frames`],['Correlation',`rho = ${snapshot.rho}`],['Candidates',`E shift = ${snapshot.shift}; F permutes each sequence`],['Replay',`base seed = ${snapshot.seed}`],['Repetitions',`${REPEATS} repeats`],['Extra checks','One additional trial per sample size; seed rule below.']];
+        for(const [label,value] of fields){const entry=document.createElement('div');entry.append(cell('dt',label),cell('dd',value));protocol.append(entry);}
+      } catch (error) {
+        if (current === generation) {
+          reset();
+          status.textContent = "Calculation failed. Test the protocol again.";
+        }
+        console.error(error);
+      } finally {
+        if (current === generation) runButton.disabled = false;
+      }
+    };
+    for (const control of [worseSelect,lensSelect,nSelect,rhoSelect]) control.addEventListener('change',reset);
+    seedInput.addEventListener('input',reset);
+    pick<HTMLButtonElement>('[data-rp-new-seed]').addEventListener('click',()=>{
+      const seed = seedInput.validity.valid ? Number(seedInput.value) : 20261019;
+      seedInput.value = String((Math.imul(seed,1664525)+1013904223)>>>0);
+      reset();
+    });
+    runButton.addEventListener('click',()=>void run());
+    pick<HTMLFormElement>('[data-rp-controls]').addEventListener('submit',event=>{event.preventDefault();void run();});
   }
-
   setup();
-  document.addEventListener("astro:page-load", setup);
+  document.addEventListener("astro:page-load",setup);
 </script>
 
 <style>
-  .report {
-    --rp-supports: #3a7d44;
-    --rp-against: #b5495b;
-    --rp-none: #9d968b;
-    border: 1px solid var(--at-border, #d8d2c6);
-    border-radius: 6px;
-    padding: var(--at-spacing-lg);
-    margin-block: var(--at-spacing-xl);
-  }
-
-  .rp-claim {
-    border-block-end: 1px solid var(--at-border, #e4ddd0);
-    padding-block-end: var(--at-spacing-md, 1rem);
-    margin-block-end: var(--at-spacing-lg);
-  }
-
-  .rp-sentence {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: var(--at-spacing-sm) var(--at-spacing-md, 1rem);
-    margin: 0 0 var(--at-spacing-md, 1rem);
-  }
-
-  .rp-inline {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .rp-said {
-    padding-block-end: 0.35rem;
-    font-size: var(--at-font-size-sm);
-  }
-
-  .rp-label,
-  .rp-status,
-  .rp-legend,
-  .rp-strip,
-  .report button {
-    font-family: var(--at-font-mono, ui-monospace, monospace);
-    font-size: var(--at-font-size-xs);
-    letter-spacing: 0.07em;
-  }
-
-  .rp-label {
-    text-transform: uppercase;
-    color: var(--at-text-muted, #6f675c);
-    margin: 0 0 0.3rem;
-  }
-
-  .rp-inline select {
-    font: inherit;
-    padding: 0.25rem 0.4rem;
-    border: 1px solid var(--at-border, #c9c2b4);
-    border-radius: 3px;
-    background: var(--at-white, #fff);
-  }
-
-  .report button {
-    padding: 0.45rem 0.95rem;
-    border-radius: 999px;
-    border: 1px solid var(--at-primary);
-    background: var(--at-primary);
-    color: var(--at-white, #fff);
-    cursor: pointer;
-  }
-
-  .report button[disabled] {
-    opacity: 0.5;
-    cursor: progress;
-  }
-
-  .rp-status {
-    margin: var(--at-spacing-sm) 0 0;
-    text-transform: none;
-    letter-spacing: 0.02em;
-    color: var(--at-text-muted, #6f675c);
-  }
-
-  .rp-runs,
-  .rp-counter {
-    margin-block-end: var(--at-spacing-lg);
-  }
-
-  .rp-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    margin: 0 0 var(--at-spacing-xs);
-    min-height: 2rem;
-  }
-
-  /* Global: these marks are built by the script, after the build has stamped
-     its scope attributes on the markup, so a scoped rule never matches them. */
-  :global(.rp-mark) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.9rem;
-    height: 1.9rem;
-    border-radius: 4px;
-    font-family: var(--at-font-mono, ui-monospace, monospace);
-    font-size: var(--at-font-size-xs);
-    color: var(--at-white, #fff);
-  }
-
-  :global(.rp-mark--supports) {
-    background: #3a7d44;
-  }
-
-  :global(.rp-mark--against) {
-    background: #b5495b;
-  }
-
-  :global(.rp-mark--none) {
-    background: #9d968b;
-  }
-
-  .rp-key--supports {
-    color: var(--rp-supports);
-  }
-
-  .rp-key--against {
-    color: var(--rp-against);
-    margin-inline-start: 1.1em;
-  }
-
-  .rp-key--none {
-    color: var(--rp-none);
-    margin-inline-start: 1.1em;
-  }
-
-  .rp-key {
-    margin-inline-end: 0.2em;
-  }
-
-  .rp-legend {
-    margin: 0;
-    color: var(--at-text-muted, #6f675c);
-  }
-
-  .rp-counter ul {
-    margin: 0;
-    padding-inline-start: 1.1rem;
-  }
-
-  .rp-counter li {
-    font-size: var(--at-font-size-sm);
-    line-height: 1.7;
-    max-width: 68ch;
-  }
-
-  :global(.rp-empty) {
-    color: var(--at-text-muted, #6f675c);
-    font-size: var(--at-font-size-sm);
-  }
-
-  .rp-floors {
-    font-size: var(--at-font-size-sm);
-    line-height: 1.7;
-    max-width: 68ch;
-    color: var(--at-text-muted, #6f675c);
-  }
-
-  .rp-publish {
-    border-inline-start: 2px solid var(--at-primary);
-    padding: 0.8rem 0 0.8rem 1.2rem;
-    margin: var(--at-spacing-lg) 0 0;
-  }
-
-  .rp-publish p:last-child {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    max-width: 68ch;
-    margin: 0;
+  .report {--rp-supports:#3a7d44;--rp-against:#b5495b;--rp-none:#9d968b;border-block:1px solid var(--at-primary);padding:clamp(1rem,3vw,2rem) 0;margin-block:var(--at-spacing-xl);line-height:1.65;}
+  .report h3 {font-size:clamp(1.2rem,2vw,1.55rem);color:var(--at-link);margin:0 0 1rem;line-height:1.3;}
+  .rp-intro>p:not(.rp-label) {max-width:65ch;margin-bottom:1.5rem;}
+  .rp-label {font:.72rem/1.5 var(--at-font-mono,monospace);letter-spacing:.045em;text-transform:uppercase;margin:0 0 .5rem;}
+  .rp-candidates {display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:0 0 2.5rem;}
+  .rp-candidates>div {border-left:2px solid var(--at-primary);padding-left:1rem;}
+  .rp-candidates dt {font-weight:650;margin-bottom:.4rem;}
+  .rp-candidates dd {margin:0;font-size:.95rem;}
+  .rp-claim {padding-bottom:2rem;border-bottom:1px solid var(--at-border);margin-bottom:2rem;}
+  .rp-sentence {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;}
+  .rp-inline {display:flex;flex-direction:column;gap:.4rem;min-width:0;}
+  .rp-inline select,.rp-inline input {width:100%;min-height:44px;box-sizing:border-box;padding:.65rem .75rem;border:1px solid var(--at-border);border-radius:3px;background:var(--at-bg);color:var(--at-text);font:inherit;}
+  small,.rp-hint {font-size:.85rem;line-height:1.6;}
+  .rp-replay,.rp-details {margin:1.5rem 0;border-block:1px solid var(--at-border);padding:.25rem 0;}
+  .report summary {cursor:pointer;padding:.85rem 0;color:var(--at-link);font-weight:600;}
+  .rp-replay p {max-width:65ch;font-size:.9rem;}
+  .rp-replay .rp-inline {max-width:22rem;}
+  .report button {min-height:44px;padding:.65rem 1rem;border:1px solid var(--at-primary);border-radius:3px;background:var(--at-primary);color:var(--at-on-primary);cursor:pointer;font: .85rem var(--at-font-mono,monospace);margin:.75rem 0;}
+  .report button[disabled] {opacity:.5;cursor:progress;}
+  .report :is(button,select,input,summary):focus-visible,.rp-table-wrap:focus-visible {outline:2px solid var(--at-link);outline-offset:4px;}
+  .rp-status {font-size:.9rem;margin:.75rem 0 0;max-width:65ch;}
+  .rp-outcome {font-size:clamp(1.1rem,2vw,1.4rem);line-height:1.5;max-width:55ch;margin:1.5rem 0;}
+  .rp-counts {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;padding:1.5rem 0;margin:1rem 0 2rem;border-block:1px solid var(--at-border);}
+  .rp-counts>div {display:flex;flex-direction:column;gap:.5rem;}
+  .rp-counts strong {font-size:2.5rem;line-height:1;font-weight:500;font-variant-numeric:tabular-nums;}
+  .rp-counts span {font-size:.85rem;}
+  .rp-runs {margin-bottom:2rem;}
+  .rp-strip {display:flex;flex-wrap:wrap;gap:.45rem;min-height:2rem;margin:.75rem 0;}
+  .report :global(.rp-mark) {display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:3px;font:.85rem var(--at-font-mono,monospace);color:#fff;}
+  .report :global(.rp-mark--supports) {background:var(--rp-supports);}
+  .report :global(.rp-mark--against) {background:var(--rp-against);}
+  .report :global(.rp-mark--none) {background:var(--rp-none);color:#17140f;}
+  .rp-legend {font-size:.8rem;line-height:1.8;margin:0;}
+  .rp-key--supports {color:var(--rp-supports);}
+  .rp-key--against {color:var(--rp-against);margin-left:.75rem;}
+  .rp-key--none {color:var(--rp-none);margin-left:.75rem;}
+  .rp-table-wrap {max-width:100%;overflow-x:auto;margin:1.5rem 0;}
+  .report .rp-table {width:100%;border-collapse:collapse;table-layout:fixed;margin:0;font-size:.9rem;}
+  .rp-table caption {text-align:left;margin-bottom:.75rem;font-size:.9rem;}
+  .rp-table :global(th),.rp-table :global(td) {padding:.8rem .5rem;text-align:right;vertical-align:top;border-bottom:1px solid var(--at-border);font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
+  .rp-table :global(th:first-child),.rp-table :global(td:first-child) {text-align:left;width:35%;}
+  .rp-table thead {background:var(--at-bg-alt);color:var(--at-text);}
+  .rp-table :global(th) {font-weight:600;}
+  .rp-limit {border-left:2px solid var(--at-primary);padding-left:1rem;max-width:65ch;font-size:.9rem;margin:1.5rem 0;}
+  .rp-protocol {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin:1rem 0 2rem;}
+  .rp-protocol :global(dt) {font:.75rem var(--at-font-mono,monospace);margin-bottom:.4rem;}
+  .rp-protocol :global(dd) {margin:0;overflow-wrap:anywhere;}
+  .rp-details>p {max-width:65ch;font-size:.9rem;}
+  @media(max-width:550px){
+    .rp-sentence,.rp-candidates,.rp-protocol {grid-template-columns:1fr;}
+    .rp-counts {gap:.6rem;}
+    .rp-counts span {font-size:.78rem;}
+    .rp-table :global(th),.rp-table :global(td) {padding:.65rem .3rem;}
+    .report .rp-table {font-size:.8rem;}
   }
 </style>

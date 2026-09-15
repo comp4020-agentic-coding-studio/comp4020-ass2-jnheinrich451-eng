@@ -1,0 +1,93 @@
+---
+title: Week 02 · PowerPoint template preview
+description: Three design samples for author review, not the complete lecture.
+published: false
+---
+
+import Eq from "../components/Eq.astro";
+import DeckExit from "../components/DeckExit.astro";
+import "./week-02-template.css";
+
+<DeckExit back="/lectures/week-02/" label="Week 02" />
+
+{/* _class: paper-slide paper-opening */}
+
+<div class="paper-body">
+  <h1>Two Gaussians,<br />one number.</h1>
+  <div class="paper-rule" aria-hidden="true"><span class="paper-star"><i /><i /><i /><i /></span></div>
+  <p class="paper-subtitle">Where FID gets its mathematics,<br />before we ask whether it deserves our trust.</p>
+</div>
+<footer class="paper-foot">
+  <span>SLOP8412 / Lecture 02 / Design preview</span>
+  <a href="#/2">Content sample <span aria-hidden="true">→</span></a>
+</footer>
+
+```notes
+Design sample 1 of 3, using the author's PowerPoint title layout.
+The complete lecture remains at /decks/week-02/.
+Say the distinction aloud: the Gaussian distance is exact; FID adds a measurement instrument.
+```
+
+---
+
+{/* _class: paper-slide paper-content */}
+
+<div class="paper-body">
+  <header class="paper-heading">
+    <h2>The number we are trying to explain</h2>
+    <span class="paper-star" aria-hidden="true"><i /><i /><i /><i /></span>
+  </header>
+  <div class="paper-equation">
+    <Eq name="fid" alt="FID equals the squared distance between the two means, plus the trace of sigma-r plus sigma-g minus twice the matrix square root of sigma-r-half sigma-g sigma-r-half." size="wide" />
+  </div>
+  <div class="paper-terms">
+    <div>
+      <h3>Location</h3>
+      <Eq name="fid-location" alt="Squared norm of mu-r minus mu-g." />
+    </div>
+    <div>
+      <h3>Covariance</h3>
+      <Eq name="fid-shape" alt="Trace of sigma-r plus sigma-g minus twice the matrix square root term." />
+    </div>
+  </div>
+  <p class="paper-takeaway">By the end of this lecture every symbol here<br class="paper-desktop-break" /> should have a reason to be here.</p>
+  <p class="paper-caveat">Covariance describes spread and correlation, not arbitrary distribution shape.</p>
+</div>
+<footer class="paper-foot">
+  <span>SLOP8412 / Lecture 02 / Design preview</span>
+  <nav aria-label="Preview slides"><a href="#/1">← Title</a><a href="#/3">Ending →</a></nav>
+</footer>
+
+```notes
+Design sample 2 of 3, using the identical middle layouts in the PowerPoint.
+Give the destination before the derivation. Name the two contributions without explaining the matrix square root yet.
+The original script-generated equation assets and their accessible descriptions are retained.
+```
+
+---
+
+{/* _class: paper-slide paper-ending */}
+
+<div class="paper-body">
+  <h2>The distance is clean.<br />The instrument is not.</h2>
+  <div class="paper-ending-columns">
+    <div>
+      <h3>Mathematics</h3>
+      <p>A closed form. Geometrically meaningful. Exact for Gaussians.</p>
+    </div>
+    <div>
+      <h3>Instrument</h3>
+      <p>Images → preprocessing → encoder → finite sample → estimated moments → Gaussian fit → one scalar</p>
+    </div>
+  </div>
+  <p class="paper-next">Next: what exactly is Inception measuring?</p>
+</div>
+<footer class="paper-foot">
+  <span>SLOP8412 / Lecture 02 / Design preview</span>
+  <a href="#/1">Back to title ↑</a>
+</footer>
+
+```notes
+Design sample 3 of 3, using the PowerPoint's unadorned ending layout.
+Close on the distinction between the exact Gaussian result and the measurement pipeline, not a generic thank-you slide.
+```

@@ -33,44 +33,50 @@ have to run. Week 9's protocol belongs in that second list too.
 ## Declare a claim
 
 The instrument below takes a claim and the evidence you are offering for it.
-Name which candidate you say is worse, name the instrument, name the sample
+Name which candidate you expect to score higher, name the instrument, name the sample
 size, and say whether the recordings have any temporal structure at all. Then
-it runs exactly that protocol twelve times on fresh recordings and shows you
-every run.
+it runs that protocol twelve times and shows you every run. The base seed is
+editable under **Reproduce this experiment**: rerunning the same settings and seed reproduces the same draws;
+choose a new seed for fresh recordings. Keep the seed fixed when comparing
+instruments on the same evidence.
 
-Three things come back. The strip says how often your own protocol returned
-the verdict you claimed. The list under it says what the other two
-instruments returned from the same recordings at the same N. The last panel
-writes the sentence your evidence supports, which is not always the sentence
-you asked it to support.
+The experiment summary starts with a conclusion and counts of supporting,
+contradicting and unranked repeats. The strip preserves each individual
+outcome. The comparison table shows all three instruments on the same
+recordings at the same N, so a reversal is visible beside the selected result.
+This is a calculated summary using fixed wording, not an AI-written report.
 
 Try the claim you believe. Then try it through a different instrument without
 changing anything else.
 
 ## What twelve repeats can and cannot settle
 
-Repeating removes the objection that you were unlucky. Every protocol here
-returns the same verdict in all twelve runs, so nothing in this disagreement
-is sampling noise, and no amount of further measurement will dissolve it.
+Twelve repeats describe the stability observed in those draws. Even twelve
+agreeing verdicts do not prove zero sampling uncertainty or guarantee the
+next result. Report the observed counts, including mixed outcomes, rather
+than replacing them with a claim of certainty.
 
-Set the frames to independent and run it again. Frame-to-frame reports both
-candidates at its own floor and the panel says so: no ordering to defend. A
-protocol can fail to support your claim by contradicting it, and it can fail
-by having nothing to say, and a report that shows only a number hides which.
+Set the frames to independent and run it again. Frame-to-frame scores often
+leave both candidates below the demonstration threshold. The panel then
+reports no ordering under that heuristic, not proof that the distributions
+are equal. The rule uses two baseline draws per repeat, just as week 8 does;
+its formula is typeset under **Recorded protocol and numerical method** and
+is not a calibrated test.
 
-Raising N does not dissolve it either. The floor line under the strip reports
-what your instrument returns when nothing changed at all, at each sample size
-on offer. Those numbers fall as N rises, exactly as week 5 said they would,
-and the verdict does not move with them. A reader who sees only your number
-cannot tell which of those two facts is holding it up. That is the reason
-your report has to say both.
+The **Additional sample-size checks** table adds one trial at each sample
+size on offer. Both its values and its heuristic verdicts can fluctuate. A trend
+across these individual trials is not an estimate of the trend in expectation;
+week 5's distinction still applies. Retain the sampling conditions rather
+than interpreting a smaller number as automatically better evidence.
 
-## The sentence, not the number
+## The conclusion and its conditions
 
-The panel at the bottom is the deliverable. It names the candidate, the
-instrument, the sample size, the number of repeats, and, when one exists, the
-equally honest protocol that reverses the result. A claim in that shape can be
-disagreed with, which is the only property that makes it worth printing.
+The experiment summary gives you evidence to interpret, not a finished
+student report. Its recorded protocol names the candidate, instrument,
+sample size, sequence length, temporal correlation, shift, base seed and
+repeat count. The method disclosure retains the heuristic; the comparison
+table retains all instruments' counts, including reversals and mixed results.
+Use those conditions when writing your own conclusion and its limitations.
 
 Notice what it never says: that the candidate is worse. Only that an
 instrument at a sample size, run a stated number of times, called it worse.

@@ -6,17 +6,18 @@
  * one asks what the disagreement is made of. It scores the same candidate at
  * five sample sizes, averages a few draws at each, and fits a straight line
  * against 1/N. Where that line crosses 1/N = 0 is the score the estimator
- * would report with unlimited samples.
+ * is estimated to approach with unlimited samples; higher-order bias may remain.
  *
  * The plot is drawn at the scale of the measurements, not at the scale of the
  * answer, so the true value sits almost on the axis and the correction is a
  * long reach down the fitted line. The strip below is the zoom: one dot per
  * completed ladder, at the scale of the true value, so repeated runs show
- * what a single extrapolated number hides. The intercept is unbiased and
- * imprecise, and both halves are pinned by the course's reference tests.
+ * what a single extrapolated number hides. The intercept is noisy and may
+ * retain bias; numerical reference tests do not prove unbiasedness.
  *
  * Arithmetic is src/lib/bench.ts. Nothing here leaves the browser.
  */
+import '../styles/lecture-instruments.css';
 interface Props {
   heading?: string;
 }
@@ -24,8 +25,15 @@ const { heading } = Astro.props;
 const SIZES = [60, 100, 200, 400, 800];
 ---
 
-<section class="extrapolator" data-xp aria-label={heading ?? "The extrapolator"}>
+<section class="extrapolator lecture-instrument lecture-workbench" data-xp aria-label={heading ?? "The extrapolator"}>
   {heading && <h2>{heading}</h2>}
+  <header class="instrument-intro">
+    <p class="instrument-kicker">Sample → fit → compare</p>
+    <h3>Can the correction recover the fixed score?</h3>
+    <p>Measure one Gaussian candidate at five sample sizes. Fit the averages, then compare the extrapolated estimate with its known population value.</p>
+    <dl class="instrument-definitions"><div><dt>A / Mean changes</dt><dd>Every coordinate's mean shifts by 0.05; covariance stays fixed.</dd></div><div><dt>B / Covariance changes</dt><dd>The mean stays fixed; each coordinate's variance rises from 1 to 1.1.</dd></div></dl>
+    <p class="instrument-hint">A reduced-dimensional teaching experiment, not image-based FID or the full 2,048-dimensional bench.</p>
+  </header>
 
   <noscript>
     <p>
@@ -35,6 +43,7 @@ const SIZES = [60, 100, 200, 400, 800];
   </noscript>
 
   <form class="xp-controls" data-xp-controls>
+    <h3 class="instrument-step">1. Set the experiment</h3>
     <div class="xp-field" role="group" aria-label="Candidate">
       <span class="xp-label">candidate</span>
       <div class="xp-toggle">
@@ -57,12 +66,13 @@ const SIZES = [60, 100, 200, 400, 800];
         <option value="12">12</option>
       </select>
     </div>
-    <button type="button" data-xp-run>run the ladder</button>
-    <button type="button" class="xp-ghost" data-xp-clear>clear the strip</button>
+    <div class="instrument-actions"><button type="button" data-xp-run>Run the ladder</button>
+    <button type="button" class="xp-ghost" data-xp-clear>Clear the history</button></div>
     <p class="xp-status" role="status" data-xp-status>
       Five sample sizes, one line, one number at the end of it.
     </p>
   </form>
+  <h3>2. Inspect the fit</h3>
 
   <figure class="xp-plot">
     <p class="xp-legend" aria-hidden="true">
@@ -77,26 +87,28 @@ const SIZES = [60, 100, 200, 400, 800];
       data-xp-plot
       aria-label="Estimated score against one over N, with a line fitted through the sample means and extended to the axis"></svg>
     <figcaption>
-      Every point is an estimate of the same fixed number. They disagree because of N,
-      not because the candidate changed.
+      Every point estimates the same fixed number. Both sample size and random
+      draws affect the result; the candidate stays fixed.
     </figcaption>
   </figure>
 
   <div class="xp-nums" aria-live="polite">
     <div>
-      <div class="xp-num-label">shortest ladder, N = 60</div>
+      <div class="xp-num-label">Sample estimate / N = 60</div>
       <div class="xp-num xp-est" data-xp-raw>&nbsp;</div>
     </div>
     <div>
-      <div class="xp-num-label">extrapolated to 1/N = 0</div>
+      <div class="xp-num-label">Extrapolated estimate</div>
       <div class="xp-num xp-fit" data-xp-intercept>&nbsp;</div>
     </div>
     <div>
-      <div class="xp-num-label">true FID, closed form</div>
+      <div class="xp-num-label">Population value</div>
       <div class="xp-num xp-true" data-xp-truth>&nbsp;</div>
     </div>
   </div>
 
+  <h3>3. Check repeatability</h3>
+  <p class="instrument-hint">Run again for fresh draws with the same candidate. The history retains up to 20 intercepts; changing the settings clears it.</p>
   <figure class="xp-strip">
     <svg
       viewBox="0 0 560 150"
@@ -108,6 +120,12 @@ const SIZES = [60, 100, 200, 400, 800];
       per ladder, against the true value.
     </figcaption>
   </figure>
+  <details class="instrument-method">
+    <summary>How the extrapolation works</summary>
+    <div class="instrument-formula"><math display="block" aria-label="Mean estimated FID at sample size N is approximately a plus b divided by N"><msub><mover><mtext>FID</mtext><mo>¯</mo></mover><mi>N</mi></msub><mo>≈</mo><mi>a</mi><mo>+</mo><mfrac><mi>b</mi><mi>N</mi></mfrac></math></div>
+    <p>The left side is the average of the draws at a sample size <var>N</var>. The fitted slope <var>b</var> describes the leading inverse-sample-size trend. The intercept <var>a</var> estimates the limit as <var>N</var> grows.</p>
+    <p>Averages are fitted at N = {SIZES.join(', ')}. Higher-order bias and sampling variation can remain; a negative intercept is a fit result, not a negative squared distance. Compare the errors against the known population value.</p>
+  </details>
 </section>
 
 <script>
@@ -143,6 +161,7 @@ const SIZES = [60, 100, 200, 400, 800];
     let seed = 424242;
     let intercepts: number[] = [];
     let running = false;
+    let generation = 0;
 
     const candidate = (): Candidate =>
       letter === "A"
@@ -325,6 +344,9 @@ const SIZES = [60, 100, 200, 400, 800];
     // and not the true value, which is the number a stale readout would make a
     // liar of.
     const reset = (message: string) => {
+      generation++;
+      running = false;
+      runButton.disabled = false;
       intercepts = [];
       const truth = truthOf(candidate(), dimensions());
       truthOut.textContent = truth.toFixed(3);
@@ -341,6 +363,8 @@ const SIZES = [60, 100, 200, 400, 800];
 
     const run = async () => {
       if (running) return;
+      const current = ++generation;
+      const active = () => current === generation && section.isConnected;
       running = true;
       runButton.disabled = true;
       const c = candidate();
@@ -348,7 +372,9 @@ const SIZES = [60, 100, 200, 400, 800];
       const t = trials();
       const truth = truthOf(c, d);
       seed = (seed * 1664525 + 1013904223) >>> 0;
+      const runSeed = seed;
 
+      try {
       truthOut.textContent = truth.toFixed(3);
       interceptOut.textContent = "—";
       const rungs: Rung[] = [];
@@ -356,10 +382,12 @@ const SIZES = [60, 100, 200, 400, 800];
       for (let i = 0; i < SIZES.length; i++) {
         status.textContent = "scoring " + t + " draws at N = " + SIZES[i] + "…";
         await frame();
-        rungs.push(rung(c, d, SIZES[i], t, seed, i));
+        if (!active()) return;
+        rungs.push(rung(c, d, SIZES[i], t, runSeed, i));
         rawOut.textContent = rungs[0].mean.toFixed(3);
         drawPlot(rungs, null, truth);
         await frame();
+        if (!active()) return;
       }
       const fit = fitInverseN(rungs);
       drawPlot(rungs, fit, truth);
@@ -371,7 +399,7 @@ const SIZES = [60, 100, 200, 400, 800];
       const closer = Math.abs(rungs[0].mean - truth) / Math.max(Math.abs(fit.intercept - truth), 1e-6);
       status.textContent =
         fit.intercept < 0
-          ? "The line crossed below zero. No distance is negative, so this ladder has reported its own uncertainty rather than the score."
+          ? "The fitted intercept is negative. It is an unconstrained estimate, not a negative distance; inspect sampling variation and fit error."
           : "The shortest ladder missed by " +
             (rungs[0].mean - truth).toFixed(2) +
             "; the intercept missed by " +
@@ -383,9 +411,14 @@ const SIZES = [60, 100, 200, 400, 800];
         intercepts.length < 3
           ? "Run it again. This strip is the same numbers at the scale of the answer: one dot per ladder, against the true value."
           : intercepts.length +
-            " ladders. The dots fall either side of the true value rather than above it, which is what removing a bias looks like. Their spread is what the correction does not remove.";
-      running = false;
-      runButton.disabled = false;
+            " completed ladders. Compare their spread and centre with the true value. Finite repeats do not establish unbiasedness, and higher-order fit bias may remain.";
+      status.textContent += ` Seed ${runSeed}; d = ${d}; ${t} draws per N.`;
+      } catch (error) {
+        if (active()) reset('Calculation failed. Run the ladder again.');
+        console.error(error);
+      } finally {
+        if (current === generation) { running = false; runButton.disabled = false; }
+      }
     };
 
     for (const button of section.querySelectorAll<HTMLButtonElement>("[data-xp-candidate]")) {
@@ -464,7 +497,8 @@ const SIZES = [60, 100, 200, 400, 800];
     padding: 0.25rem 0.4rem;
     border: 1px solid var(--at-border, #c9c2b4);
     border-radius: 3px;
-    background: var(--at-white, #fff);
+    background: var(--at-bg);
+    color: var(--at-text);
   }
 
   .xp-toggle {
@@ -474,17 +508,17 @@ const SIZES = [60, 100, 200, 400, 800];
 
   .xp-controls button {
     padding: 0.45rem 0.95rem;
-    border-radius: 999px;
+    border-radius: 3px;
     border: 1px solid var(--at-primary);
     background: var(--at-primary);
-    color: var(--at-white, #fff);
+    color: var(--at-on-primary);
     cursor: pointer;
   }
 
   .xp-controls button.xp-ghost,
   .xp-toggle button[aria-pressed="false"] {
     background: transparent;
-    color: var(--at-secondary, var(--at-primary));
+    color: var(--at-text);
   }
 
   .xp-controls button[disabled] {

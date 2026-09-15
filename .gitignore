@@ -7,8 +7,9 @@ dist/
 # Astro's generated types and build cache
 .astro/
 
-# staging dir for the CI link check
+# staging dir for the CI link check, and the log the link checker writes
 linkcheck/
+.link-checker/
 
 # editor and OS junk
 .DS_Store

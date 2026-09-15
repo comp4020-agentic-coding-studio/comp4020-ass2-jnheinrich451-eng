@@ -5,19 +5,21 @@ description: Where FID gets its mathematics, before we ask whether it deserves o
 
 import Eq from "../components/Eq.astro";
 import DeckExit from "../components/DeckExit.astro";
+import PaperSlide from "../components/PaperSlide.astro";
+import "./week-02-template.css";
 
 <DeckExit back="/lectures/week-02/" label="Week 02" />
 
-<style>{`:root { --deck-footer: "SLOP8412 · LECTURE 02 · THE DISTANCE"; }`}</style>
+{/* _class: paper-slide paper-lecture paper-opening paper-slide--1 */}
 
-{/* _class: impact */}
-
-# Two Gaussians, one number.
+<PaperSlide title="Two Gaussians, one number." index={1} total={17} variant="opening">
 
 Where FID gets its mathematics, before we ask whether it deserves our trust.
 
+</PaperSlide>
+
 ```notes
-- sixteen slides, one derivation, then one hinge
+- seventeen slides, one derivation, then one hinge
 - say the shape out loud: we want a distance between distributions, transport
   gives the right question, the general problem is hard, Gaussians are
   cooperative, and the closed form is only mean and covariance
@@ -26,7 +28,9 @@ Where FID gets its mathematics, before we ask whether it deserves our trust.
 
 ---
 
-## The number we are trying to explain
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--2 */}
+
+<PaperSlide title="The number we are trying to explain" index={2} total={17} variant="teaching">
 
 <Eq name="fid" alt="FID equals the squared distance between the two means, plus the trace of sigma-r plus sigma-g minus twice the matrix square root of sigma-r-half sigma-g sigma-r-half." size="wide" />
 
@@ -45,6 +49,8 @@ By the end of this lecture every symbol here should have a reason to be here.
 
 <p class="small">Covariance describes spread and correlation, not arbitrary distribution shape.</p>
 
+</PaperSlide>
+
 ```notes
 - give them the destination before the derivation; nobody follows a derivation
   toward an unknown
@@ -53,7 +59,9 @@ By the end of this lecture every symbol here should have a reason to be here.
 
 ---
 
-## FID does not compare images
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--3 */}
+
+<PaperSlide title="FID does not compare images" index={3} total={17} variant="teaching">
 
 <div class="split">
   <div>
@@ -71,6 +79,8 @@ By the end of this lecture every symbol here should have a reason to be here.
 **We need a distance between distributions, not a matching between individual
 samples.**
 
+</PaperSlide>
+
 ```notes
 - ask for a definition before showing one; the wrong answers are the useful
   part, because most of them pair samples
@@ -80,13 +90,17 @@ samples.**
 
 ---
 
-## Same marginals. Different couplings.
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--4 */}
+
+<PaperSlide title="Same marginals. Different couplings." index={4} total={17} variant="teaching">
 
 ![Three couplings of the same two Gaussians, with their expected squared costs](../assets/figures/couplings.svg)
 
 <Eq name="marginals" alt="X drawn from P, Y drawn from Q." />
 
 P and Q say where X and Y live. They do not say how to pair them.
+
+</PaperSlide>
 
 ```notes
 - costs are 6 for independent, 8 for counter-monotone, 4 for the monotone one
@@ -96,9 +110,9 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 ---
 
-{/* _class: centered */}
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--5 */}
 
-## Wasserstein as a search
+<PaperSlide title="Wasserstein as a search" index={5} total={17} variant="teaching">
 
 <Eq name="w2-def" alt="W-2 squared of P and Q is the infimum over couplings pi in Pi of P and Q of the expected squared distance between X and Y." size="wide" />
 
@@ -108,6 +122,8 @@ P and Q say where X and Y live. They do not say how to pair them.
   <p><span class="mono">inf</span> choose the cheapest admissible coupling</p>
 </div>
 
+</PaperSlide>
+
 ```notes
 - read it as a search, not as a formula
 - Wasserstein asks for the cheapest way to make P and Q coexist
@@ -115,7 +131,9 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 ---
 
-## Why this is hard
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--6 */}
+
+<PaperSlide title="Why this is hard" index={6} total={17} variant="teaching">
 
 <div class="split">
   <div>
@@ -134,6 +152,8 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 **This lecture works because Gaussians are unusually cooperative.**
 
+</PaperSlide>
+
 ```notes
 - do NOT say we approximate Wasserstein by restricting to jointly Gaussian
   couplings. For Gaussian marginals the problem admits the affine structure
@@ -144,7 +164,9 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 ---
 
-## Start in one dimension
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--7 */}
+
+<PaperSlide title="Start in one dimension" index={7} total={17} variant="teaching">
 
 <Eq name="oneD-setup" alt="P is normal with mean mu-P and variance sigma-P squared; Q likewise." />
 
@@ -156,6 +178,8 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 <div class="fragment boxed"><Eq name="oneD-result" alt="W-2 squared equals mu-P minus mu-Q squared plus sigma-P minus sigma-Q squared." size="wide" /></div>
 
+</PaperSlide>
+
 ```notes
 - the same Z is the whole trick; point at it
 - using E[Z] = 0 and E[Z squared] = 1
@@ -165,7 +189,9 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 ---
 
-## Two things are being measured
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--8 */}
+
+<PaperSlide title="Two things are being measured" index={8} total={17} variant="teaching">
 
 ![Two panels: equal spread with shifted centres, and equal centres with different spreads](../assets/figures/location-vs-spread.svg)
 
@@ -174,6 +200,8 @@ P and Q say where X and Y live. They do not say how to pair them.
   <div><Eq name="term-spread" alt="Sigma-P minus sigma-Q, squared." /><p class="label">variance mismatch is spread</p></div>
 </div>
 
+</PaperSlide>
+
 ```notes
 - neither panel is more wrong than the other in any way the number expresses
 - that is a feature here and a problem in week 6
@@ -181,7 +209,9 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 ---
 
-## Now go to d dimensions
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--9 */}
+
+<PaperSlide title="Now go to d dimensions" index={9} total={17} variant="teaching">
 
 ![Two Gaussians as one-sigma ellipses with different centres, axis lengths and orientations](../assets/figures/covariance-ellipses.svg)
 
@@ -189,6 +219,8 @@ P and Q say where X and Y live. They do not say how to pair them.
 
 In multiple dimensions, spread is no longer one number. It is scale,
 orientation and correlation at once.
+
+</PaperSlide>
 
 ```notes
 - point at the tilt: that is correlation, and no scalar variance can carry it
@@ -198,7 +230,9 @@ orientation and correlation at once.
 
 ---
 
-## The derivation board
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--10 */}
+
+<PaperSlide title="The derivation board" index={10} total={17} variant="teaching">
 
 <Eq name="row-setup" alt="U equals X minus mu-P; V equals Y minus mu-Q." />
 
@@ -211,6 +245,8 @@ orientation and correlation at once.
 
 <p class="fragment verdict">Everything is known except the cross-covariance C.</p>
 
+</PaperSlide>
+
 ```notes
 - reveal one row at a time; do not advance until the previous row is read back
 - the whole reduction is four lines and it belongs on one slide
@@ -218,7 +254,9 @@ orientation and correlation at once.
 
 ---
 
-## The problem has collapsed
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--11 */}
+
+<PaperSlide title="The problem has collapsed" index={11} total={17} variant="teaching">
 
 <div class="split">
   <div>
@@ -246,6 +284,8 @@ orientation and correlation at once.
 
 The infinite-dimensional coupling problem is now a structured matrix problem.
 
+</PaperSlide>
+
 ```notes
 - this is the slide where the search becomes finite
 - the constraint is the whole difficulty: C cannot be chosen freely
@@ -253,15 +293,17 @@ The infinite-dimensional coupling problem is now a structured matrix problem.
 
 ---
 
-{/* _class: centered */}
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--12 */}
 
-## The Gaussian solution
+<PaperSlide title="The Gaussian solution" index={12} total={17} variant="teaching">
 
 <Eq name="max-trace" alt="The maximum over C of the trace of C equals the trace of the matrix square root of Sigma-P-half Sigma-Q Sigma-P-half." size="wide" />
 
 <div class="boxed"><Eq name="w2-gaussian" alt="W-2 squared of P and Q equals the squared distance between the means plus the trace of Sigma-P plus Sigma-Q minus twice the symmetric matrix square root term." size="wide" /></div>
 
 <p class="small">Sanity check, in one dimension or whenever the covariances commute, the covariance term collapses: <Eq name="sanity-1d" alt="Tends to sigma-P minus sigma-Q squared." inline /></p>
+
+</PaperSlide>
 
 ```notes
 - the matrix expression is the multidimensional version of centre plus spread
@@ -271,7 +313,9 @@ The infinite-dimensional coupling problem is now a structured matrix problem.
 
 ---
 
-## FID adds an instrument
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--13 */}
+
+<PaperSlide title="FID adds an instrument" index={13} total={17} variant="teaching">
 
 <div class="pipeline" role="img" aria-label="Real images and generated images each pass through Inception-v3 to feature vectors, then to a mean and covariance. The two pairs of moments meet in the Gaussian Wasserstein-2 distance, whose output is FID.">
   <div class="rail">
@@ -286,6 +330,8 @@ The infinite-dimensional coupling problem is now a structured matrix problem.
 **The Gaussian distance is the mathematics. Everything before it is a
 measurement decision.**
 
+</PaperSlide>
+
 ```notes
 - this is the conceptual hinge of the whole course
 - Inception is an ImageNet-trained representation, and the moments retain only
@@ -297,7 +343,9 @@ measurement decision.**
 
 ---
 
-## Why people believed the number
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--14 */}
+
+<PaperSlide title="Why people believed the number" index={14} total={17} variant="teaching">
 
 **Worse images, larger FID.**
 
@@ -307,6 +355,8 @@ In the original experiments the score rose monotonically as each of these
 disturbances grew stronger.
 
 <p class="label">Schematic trends, not measured values · original experiment identified in speaker notes</p>
+
+</PaperSlide>
 
 ```notes
 - source: Heusel et al. 2017, Figure 3 and the discussion around it
@@ -318,7 +368,9 @@ disturbances grew stronger.
 
 ---
 
-## Four assumptions enter the number
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--15 */}
+
+<PaperSlide title="Four assumptions enter the number" index={15} total={17} variant="teaching">
 
 <div class="assumptions">
   <div><p class="label">1 · Representation</p><p>Inception-v3 decides which visual differences are visible at all.</p><p class="mono">&rarr; week 03</p></div>
@@ -330,6 +382,8 @@ disturbances grew stronger.
 The formula is exact for Gaussians. FID is an engineered pipeline built around
 that formula.
 
+</PaperSlide>
+
 ```notes
 - these four are the semester's audit list; every later week attacks one of them
 - do not defend or attack them here, only name them
@@ -337,7 +391,9 @@ that formula.
 
 ---
 
-## Which model is closer?
+{/* _class: paper-slide paper-lecture paper-teaching paper-slide--16 */}
+
+<PaperSlide title="Which model is closer?" index={16} total={17} variant="teaching">
 
 Reference R, candidates A and B, scored by the closed form rather than by
 sampling.
@@ -350,6 +406,8 @@ sampling.
 **B wins.** We will spend the rest of the course asking whether that ranking
 survives the measurement pipeline.
 
+</PaperSlide>
+
 ```notes
 - one worked example only; the arithmetic is on the session page
 - this is the number week 5 takes apart
@@ -357,9 +415,9 @@ survives the measurement pipeline.
 
 ---
 
-{/* _class: centered */}
+{/* _class: paper-slide paper-lecture paper-ending paper-slide--17 */}
 
-## The distance is clean. The instrument is not.
+<PaperSlide title="The distance is clean. The instrument is not." index={17} total={17} variant="ending">
 
 <div class="split">
   <div>
@@ -376,6 +434,8 @@ survives the measurement pipeline.
 </div>
 
 Next: what exactly is Inception measuring?
+
+</PaperSlide>
 
 ```notes
 - two teasers, no more. Finite-sample FID is biased and the bias depends on the

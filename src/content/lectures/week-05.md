@@ -1,7 +1,7 @@
 ---
 title: Question the estimate
 description:
-  A biased score is not a noisy one. Return to the week 2 baseline, measure
+  Bias and noise are different problems. Return to the week 2 baseline, measure
   the bias on the bench, and take its price with it.
 week: 5
 date: 2026-08-31
@@ -15,10 +15,10 @@ related:
   - sessions/04-getting-it-right
 ---
 
-Repeating a measurement removes noise. It does not remove bias, and at the
-sample sizes anyone actually works at, the bias is not a correction to the
-score. It is most of the score. The week 1 bench reports about 22 where the
-true value is 0.16. Averaging a thousand of those draws returns 22.
+Averaging independent measurements reduces sampling variation. It does not
+remove bias. On the small-sample bench, the discrepancy can dominate the
+population score: repeating a biased procedure estimates its expectation
+more precisely, not necessarily the quantity we wanted.
 
 So the question this lecture asks of the bench is not how much the estimate
 moves. Week 1 answered that. It is where the estimate is moving around, and
@@ -28,8 +28,9 @@ whether that place can be found from measurements you can afford.
 
 Bring the scores and sample sizes from your measurement log, and keep the
 closed-form baseline from week 2 beside them. Week 4 pinned the
-implementation, so a disagreement between your numbers and the baseline is
-now about sampling and nothing else.
+implementation. With the same construction and protocol, we can investigate
+sampling effects without deliberately changing the implementation. Numerical
+errors still need their own checks.
 
 ## The ladder
 
@@ -40,27 +41,25 @@ averaged at each sample size. Press run, and it scores the same fixed
 candidate at N = 60, 100, 200, 400 and 800, plots each average against 1/N,
 and fits a line through the five points.
 
-Read the line at 1/N = 0. That intercept is the score the estimator would
-report with unlimited samples, and it is the third number in the row beneath
-the plot, between the shortest ladder and the truth. The rungs are wrong by
-a factor of seventy. The intercept is wrong in the third decimal place.
+Read the line at 1/N = 0. Its intercept estimates the unlimited-sample limit;
+it is the middle number below the plot. A linear fit removes a leading 1/N
+trend, but higher-order bias and sampling variation can remain. Compare its
+error with the shortest rung's error rather than assuming a fixed improvement.
 
 It is the same arithmetic as the week 1 bench, scored many times instead of
 once.
 
 ## Read the second number too
 
-Press run again. The intercept moves, and it moves by about as much as the
-true value it is estimating. Often enough it lands below zero, where no
-distance can be. That is not a fault in the ladder. It is the price named in
-the session: extrapolation removes the direction of the error and leaves its
-size, and a spread of that size is invisible in any single run.
+Press run again. The intercept moves and can land below zero, where no
+squared distance can be. This unconstrained fit is an estimate, not an exact
+distance. A negative intercept is a reason to inspect sampling variation and
+fit error, not to silently clip the answer or declare the correction exact.
 
-The strip under the numbers keeps every intercept you produce, at the scale
-of the answer rather than the scale of the measurements. Three or four runs
-are enough to see that the dots fall either side of the true value instead of
-above it, and that the width of the cloud is the whole of what the correction
-does not fix.
+The strip keeps the most recent twenty intercepts at the scale of the answer.
+Inspect both the spread and the centre of the dots. A few runs can illustrate
+variability; they cannot prove that the fitted intercept is unbiased. Vary
+the sample-size range in a fuller analysis and inspect residuals.
 
 So an extrapolated score is not a measurement until it is reported with the
 ladder that produced it: which sample sizes, how many draws at each, and how

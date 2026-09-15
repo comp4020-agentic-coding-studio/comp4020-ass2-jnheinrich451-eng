@@ -7,19 +7,61 @@ description:
 layout: ../../layouts/PageLayout.astro
 ---
 
-# Policies and support
+import GradeCalculator from '../../components/GradeCalculator.astro';
+import OverviewHeader from '../../components/OverviewHeader.astro';
+
+<OverviewHeader kicker="SLOP8412 / Policies and support"><Fragment slot="title">The conditions belong beside the number.</Fragment><p>A submission is assessable when another person can trace its evidence, reproduce its measurements and distinguish your contribution from the tools you used.</p></OverviewHeader>
 
 These rules hold for every piece of assessed work in SLOP8412. Assessment
 briefs link here rather than repeating them, so there is one place to read
 them and one place they can change.
+
+[Grade planner](#grade-calculator) · [Late work](#late-work) ·
+[Reporting](#reporting) · [Workspaces](#browser-workspaces) · [Generative tools](#use-of-generative-tools) ·
+[Support](#getting-help)
+
+## Marks and planning
+
+The [assessment briefs](/assessments/) define each task's course weight and
+criterion maxima. The sheet below reads those published values directly; it
+does not create a second marking scheme. A criterion mark is a mark within
+that assessment, not a percentage of the whole course.
+
+SLOP8412 uses these grade thresholds out of 100: P (Pass) at 50, CR (Credit)
+at 60, D (Distinction) at 70 and HD (High distinction) at 80. These are the
+numerical targets used by the planner.
+
+The calculator is a personal planning tool, not an official Slop University
+result. It does not decide submission eligibility or apply administrative
+decisions. Entering a hypothetical mark changes your plan, not your recorded
+grade.
+
+<GradeCalculator />
 
 ## Late work
 
 Every deadline carries a **grace period** of 12 hours. Within it a submission
 is on time and is marked without comment.
 
-**Late submissions are not accepted.** After the grace period the entry is
-recorded as absent, at the sample size it arrived with.
+**Late submissions are not accepted.** After the grace period the submission
+is recorded as absent. Do not treat a blank cell in the planner as the result
+of that decision: enter a zero only if that is the mark actually recorded.
+
+Use the dated deadline on the assessment brief, including its time zone.
+The grace period is measured from that deadline; it is not an extra working
+day. For example, a deadline at 12:00 has its 12-hour grace boundary at 00:00
+the following day in the same time zone.
+
+If illness, access needs or circumstances outside your control affect a
+deadline, contact the [convenor](/people/helen-sandoval/) privately as early
+as possible. Ask which extension or adjustment process applies. A request
+does not itself grant an extension; keep any written decision and follow the
+deadline it specifies. Do not post medical or other sensitive documents to
+the class forum. This page does not promise an automatic exception.
+
+Check that your submitted files open and that the archive contains the files
+named in its instructions. Keep your submission receipt. An export from a lab
+or the grade planner is a local download, not a course submission.
 
 ## Reporting
 
@@ -27,10 +69,28 @@ Every number in every submission states its N, its reference set and its
 implementation. A number without those three is not a result and will not be
 read as one.
 
+Record the reference and generated sample counts separately when they differ.
+Identify the reference data and split, feature extractor and weights,
+preprocessing, code version, estimator and random seed. Where a published
+comparison omits a setting, label it unknown rather than silently filling it
+in. These are the conditions that make an N-honest comparison possible.
+
+A reproducible archive explains how to run it, lists its dependencies and
+states the expected outputs. Keep raw measurements and intermediate settings
+alongside the displayed result. If resources prevent a matched comparison,
+describe the limit and the check you could not perform. Do not relabel a
+reduced-dimensional Gaussian experiment as image-based FID.
+
 ## Precision
 
 Report scores to one decimal place. Week 5 explains why the second is not
 yours to claim.
+
+This display convention is for reported measurement scores, not an instruction
+to round intermediate calculations or criterion marks. Retain full precision
+in computation and in the raw evidence. When comparing repeated estimates,
+state how many draws were made and what the reported variation summarises.
+A rounded equality does not establish equal underlying quantities.
 
 ## Use of generative tools
 
@@ -41,14 +101,83 @@ one.
 Text produced by a model is held to the same standard as a number produced by
 one: state what generated it, and at what setting.
 
+Include a disclosure identifying the tool and model or version where known,
+the task it helped with, the prompts, and the files or passages affected.
+Explain what you checked yourself. For a generated script, that means checking
+its inputs, outputs and assumptions, not only whether it ran without an error.
+
+Keep relevant prompt and output records with your working evidence. Remove
+credentials, private data and third-party personal information before sharing
+records. Disclose those redactions; do not publish secrets to prove tool use.
+You remain responsible for citations, calculations and the explanation you
+defend in person.
+
 ## Academic integrity
 
 The School of Continuous Improvement applies the University's policy without
 variation. Note that the bench is shared, so identical scores are expected.
 Identical explanations are not.
 
+Cite the origin of reused code, data, figures and ideas. Make the boundary
+between supplied material, collaboration and your own work visible. Another
+student's archive or explanation cannot be presented as your construction.
+Disclosing a generative tool does not make an invented reference or an
+unverified claim acceptable.
+
+If you are unsure whether a proposed collaboration or reuse is permitted,
+ask the convenor before submitting and describe the specific material. Keep
+that clarification with your records rather than assuming a shared bench
+permits shared authorship.
+
 ## Re-marks
 
 A different marker marks the work from scratch. Their mark replaces the
 original, higher or lower. The course does not report the standard deviation
 of its own marking.
+
+First read the feedback beside the rubric and identify the criterion or
+calculation you think needs review. Contact the convenor with the assessment,
+the relevant feedback and the submitted evidence that supports your question.
+Ask about the applicable procedure and time limit; no additional review
+window is invented on this page. A clarification request is not itself a
+re-mark, and a re-mark is not an opportunity to replace the submitted work.
+
+## Browser workspaces
+
+Use the [Maths lab](/math-lab/) to reason from Gaussian population parameters,
+the [Python workspace](/workspace/) to experiment with sampled estimates, and
+the [Image lab](/image-lab/) to inspect real image features and preprocessing.
+The linked teaching activities follow **Predict → Open the lab → Record →
+Result → Explain the limitation**: record the protocol, then the observed
+result, so the number can be checked against the prediction.
+
+Keep supplementary lab observations distinct from the required assessment
+evidence. A population calculation has no sampling N; a lab that does not
+estimate FID∞ cannot supply that comparison. Neither replaces a required
+bench run. Follow the [reporting rules](#reporting) and the relevant
+[assessment brief](/assessments/) when carrying observations into submitted work.
+
+Check each lab’s saving and export guidance before leaving. An export is not
+a submission or an automatic backup. Image records contain image-derived
+features even when original images and filenames are omitted; review them
+before sharing. Python runs locally, but code you run can access the network.
+Use trusted code and consult [Getting help](#getting-help) if a lab cannot run
+on your device.
+
+## Getting help
+
+Use the [tutor's contact route](/people/tomasz-wierzba/) for bench setup,
+reproduction problems and questions that the class can learn from. Include
+the smallest reproducible example, software versions, seed, expected result
+and actual result. Do not post a complete assessed solution to a public thread.
+
+For personal circumstances, access requirements, assessment decisions or
+integrity concerns, contact the [convenor](/people/helen-sandoval/) privately.
+Describe the effect on your study and ask what support or adjustment is
+available. There is no need to publish personal details for the whole class.
+
+If the browser labs do not work with your device or access tools, preserve
+the worksheet or source code where possible and tell the teaching team what
+failed. The lab interfaces are learning tools, not submission portals. A
+calculator's target is information for planning, not a judgement of the
+student using it.

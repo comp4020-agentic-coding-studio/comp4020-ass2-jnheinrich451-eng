@@ -2,12 +2,14 @@
 import { render } from "astro:content";
 import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
-import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import ContentLayout from "../../layouts/ContentLayout.astro";
 import { withBase } from "astro-theme-university/url";
 import BenchExtrapolator from "../../components/BenchExtrapolator.astro";
 import BenchWorkbench from "../../components/BenchWorkbench.astro";
 import InstrumentBench from "../../components/InstrumentBench.astro";
 import ReportBench from "../../components/ReportBench.astro";
+import WorkspaceActivity from "../../components/WorkspaceActivity.astro";
+import { workspaceActivities } from "../../data/workspace-activities";
 import TeachingTeam from "../../components/TeachingTeam.astro";
 import { formatCourseDate } from "../../lib/dates";
 import { graphCollections, siteConfig } from "../../site-config";
@@ -18,6 +20,7 @@ export async function getStaticPaths() {
 }
 
 const { lecture } = Astro.props;
+const activity = workspaceActivities[`lectures/${lecture.id}`];
 const { Content } = await render(lecture);
 // `workbench` and `extrapolator` are loose keys, like `arc` on sessions: the
 // schema passes them through undeclared, and this page is the only consumer.
@@ -35,11 +38,13 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
   <p><strong>{formatCourseDate(lecture.data.date)}</strong></p>
   {isOutline && <aside class="lecture-preview" aria-label="Lecture development status"><strong>Outline preview</strong><p>This lecture is in development. The route and linked preparation are available below; a slide deck has not been published yet.</p></aside>}
   {lecture.data.slides && <p><a href={withBase(lecture.data.slides)}>Open the slides</a></p>}
+  {activity && <p><a href="#workspace-activity">Try it in the workspace →</a></p>}
   <Content />
   {wantsWorkbench && <BenchWorkbench />}
   {wantsExtrapolator && <BenchExtrapolator />}
   {wantsInstruments && <InstrumentBench />}
   {wantsReport && <ReportBench />}
+  {activity && <WorkspaceActivity activity={activity} />}
   <TeachingTeam teachers={lecture.data.teachers} />
   <RelatedContent entry={lecture} collections={graphCollections} />
 </ContentLayout>

@@ -1,11 +1,13 @@
 ---
 import { getPublishedCollection } from 'astro-course-university/content';
 import { withBase } from 'astro-theme-university/url';
+import { getLectureLinks } from '../lib/lecture-links';
 interface Props { current: string }
 const { current } = Astro.props;
 const sessions = (await getPublishedCollection('sessions')).sort((a,b) => a.data.week-b.data.week);
 const index = sessions.findIndex(s => s.id === current);
 const active = sessions[index];
+const lectureLink = (await getLectureLinks()).get(active.data.week);
 const previous = sessions[index-1], next = sessions[index+1];
 const names: Record<string,string> = { A: 'Compute it', B: 'Break it', C: 'Live with it' };
 const arcOf = (s: typeof active) => String((s.data as Record<string,unknown>).arc ?? '');
@@ -26,7 +28,7 @@ const href = (id: string) => withBase(`/sessions/${id}/`);
     </div>)}
   </div>
   <div class="scale-current"><span class="current-ring" aria-hidden="true"></span><span>{active.data.title}</span></div>
-  {active.data.week === 2 && <a class="lecture-branch" href={withBase('/lectures/week-02/')}><span aria-hidden="true">↳</span> Lecture 02 · Two Gaussians, One Number →</a>}
+  {lectureLink && <a class="lecture-branch" href={lectureLink.href}><span aria-hidden="true">↳</span> {lectureLink.label} →</a>}
   <details class="mobile-weeks"><summary>Choose a week</summary><ol>{sessions.map(s=><li><a href={href(s.id)} aria-current={s.id===current?'page':undefined}>Week {s.data.week} · {s.data.title}</a></li>)}</ol></details>
   <div class="adjacent">
     {previous ? <a href={href(previous.id)}><span>← Previous</span><strong>{previous.data.title}</strong></a> : <span>Start of course</span>}

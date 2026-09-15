@@ -1,0 +1,35 @@
+---
+/** Shared frame for the approved Week 2 PowerPoint-derived layout. */
+interface Props {
+  title: string;
+  index: number;
+  total: number;
+  variant?: 'opening' | 'teaching' | 'ending';
+}
+const { title, index, total, variant = 'teaching' } = Astro.props;
+---
+
+<div class="paper-body">
+  {variant === 'opening' ? (
+    <>
+      <h1>Two Gaussians,<br />one number.</h1>
+      <div class="paper-rule" aria-hidden="true"><span class="paper-star"><i /><i /><i /><i /></span></div>
+    </>
+  ) : variant === 'ending' ? (
+    <h2>The distance is clean.<br />The instrument is not.</h2>
+  ) : (
+    <header class="paper-heading">
+      <h2>{title}</h2>
+      <span class="paper-star" aria-hidden="true"><i /><i /><i /><i /></span>
+    </header>
+  )}
+  <div class="paper-material"><slot /></div>
+</div>
+<footer class="paper-foot">
+  <span>SLOP8412 / Lecture 02 / The distance</span>
+  <nav aria-label={`Slide ${index} navigation`}>
+    {index > 1 && <a href={`#/${index - 1}`} aria-label="Previous slide">← Previous</a>}
+    <span aria-label={`Slide ${index} of ${total}`}>{String(index).padStart(2, '0')} / {total}</span>
+    {index < total ? <a href={`#/${index + 1}`} aria-label="Next slide">Next →</a> : <a href="#/1">Title ↑</a>}
+  </nav>
+</footer>

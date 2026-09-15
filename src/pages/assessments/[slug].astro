@@ -4,8 +4,10 @@ import { getPublishedCollection } from "astro-course-university/content";
 import RelatedContent from "astro-course-university/components/RelatedContent.astro";
 import AssessmentChecklist from "../../components/AssessmentChecklist.astro";
 import Callout from "astro-theme-university/components/Callout.astro";
-import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import ContentLayout from "../../layouts/ContentLayout.astro";
 import MarkingModel from "../../components/MarkingModel.astro";
+import WorkspaceActivity from "../../components/WorkspaceActivity.astro";
+import { workspaceActivities } from "../../data/workspace-activities";
 import { formatCourseDate } from "../../lib/dates";
 import { graphCollections, siteConfig } from "../../site-config";
 
@@ -18,6 +20,7 @@ export async function getStaticPaths() {
 }
 
 const { assessment } = Astro.props;
+const activity = workspaceActivities[`assessments/${assessment.id}`];
 const { Content } = await render(assessment);
 // Surface the existing submission instruction; keep the authored brief authoritative.
 const submission = assessment.body?.replace(/\r\n/g,'\n').match(/Submit [\s\S]*?(?=\n\n|\n\d+\.|$)/)?.[0].replace(/\s+/g,' ').trim();
@@ -42,8 +45,9 @@ const submission = assessment.body?.replace(/\r\n/g,'\n').match(/Submit [\s\S]*?
     <div><p class="fact-label">Course weight</p><p class="fact-weight">{assessment.data.weight}%</p></div>
     {submission && <div class="submission"><p class="fact-label">What to submit</p><p>{submission}</p></div>}
   </div>
-  <nav class="brief-nav" aria-label="Assessment sections"><a href="#assessment-brief">Brief ↓</a><a href="#assessment-spec">Review spec ↓</a>{assessment.data.marking && <a href="#how-marked">Marking ↓</a>}</nav>
+  <nav class="brief-nav" aria-label="Assessment sections"><a href="#assessment-brief">Brief ↓</a><a href="#assessment-spec">Review spec ↓</a>{assessment.data.marking && <a href="#how-marked">Marking ↓</a>}{activity && <a href="#workspace-activity">Workspace practice ↓</a>}</nav>
   <div id="assessment-brief" class="assessment-reading"><Content /></div>
+  {activity && <WorkspaceActivity activity={activity} />}
   <AssessmentChecklist id={assessment.id} spec={assessment.data.spec} />
   {assessment.data.marking && <MarkingModel marking={assessment.data.marking} />}
   <RelatedContent entry={assessment} collections={graphCollections} />

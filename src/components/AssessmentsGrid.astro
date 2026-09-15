@@ -2,6 +2,7 @@
 import { getPublishedCollection } from "astro-course-university/content";
 import { withBase } from "astro-theme-university/url";
 import { formatCourseDate } from "../lib/dates";
+import OverviewHeader from './OverviewHeader.astro';
 
 const assessments = await getPublishedCollection("assessments");
 // The ongoing log begins in Week 1; its submission deadline remains Week 12.
@@ -12,7 +13,8 @@ const visible = assessments.sort((a, b) =>
 ---
 
 <section class="assessment-route" aria-label="Assessment sequence">
-  <header><p class="eyebrow">Reproduce / Break / Report</p><h2>The mark is in the account.</h2><p>Reproduce a published number, construct a failure, then defend what you would report instead. The measurement log records what you learned along the way.</p><p class="total">{visible.reduce((sum,a)=>sum+a.data.weight,0)}% <span>of the course · {visible.length} assessments</span></p></header>
+  <OverviewHeader level="h2" kicker="Reproduce / Break / Report"><Fragment slot="title">The mark is in the account.</Fragment><p>Reproduce a published number, construct a failure, then defend what you would report instead. The measurement log records what you learned along the way.</p><p slot="footer" class="total">{visible.reduce((sum,a)=>sum+a.data.weight,0)}% <span>of the course · {visible.length} assessments</span></p></OverviewHeader>
+  <p><a class="open" href={withBase('/policies/#grade-calculator')}>Plan your marks: open the grade calculator →</a></p>
   <ol>
     {visible.map((assessment,index)=><li>
       <span class="index" aria-hidden="true">{String(index+1).padStart(2,'0')}</span>
@@ -26,10 +28,8 @@ const visible = assessments.sort((a, b) =>
   </ol>
 </section>
 <style>
-  header {max-width:65ch;margin-bottom:3rem;}
   .eyebrow,.index,.open,.total span {font:.75rem var(--at-font-mono,monospace);}
   .eyebrow {color:var(--at-text-muted);line-height:1.7;}
-  header h2 {font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.1;}
   p {line-height:1.65;}
   .total {font-size:2rem;color:var(--at-primary);border-bottom:1px solid var(--at-primary);padding-bottom:1rem;}
   .total span {color:var(--at-text-muted);}

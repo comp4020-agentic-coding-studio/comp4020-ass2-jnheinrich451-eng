@@ -1,0 +1,39 @@
+---
+interface Props {
+  kicker?: string;
+  level?: 'h1' | 'h2';
+}
+const {kicker, level: Heading = 'h1'} = Astro.props;
+---
+<header class="overview-header">
+  <p class="overview-kicker" aria-hidden={kicker ? undefined : 'true'}>{kicker || '\u00a0'}</p>
+  <Heading class="overview-title"><slot name="title" /></Heading>
+  <div class="overview-description"><slot /></div>
+  {Astro.slots.has('footer') && <div class="overview-footer"><slot name="footer" /></div>}
+</header>
+<style>
+  .overview-header {
+    width:100%;max-width:52rem;box-sizing:border-box;
+    margin:0 0 2.5rem;padding:1rem 0 0;
+  }
+  .overview-kicker {
+    font:.75rem/1.6 var(--at-font-mono,monospace);
+    letter-spacing:.06em;color:var(--at-link);margin:0 0 1rem;
+  }
+  .overview-title {
+    font-family:var(--at-font-body,sans-serif);
+    font-size:clamp(2rem,4vw,3.5rem);font-weight:700;
+    line-height:1.1;letter-spacing:-.04em;color:var(--at-link);
+    min-height:2.2em;margin:0 0 1.5rem;padding:0;border:0;
+  }
+  .overview-description {
+    font:1.05rem/1.7 var(--at-font-body,sans-serif);
+    color:var(--at-text);max-width:65ch;
+  }
+  .overview-description :global(p) {font:inherit;margin:0;}
+  .overview-footer {margin-top:1.5rem;}
+  @media(max-width:550px){
+    .overview-title {min-height:0;}
+    .overview-header {margin-bottom:2rem;}
+  }
+</style>

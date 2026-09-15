@@ -1,13 +1,16 @@
 ---
-import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import OverviewHeader from '../../components/OverviewHeader.astro';
 import SessionJourney from "../../components/SessionJourney.astro";
 import { sessionLabels, siteConfig } from "../../site-config";
 ---
 
-<ContentLayout
+<BaseLayout
   title={sessionLabels.plural}
   description={`The twelve-week teaching schedule: what happens in each ${sessionLabels.singular.toLowerCase()}, what to prepare, and what leaves the room.`}
   {...siteConfig}
 >
+  <p class="lead">The twelve-week teaching schedule: what happens in each {sessionLabels.singular.toLowerCase()}, what to prepare, and what leaves the room.</p>
+  <OverviewHeader kicker="SLOP8412 / Teaching Session / Reading"><Fragment slot="title">{sessionLabels.plural}</Fragment><p>Dive in FID to study with concepts, math codes and applications.</p></OverviewHeader>
   <SessionJourney />
-</ContentLayout>
+</BaseLayout>

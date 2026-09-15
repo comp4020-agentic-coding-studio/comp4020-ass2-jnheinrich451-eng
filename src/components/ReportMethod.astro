@@ -1,0 +1,49 @@
+---
+interface Props {thresholdOnly?:boolean}
+const {thresholdOnly=false}=Astro.props;
+---
+<div class="report-method">
+  <h4>Demonstration threshold</h4>
+  <div class="formula">
+    <math display="block" aria-label="T equals 1.6 times the maximum of b one and b two, plus 4 times their absolute difference, plus 0.001">
+      <mtable columnalign="left">
+        <mtr><mtd><mi>T</mi><mo>=</mo><mn>1.6</mn><mo>⋅</mo><mi mathvariant="normal">max</mi><mo>(</mo><msub><mi>b</mi><mn>1</mn></msub><mo>,</mo><msub><mi>b</mi><mn>2</mn></msub><mo>)</mo></mtd></mtr>
+        <mtr><mtd><mo>+</mo><mn>4</mn><mo>|</mo><msub><mi>b</mi><mn>1</mn></msub><mo>−</mo><msub><mi>b</mi><mn>2</mn></msub><mo>|</mo><mo>+</mo><mn>0.001</mn></mtd></mtr>
+      </mtable>
+    </math>
+  </div>
+  <p><var>b</var><sub>1</sub> and <var>b</var><sub>2</sub> are two independent reference-against-reference scores for the selected instrument in that repeat. <var>T</var> is the demonstration threshold.</p>
+  <p>If both candidate scores are below <var>T</var>, the rule gives no ordering. If only one is below it, the other is ranked higher. Otherwise, the larger score is ranked higher; an exact tie is assigned to F by the current implementation.</p>
+  <p>This is a heuristic, not a calibrated statistical test. “No ordering” does not establish equal distributions.</p>
+  {!thresholdOnly && <>
+  <h4>Replaying the twelve repeats</h4>
+  <div class="formula">
+    <math display="block" aria-label="u sub i equals the base seed plus 104729 times i plus one">
+      <msub><mi>u</mi><mi>i</mi></msub><mo>=</mo><msub><mi>s</mi><mtext>base</mtext></msub><mo>+</mo><mn>104729</mn><mo>(</mo><mi>i</mi><mo>+</mo><mn>1</mn><mo>)</mo>
+    </math>
+    <math display="block" aria-label="s sub i equals u sub i modulo two to the power 32">
+      <msub><mi>s</mi><mi>i</mi></msub><mo>=</mo><msub><mi>u</mi><mi>i</mi></msub><mo>mod</mo><msup><mn>2</mn><mn>32</mn></msup>
+    </math>
+  </div>
+  <p><var>s</var><sub>base</sub> is the base seed; <var>i</var> runs from 0 to 11. <var>u</var><sub>i</sub> is an intermediate value; <var>s</var><sub>i</sub> is the seed for that repeat. Modulo keeps it in the unsigned 32-bit range.</p>
+  <p>The numerical engine is <code>bench.ts</code>, using splitmix32 draws and sample covariance with denominator equal to the feature-row count minus one.</p>
+  <h4>Seeds for the additional sample-size checks</h4>
+  <div class="formula">
+    <math display="block" aria-label="v sub N equals the base seed bitwise XOR 7919 times N; the additional trial seed equals v sub N modulo two to the power 32">
+      <mtable columnalign="left">
+        <mtr><mtd><msub><mi>v</mi><mi>N</mi></msub><mo>=</mo><msub><mi>s</mi><mtext>base</mtext></msub><mo>XOR</mo><mo>(</mo><mn>7919</mn><mi>N</mi><mo>)</mo></mtd></mtr>
+        <mtr><mtd><msub><mi>s</mi><mi>N</mi></msub><mo>=</mo><msub><mi>v</mi><mi>N</mi></msub><mo>mod</mo><msup><mn>2</mn><mn>32</mn></msup></mtd></mtr>
+      </mtable>
+    </math>
+  </div>
+  <p>Here <var>N</var> is 100, 400 or 800 sequences. XOR is bitwise exclusive OR; <var>v</var><sub>N</sub> is the intermediate value and <var>s</var><sub>N</sub> is that additional trial's seed. These checks are separate from the twelve repeats above.</p>
+  </>}
+</div>
+<style>
+  .report-method {line-height:1.7;max-width:65ch;}
+  h4 {margin:1.5rem 0 .75rem;color:var(--at-link);}
+  .formula {padding:1rem;background:var(--at-bg-alt);border-left:2px solid var(--at-primary);overflow-x:auto;}
+  math {font-size:1.2rem;margin:.5rem 0;}
+  p {margin:1rem 0;}
+  @media(max-width:500px){math{font-size:1rem;}.formula{padding:.75rem;}}
+</style>

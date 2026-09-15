@@ -1,8 +1,10 @@
 ---
 import MdxPageLayout from "astro-theme-university/layouts/MdxPageLayout.astro";
 import { siteConfig } from "../site-config";
+import CourseNavigation from '../components/CourseNavigation.astro';
 ---
 
 <MdxPageLayout siteConfig={siteConfig} {...Astro.props}>
+  <Fragment slot="head"><CourseNavigation /><slot name="head" /></Fragment>
   <slot />
 </MdxPageLayout>

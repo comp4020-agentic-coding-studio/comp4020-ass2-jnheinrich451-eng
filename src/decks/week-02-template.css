@@ -1,0 +1,215 @@
+/* Approved paper layout from assets/slide template.pptx.
+ * Shared by the Week 2 lecture and its unpublished three-slide design study.
+ * Every selector is gated to these paper slides, not the rest of the site.
+ * The source's paper, typography, rule and starburst are recreated as HTML/CSS;
+ * its orange accent is replaced by the course's existing gold token.
+ */
+:root:has(.paper-slide) {
+  color-scheme: light;
+  --paper-ground: #f6f2e6;
+  --paper-ink: #171510;
+  --paper-accent: var(--at-primary);
+  --paper-muted: #625a4e;
+  --r-background-color: var(--paper-ground);
+  --r-main-color: var(--paper-ink);
+  --r-heading-color: var(--paper-ink);
+  --r-link-color: var(--at-secondary);
+  --r-link-color-hover: var(--paper-ink);
+}
+body:has(.paper-slide) a.deck-exit { color: var(--paper-muted); opacity: 1; }
+.reveal .slides:has(.paper-slide)::after { content: none; }
+.reveal .slides > section.paper-slide {
+  height: 720px;
+  box-sizing: border-box;
+  padding: 64px 72px 42px;
+  align-content: stretch;
+  justify-content: stretch;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 32px;
+  color: var(--paper-ink);
+  background: var(--paper-ground);
+}
+.reveal .paper-slide > * { margin: 0; }
+.reveal .paper-slide :is(h1, h2, h3, p) { padding: 0; margin: 0; }
+.reveal .slides section.paper-slide :is(h1, h2) {
+  display: block;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--paper-ink);
+  font-weight: 400;
+  letter-spacing: -.045em;
+  text-align: left;
+}
+.reveal .paper-slide h3 {
+  color: var(--at-secondary);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.reveal .paper-opening h1 {
+  margin-top: 44px;
+  font-size: 88px;
+  line-height: 1.08;
+  text-transform: uppercase;
+}
+.reveal .paper-rule {
+  position: relative;
+  height: 2px;
+  background: var(--paper-accent);
+  margin: 38px 0 54px;
+}
+.reveal .paper-star {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 76px;
+  height: 76px;
+  color: var(--paper-accent);
+}
+.reveal .paper-star i {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  left: 0;
+  top: calc(50% - 1px);
+  background: currentColor;
+}
+.reveal .paper-star i:nth-child(2) { transform: rotate(45deg); }
+.reveal .paper-star i:nth-child(3) { transform: rotate(90deg); }
+.reveal .paper-star i:nth-child(4) { transform: rotate(135deg); }
+.reveal .paper-rule .paper-star { position: absolute; right: 0; top: -37px; }
+.reveal .paper-slide .paper-subtitle { font-size: 27px; line-height: 1.5; }
+.reveal .paper-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  color: var(--paper-muted);
+  font: 12px var(--at-font-mono, ui-monospace, monospace);
+  letter-spacing: .04em;
+}
+.reveal .paper-foot nav { display: flex; gap: 26px; }
+.reveal .paper-foot a { color: var(--at-secondary); text-decoration: none; }
+.reveal .paper-foot a:hover { text-decoration: underline; }
+.reveal .paper-foot a:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; }
+.reveal .paper-heading { display: flex; justify-content: space-between; align-items: start; gap: 30px; }
+.reveal .paper-heading h2 { font-size: 32px; letter-spacing: -.025em; line-height: 1.2; }
+.reveal .paper-content .paper-body { display: flex; flex-direction: column; }
+.reveal .paper-equation { margin: 38px 0 44px; }
+.reveal .paper-slide .paper-equation .eq {
+  width: 100%;
+  max-height: 96px;
+  height: auto;
+  margin: 0;
+}
+/* Existing gold SVGs remain the mathematical source of truth. Dark ink makes
+ * fine equation strokes readable on paper without regenerating their paths. */
+.reveal .paper-slide .eq { filter: brightness(0); }
+.reveal .paper-terms { display: grid; grid-template-columns: 1fr 1.7fr; gap: 60px; }
+.reveal .paper-terms > div { min-width: 0; }
+.reveal .paper-terms .eq { margin: 20px 0 0; max-height: 62px; width: auto; }
+.reveal .paper-slide .paper-takeaway { font-size: 26px; line-height: 1.4; margin-top: 42px; }
+.reveal .paper-slide .paper-caveat { font-size: 17px; line-height: 1.5; color: var(--paper-muted); margin-top: 16px; }
+.reveal .paper-ending h2 { font-size: 66px; line-height: 1.12; text-transform: uppercase; }
+.reveal .paper-ending-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; margin-top: 68px; }
+.reveal .slides section.paper-slide .paper-ending-columns p { font-size: 25px; line-height: 1.5; margin-top: 18px; }
+.reveal .paper-slide .paper-next { font-size: 24px; margin-top: 54px; color: var(--at-secondary); }
+
+/* Full lecture: keep the approved frame while giving each teaching object
+ * predictable space. Formulas and figure assets themselves are unchanged. */
+.reveal .paper-lecture .paper-body { min-width: 0; min-height: 0; }
+.reveal .paper-teaching .paper-material { display: grid; gap: 22px; margin-top: 30px; }
+.reveal .paper-lecture .paper-material > * { margin: 0; min-width: 0; }
+.reveal .paper-lecture .paper-material p { font-size: 26px; line-height: 1.4; }
+.reveal .paper-lecture .paper-material .small { font-size: 18px; }
+.reveal .paper-lecture .paper-material .label { font-size: 15px; line-height: 1.4; color: var(--at-secondary); opacity: 1; }
+.reveal .paper-lecture .paper-material .eq { margin: 0; max-height: 62px; }
+.reveal .paper-lecture .paper-material .eq--wide { max-height: 78px; }
+.reveal .paper-lecture .paper-material .eq--inline { max-height: 38px; }
+.reveal .paper-lecture .split { grid-template-columns: 1fr 1fr; gap: 48px; }
+.reveal .paper-lecture .split > div { min-width: 0; }
+.reveal .paper-lecture .split > div > * + * { margin-top: 14px; }
+.reveal .paper-lecture .paper-material > p:has(img:not(.eq)) { text-align: center; line-height: 0; }
+.reveal .paper-lecture .paper-material img:not(.eq) {
+  height: 265px;
+  max-height: 265px;
+  max-width: 100%;
+  width: auto;
+  margin: 0 auto;
+  /* Darken the existing transparent diagram ink for the paper surface. */
+  filter: brightness(.65);
+}
+.reveal .paper-lecture .annot p { font-size: 24px; margin-top: 16px; }
+.reveal .paper-lecture .board { padding-left: 24px; }
+.reveal .paper-lecture .board > div + div { margin-top: 14px; }
+.reveal .paper-lecture .board .eq { max-height: 50px; }
+.reveal .paper-lecture .boxed { padding: 14px 20px; border-color: var(--paper-accent); background: transparent; border-radius: 0; }
+.reveal .paper-lecture .chain { padding-left: 26px; }
+.reveal .paper-lecture .chain li { font-size: 24px; margin-top: 14px; }
+.reveal .paper-lecture .pipeline { grid-template-columns: 1fr 1fr; gap: 28px 70px; font-size: 25px; }
+.reveal .paper-lecture .pipeline .rail { gap: 8px; }
+.reveal .paper-lecture .pipeline .join { border-color: var(--paper-accent); }
+.reveal .paper-lecture .assumptions { grid-template-columns: 1fr 1fr; gap: 28px 52px; }
+.reveal .paper-lecture .assumptions p { font-size: 22px; }
+.reveal .paper-lecture .assumptions p + p { margin-top: 10px; }
+.reveal .paper-lecture .assumptions .mono { font-size: 16px; color: var(--at-secondary); }
+.reveal .paper-lecture .bench-case { padding: 20px 24px; background: transparent; }
+.reveal .paper-lecture.paper-opening .paper-material p { font-size: 27px; max-width: 44ch; line-height: 1.5; }
+.reveal .paper-lecture.paper-ending .paper-material { margin-top: 68px; }
+.reveal .paper-lecture.paper-ending .split p { font-size: 25px; }
+.reveal .paper-lecture.paper-ending .split .label { font-size: 16px; }
+.reveal .paper-lecture.paper-ending .split .mono { font-family: inherit; }
+.reveal .paper-lecture.paper-ending .paper-material > p { margin-top: 54px; color: var(--at-secondary); font-size: 24px; }
+
+/* Preserve the site's existing portrait reading mode; no shrunken 16:9 text. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .reveal .slides > section.paper-slide { gap: 36px; padding: 4.5rem 1.25rem 2rem !important; }
+  .reveal .paper-opening h1 { margin-top: 0; font-size: clamp(2rem, 9vw, 3.3rem); line-height: 1.15; }
+  .reveal .paper-star { width: 40px; height: 40px; }
+  .reveal .paper-rule { margin: 32px 0; }
+  .reveal .paper-rule .paper-star { top: -19px; }
+  .reveal .paper-slide .paper-subtitle { font-size: 1.1rem; }
+  .reveal .paper-foot { font-size: .65rem; }
+  .reveal .paper-foot :is(nav, a) { display: none; }
+  .reveal .paper-heading { gap: 16px; }
+  .reveal .paper-heading h2 { font-size: 1.6rem; }
+  .reveal .paper-equation { margin: 32px 0; overflow-x: auto; }
+  .reveal .paper-slide .paper-equation .eq { width: 100%; min-width: 0; }
+  .reveal .paper-terms, .reveal .paper-ending-columns { grid-template-columns: 1fr; gap: 28px; }
+  .reveal .paper-slide h3 { font-size: .8rem; }
+  .reveal .paper-terms .eq { max-height: 54px; margin-top: 12px; }
+  .reveal .paper-slide .paper-takeaway { font-size: 1.15rem; margin-top: 32px; }
+  .reveal .paper-slide .paper-caveat { font-size: .95rem; }
+  .reveal .paper-desktop-break { display: none; }
+  .reveal .paper-ending h2 { font-size: clamp(1.6rem, 7.5vw, 2.5rem); }
+  .reveal .paper-ending-columns { margin-top: 36px; }
+  .reveal .slides section.paper-slide .paper-ending-columns p { font-size: 1.1rem; margin-top: 12px; }
+  .reveal .paper-slide .paper-next { font-size: 1.1rem; margin-top: 36px; }
+  .reveal .paper-lecture .paper-material { gap: 24px; margin-top: 30px; }
+  .reveal .paper-lecture .paper-material p,
+  .reveal .paper-lecture .annot p,
+  .reveal .paper-lecture .chain li,
+  .reveal .paper-lecture .assumptions p,
+  .reveal .paper-lecture.paper-ending .split p,
+  .reveal .paper-lecture.paper-opening .paper-material p,
+  .reveal .paper-lecture.paper-ending .paper-material > p { font-size: 1.1rem; }
+  .reveal .paper-lecture .paper-material .small { font-size: .95rem; }
+  .reveal .paper-lecture .paper-material .label { font-size: .8rem; }
+  .reveal .paper-lecture .split,
+  .reveal .paper-lecture .pipeline,
+  .reveal .paper-lecture .assumptions { grid-template-columns: 1fr; gap: 28px; }
+  .reveal .paper-lecture .pipeline { font-size: 1.1rem; }
+  .reveal .paper-lecture .pipeline .join { grid-column: auto; grid-row: auto; order: 1; }
+  .reveal .paper-lecture .paper-material img:not(.eq) { height: auto; max-height: none; }
+  .reveal .paper-lecture .board { padding-left: 12px; }
+  .reveal .paper-lecture .boxed { padding: 12px; }
+  .reveal .paper-lecture.paper-ending .paper-material { margin-top: 36px; }
+  .reveal .paper-lecture .paper-foot { display: grid; gap: 12px; margin-top: 36px; }
+  .reveal .paper-lecture .paper-foot nav { display: block; }
+}
+@media print {
+  .reveal .paper-foot :is(nav, a) { visibility: hidden; }
+}

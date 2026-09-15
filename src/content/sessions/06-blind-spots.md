@@ -24,7 +24,8 @@ direction and 1 in every other. Call it C and add it to the bench.
 
 Its mean is 0, because the two components cancel. Its variance along e₁ is 1,
 because 0.81 of it sits between the components and the remaining 0.19 sits
-inside them. Both moments match R exactly.
+inside them. Its population mean vector and covariance matrix match R's
+exactly.
 
 So FID(C, R) = 0.
 
@@ -34,27 +35,40 @@ Not approximately zero, and not zero because a sample came out lucky. The
 closed form takes two means and two covariances, and C's are R's, so every
 term vanishes. Zero is what the definition requires.
 
-Now plot the two along e₁. R is a single hump. C has two, separated by nearly
-two standard deviations of the component width, with little between them.
+Now plot the two along e₁. R is a single hump. C has two. Its component means
+are 1.8 apart, and each component has standard deviation √0.19 ≈ 0.436 along
+e₁. The separation is about 4.1 component standard deviations.
 Anyone shown the two histograms sorts them in a second, and the score cannot.
 
 ## The other zero
 
-A second candidate scores 0, and it is worse. Take a subsample of R itself and
-submit it as generated output. It carries R's mean and R's covariance because
-it was drawn from R, so a model that has memorised its training set is
-invisible to any statistic of the first two moments.
+A candidate that copies the evaluated reference set also scores 0. Let
+X<sub>R</sub> = (x₁, …, x<sub>N</sub>) be the reference feature vectors used
+for evaluation. Construct the candidate by copying this collection exactly,
+including any repeated vectors: X<sub>G</sub> = X<sub>R</sub>. Under the same
+moment estimators,
 
-Bimodality and memorisation are different failures that receive the same
-score, which is how you know the score is not measuring the thing it is being
-read as measuring.
+μ̂<sub>G</sub> = μ̂<sub>R</sub> and Σ̂<sub>G</sub> = Σ̂<sub>R</sub>.
+
+The hats denote the empirical mean vectors and covariance matrices computed
+from these finite collections, not the population moments of R. Consequently,
+the empirical FID is zero in exact arithmetic, although the candidate merely
+reproduces the reference data. Numerical roundoff may leave a small residual.
+An arbitrary subsample does not guarantee these equalities; nor does copying
+a training set guarantee zero against a separate evaluation set.
+
+Bimodality and copying are different failures that can both receive zero.
+For C, this is the population FID; independently drawn finite samples need
+not score zero. For the exact copy, it is the empirical FID against the
+copied reference collection. Neither zero certifies what the score is being
+read as certifying.
 
 ## Which layer broke
 
-Week 5 was the estimator failing. The quantity was the right one to want, and
-the number that came back was wrong by an amount that depended on N. This week
-the estimator is faultless. It returns exactly the right value for the
-quantity it computes, and the quantity is the wrong thing to have asked for.
+Week 5 asked how sampling distorts the population score. This week asks what
+even an exact score cannot establish. C's population moments lose its
+bimodality; the copied collection's empirical moments cannot establish
+originality. Correcting sampling bias does not repair either limitation.
 
 Hold those apart, because A2 asks which of the two your construction breaks,
 and this week's is the harder one to repair.

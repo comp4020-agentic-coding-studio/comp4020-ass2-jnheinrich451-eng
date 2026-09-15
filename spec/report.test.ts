@@ -1,19 +1,10 @@
 // Week 11's claim checker, against numpy.
 //
 // The lecture lets a reader declare a claim and the protocol behind it, then
-// runs that protocol repeatedly and says what it actually supports. Three
-// things have to be true for that to be honest rather than theatre:
-//
-//   1. a declared protocol returns the same verdict every time, so the page
-//      is not reporting the luck of one draw;
-//   2. the two instruments that can see both candidates return opposite
-//      verdicts, at every sample size the page offers, so a claim supported
-//      by one really is reversed by the other; and
-//   3. when an instrument has nothing to say, the page says so rather than
-//      ordering two floor readings.
-//
-// numpy recorded all three (figures/instruments-reference.py) and this suite
-// holds the browser engine to them.
+// runs that protocol repeatedly. These fixed-seed fixtures show the intended
+// demonstration outcomes, not a guarantee of unanimity for arbitrary samples.
+// The floor rule is a heuristic; matching numpy does not calibrate it.
+// Mixed-outcome reporting is tested separately in lecture-gadgets.test.ts.
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";

@@ -1,0 +1,57 @@
+/* Local text tokens also reach status messages created at runtime.
+   Use the theme's contrast-adjusted gold, preserving semantic plot colours. */
+.lecture-instrument {
+  --at-text: var(--at-link);
+  --at-text-muted: var(--at-link);
+  color: var(--at-text);
+}
+
+/* Shared presentation for the Week 5/8 workbenches. Calculators retain their
+   own plot colours and data hooks; runtime result cards inherit this scope. */
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) {border:0;border-block:1px solid var(--at-primary);border-radius:0;padding:clamp(1rem,3vw,2rem) 0;line-height:1.65;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) h3 {font-size:clamp(1.2rem,2vw,1.55rem);line-height:1.3;color:var(--at-link);margin:0 0 1rem;}
+.lecture-workbench .instrument-intro {margin-bottom:2.5rem;}
+.lecture-workbench .instrument-intro>p {max-width:65ch;}
+.lecture-workbench .instrument-kicker {font:.72rem var(--at-font-mono,monospace);letter-spacing:.045em;text-transform:uppercase;}
+.lecture-workbench .instrument-definitions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;margin:1.5rem 0;}
+.lecture-workbench .instrument-definitions>div {border-left:2px solid var(--at-primary);padding-left:1rem;}
+.lecture-workbench .instrument-definitions dt {font-weight:650;margin-bottom:.4rem;}
+.lecture-workbench .instrument-definitions dd {margin:0;font-size:.95rem;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) :is(.xp-controls,.xi-controls) {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:1.5rem;border-top:0;padding:0 0 2rem;margin-bottom:2rem;}
+.lecture-workbench .instrument-step,.lecture-workbench .instrument-actions {grid-column:1/-1;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) :is(.xp-label,.xi-label,.xp-num-label) {font:.72rem/1.5 var(--at-font-mono,monospace);letter-spacing:.045em;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) :is(.xp-status,.xi-status) {font: .9rem/1.65 var(--at-font-body,sans-serif);letter-spacing:0;grid-column:1/-1;margin:0;max-width:65ch;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) select {font:inherit;min-height:44px;width:100%;box-sizing:border-box;padding:.65rem .75rem;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) button {min-height:44px;border-radius:3px;font:.85rem var(--at-font-mono,monospace);padding:.65rem 1rem;}
+.lecture-workbench .instrument-actions {display:flex;flex-wrap:wrap;gap:.75rem;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) :is(button,select,summary):focus-visible,.lecture-workbench .xi-scroll:focus-visible {outline:2px solid var(--at-link);outline-offset:4px;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xp-nums {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:1.5rem 0 2.5rem;padding:1.5rem 0;border-block:1px solid var(--at-border);}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xp-num {font-size:2.1rem;margin-top:.6rem;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) figcaption,.lecture-workbench .instrument-hint {font-size:.85rem;line-height:1.65;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) :is(.xp-legend,.xi-tablenote) {font-size:.85rem;line-height:1.7;letter-spacing:0;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .instrument-result-title {margin-top:2.5rem;}
+.lecture-workbench .xi-outcomes {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;border-block:1px solid var(--at-border);padding:1.5rem 0;}
+.lecture-workbench .xi-outcomes p {font-size:.8rem;margin:0 0 .6rem;}
+.lecture-workbench .xi-outcomes strong {display:block;font-size:1.15rem;font-weight:500;line-height:1.4;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table {table-layout:fixed;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table :is(th,td) {text-align:right;vertical-align:top;white-space:normal;font-family:inherit;letter-spacing:0;padding:.8rem .5rem;overflow-wrap:anywhere;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table :is(th,td):first-child {text-align:left;width:28%;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table thead {background:var(--at-bg-alt);color:var(--at-text);}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table th {font-size:.85rem;text-transform:none;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table caption {font: .9rem/1.6 var(--at-font-body,sans-serif);letter-spacing:0;}
+.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-note {font-size:.75rem;letter-spacing:0;}
+.lecture-workbench .instrument-method {margin:1.5rem 0;border-block:1px solid var(--at-border);padding:.25rem 0;}
+.lecture-workbench .instrument-method summary {cursor:pointer;padding:.85rem 0;color:var(--at-link);font-weight:600;}
+.lecture-workbench .instrument-method>p {max-width:65ch;font-size:.95rem;}
+.lecture-workbench .instrument-formula {padding:1rem;background:var(--at-bg-alt);border-left:2px solid var(--at-primary);overflow-x:auto;}
+.lecture-workbench .instrument-formula math {font-size:1.2rem;}
+@media(max-width:550px){
+  .lecture-workbench .instrument-definitions,.lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) :is(.xp-controls,.xi-controls) {grid-template-columns:1fr;}
+  .lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xp-nums {gap:.65rem;}
+  .lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xp-num {font-size:1.4rem;}
+  .lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xp-num-label {font-size:.65rem;}
+  .lecture-workbench .xi-outcomes {grid-template-columns:1fr;}
+  .lecture-workbench .xi-outcomes>div {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-table :is(th,td) {padding:.65rem .3rem;font-size:.8rem;}
+  .lecture-workbench.lecture-instrument:is([data-xp],[data-xi]) .xi-note {font-size:.68rem;}
+}

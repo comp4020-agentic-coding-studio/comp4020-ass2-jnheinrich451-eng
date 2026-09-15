@@ -1,6 +1,20 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { expect, it } from 'vitest';
 
+it('assesses prediction versus observation without requiring a surprising result', () => {
+  const {nodes}=JSON.parse(readFileSync('dist/api/index.json','utf8'));
+  const log=nodes.find((node:{id:string})=>node.id==='assessments/measurement-log');
+  expect(log.spec).toContain('at least one entry compares a prediction recorded before measuring with the observed result and explains the agreement or discrepancy');
+  expect(log.meta.marking.criteria[1].name).toBe('Predictions checked against measurements');
+  expect(log.meta.marking.criteria.map((criterion:{weight:number})=>criterion.weight)).toEqual([50,50]);
+  expect(log.meta.weight).toBe(10);
+  const html=readFileSync('dist/assessments/measurement-log/index.html','utf8').replace(/\s+/g,' ');
+  expect(html).toContain('Expected and unexpected results are equally eligible.');
+  expect(html).toContain('what you predicted before measuring and why');
+  expect(html).not.toContain('at least one entry records a result you did not expect');
+  expect(html).not.toContain('If none did, say so');
+});
+
 it('places the ongoing measurement log before the deadline-ordered assignments', () => {
   const html = readFileSync('dist/assessments/index.html','utf8');
   const slugs = ['measurement-log','a1-reproduce-the-number','a2-break-the-number','final-report'];

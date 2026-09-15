@@ -1,0 +1,153 @@
+---
+import {getPublishedCollection} from 'astro-course-university/content';
+import {withBase} from 'astro-theme-university/url';
+import {GRADE_TARGETS,type GradeRow} from '../lib/grades';
+const assessments=(await getPublishedCollection('assessments')).sort((a,b)=>Number(b.id==='measurement-log')-Number(a.id==='measurement-log')||a.data.week-b.data.week);
+const rows:GradeRow[]=assessments.flatMap(a=>{
+  if(a.data.marking?.mode!=='weighted')throw new Error('Grade planner requires weighted rubrics');
+  return a.data.marking.criteria.map((c,i)=>({id:`${a.id}:${i}`,assessment:a.id,criterion:c.name,maximum:c.weight,weight:a.data.weight}));
+});
+if(Math.abs(assessments.reduce((sum,a)=>sum+a.data.weight,0)-100)>1e-9 || assessments.some(a=>rows.filter(r=>r.assessment===a.id).reduce((s,r)=>s+r.maximum,0)!==100))throw new Error('Grade planner weights must sum to 100');
+---
+<grade-calculator id="grade-calculator" data-rows={JSON.stringify(rows)}>
+  <header><p class="gc-kicker">Personal planning sheet / Not an official result</p><h2>What does the remaining work need to earn?</h2><p>Enter marks for each rubric criterion, out of the maximum shown. Use released marks to track progress, or hypothetical marks to test a plan. The calculator cannot tell which you entered.</p></header>
+  <p id="gc-help" class="gc-help">Blank means unknown; 0 means a marked zero. Enter raw marks, not percentages: 24 out of 30 is entered as 24. Tab moves between cells; Enter moves to the next mark.</p>
+  <noscript><p>JavaScript is needed to calculate totals. The rubric weights below remain readable.</p></noscript>
+  <div class="gc-sheet" role="region" aria-label="Criterion marks spreadsheet" tabindex="0">
+    <table><caption>Published assessment weights and rubric maxima</caption><thead><tr><th scope="col">Assessment / criterion</th><th scope="col">Mark earned</th><th scope="col">Out of</th><th scope="col">Course points</th></tr></thead>
+      {assessments.map(a=><tbody>
+        <tr class="gc-assessment"><th colspan="3" scope="rowgroup"><a href={withBase(`/assessments/${a.id}/`)}>{a.data.title}</a><span>{a.data.weight}% of course</span><span data-assessment-marks={a.id}>No marks entered</span></th><td data-assessment-total={a.id}>—</td></tr>
+        {rows.filter(r=>r.assessment===a.id).map(r=><tr><th scope="row"><label for={`gc-${r.id}`}>{r.criterion}</label></th><td><input disabled type="number" id={`gc-${r.id}`} data-grade={r.id} min="0" max={r.maximum} step="any" inputmode="decimal" autocomplete="off" aria-label={`${a.data.title}: ${r.criterion}, out of ${r.maximum}`} aria-describedby="gc-help gc-status" /></td><td>{r.maximum}</td><td data-contribution={r.id}>—</td></tr>)}
+      </tbody>)}
+    </table>
+  </div>
+  <div class="gc-actions"><button type="button" data-clear disabled>Clear marks</button><button type="button" data-export disabled>Export CSV</button></div>
+  <p id="gc-status" role="status">Waiting for the calculator.</p>
+  <p class="gc-help" data-storage>Entries stay in this browser tab. Nothing is sent to teaching staff.</p>
+  <div class="gc-summary" aria-label="Grade planning summary">
+    <div><span>Course points from entries</span><strong data-result="earned">—</strong><small>out of the final 100 points</small></div>
+    <div><span>Average on entered work</span><strong data-result="average">—</strong><small data-result="covered">No marks entered</small></div>
+    <div><span>Still available</span><strong data-result="remaining">—</strong><small>course points in blank criteria</small></div>
+  </div>
+  <p class="gc-help">The entered-work average is not your final course mark. Assessment subtotals and course points include only entered criteria. A blank is not silently marked as zero.</p>
+  <h3>Targets for the remaining work</h3>
+  <p>Required averages are weighted across all blank criteria. They are rounded <em>up</em> to two decimals for planning. Individual criteria can differ; the weighted total must reach the target.</p>
+  <div class="gc-targets">{GRADE_TARGETS.map(t=><section data-target={t.label} aria-label={`${t.name} target`}><h4>{t.label} <span>{t.minimum} / 100</span></h4><p data-needed>—</p><strong data-required>—</strong><p data-target-state>Waiting for calculation</p></section>)}</div>
+  <p class="gc-help" data-ceiling></p>
+  <details><summary>How the sheet calculates</summary><p>Course points for a criterion = its entered mark × the assessment's course weight ÷ 100. The criterion maximum decides how much course weight that entry covers.</p><p>For example, 24/30 in an assessment worth 20% contributes 4.8 course points and covers 6 points of course weight. Its entered-work average is 80%, not a final course mark of 80%.</p><p>Points needed = target − points from entries, with a minimum of zero. Required remaining average = points needed ÷ remaining course weight × 100. The sheet does not apply penalties, hurdles, moderation, supplementary assessment or institutional rounding. Meeting a numerical target here does not certify an official grade.</p><p>Display rounding never promotes an internal score to a higher band. Clearing marks removes this planner's saved tab data only. CSV export downloads your entries, not a submission.</p></details>
+</grade-calculator>
+<script>
+  import {calculateGrades,gradeBand,type GradeRow} from '../lib/grades';
+  class GradeCalculator extends HTMLElement {
+    private cleanup?:()=>void;
+    connectedCallback(){
+      const rows:GradeRow[]=JSON.parse(this.dataset.rows!);
+      const inputs=[...this.querySelectorAll<HTMLInputElement>('[data-grade]')];
+      const clear=this.querySelector<HTMLButtonElement>('[data-clear]')!;
+      const download=this.querySelector<HTMLButtonElement>('[data-export]')!;
+      const status=this.querySelector<HTMLElement>('#gc-status')!;
+      const storage=this.querySelector<HTMLElement>('[data-storage]')!;
+      // Rubric changes invalidate an old saved sheet rather than reinterpreting marks.
+      const key='slop8412:grade-planner:v1',signature=JSON.stringify(rows);
+      const entries=()=>Object.fromEntries(inputs.map(i=>[i.dataset.grade!,i.validity.badInput?'invalid':i.value]));
+      const write=(selector:string,value:string)=>{this.querySelector(selector)!.textContent=value;};
+      const fixed=(n:number)=>n.toFixed(2);
+      try{
+        const saved=JSON.parse(sessionStorage.getItem(key)??'null');
+        if(saved?.signature===signature && saved.entries && typeof saved.entries==='object')inputs.forEach(i=>{const v=saved.entries[i.dataset.grade!];if(typeof v==='string' && (v.trim()==='' || (Number.isFinite(Number(v)) && Number(v)>=0 && Number(v)<=Number(i.max))))i.value=v;});
+      }catch{storage.textContent='Tab storage is unavailable. Entries last only while this page remains open.';}
+      const update=(save=true)=>{
+        const result=calculateGrades(rows,entries());
+        for(const input of inputs)input.setAttribute('aria-invalid',String(result.errors.includes(input.dataset.grade!)));
+        download.disabled=!result.ok;
+        if(!result.ok){
+          status.textContent='Correct the highlighted marks: enter a number from 0 to the row maximum. Totals are unavailable until every entry is valid.';
+          this.querySelectorAll('[data-result],[data-contribution],[data-assessment-total],[data-assessment-marks],[data-needed],[data-required],[data-ceiling]').forEach(e=>e.textContent='—');
+          this.querySelectorAll('[data-target-state]').forEach(e=>e.textContent='Correct invalid marks first');
+          return;
+        }
+        if(save)try{sessionStorage.setItem(key,JSON.stringify({signature,entries:entries()}));}catch{storage.textContent='Tab storage is unavailable. Entries last only while this page remains open.';}
+        write('[data-result="earned"]',fixed(result.earned));
+        write('[data-result="average"]',result.average===null?'—':`${fixed(result.average)}% · ${gradeBand(result.average)}`);
+        write('[data-result="covered"]',`${fixed(result.covered)}% of course weight entered`);
+        write('[data-result="remaining"]',fixed(result.remaining));
+        for(const el of this.querySelectorAll<HTMLElement>('[data-contribution]')){const value=result.contributions[el.dataset.contribution!];el.textContent=value===null?'—':fixed(value);}
+        for(const el of this.querySelectorAll<HTMLElement>('[data-assessment-total]')){const group=result.assessments[el.dataset.assessmentTotal!];el.textContent=group.covered?fixed(group.earned):'—';}
+        for(const el of this.querySelectorAll<HTMLElement>('[data-assessment-marks]')){
+          const id=el.dataset.assessmentMarks!,group=result.assessments[id];
+          const complete=rows.filter(r=>r.assessment===id).every(r=>result.contributions[r.id]!==null);
+          el.textContent=group.covered===0?'No marks entered':complete?`${fixed(group.marks)} / 100 assessment marks · ${gradeBand(group.marks)}`:`${fixed(group.marks)} entered assessment marks · partial rubric`;
+        }
+        for(const t of result.targets){
+          const card=this.querySelector(`[data-target="${t.label}"]`)!;
+          card.querySelector('[data-needed]')!.textContent=`${fixed(t.needed)} more course points needed`;
+          const rounded=t.requiredAverage===null?null:Math.ceil(t.requiredAverage*100)/100;
+          card.querySelector('[data-required]')!.textContent=t.needed===0?'Target met by entries':!t.reachable?'Not reachable':`${rounded!.toFixed(2)}% needed`;
+          card.querySelector('[data-target-state]')!.textContent=t.needed===0?'Numerical target only; not an official award.':!t.reachable?'Even full marks on every blank criterion would fall short.':'Weighted average on remaining criteria';
+        }
+        write('[data-ceiling]',`With full marks on all blank criteria, the highest total would be ${fixed(result.ceiling)} / 100. Planning bands use unrounded values.`);
+        status.textContent=result.covered===0?'No marks entered. All course weight is still available.':`${inputs.filter(i=>i.value!=='').length} of ${rows.length} criteria entered. Calculations updated locally.`;
+      };
+      const onInput=()=>update();
+      const onKey=(event:KeyboardEvent)=>{if(event.key==='Enter' && event.target instanceof HTMLInputElement && inputs.includes(event.target)){event.preventDefault();inputs[(inputs.indexOf(event.target)+1)%inputs.length].focus();}};
+      const onClear=()=>{inputs.forEach(i=>i.value='');try{sessionStorage.removeItem(key);}catch{}update(false);};
+      const onExport=()=>{
+        const result=calculateGrades(rows,entries());if(!result.ok)return;
+        const quote=(s:string)=>`"${s.replaceAll('"','""')}"`;
+        const csv=[['Assessment','Criterion','Assessment weight %','Mark entered','Criterion maximum','Course points'],...rows.map(r=>[r.assessment,r.criterion,String(r.weight),entries()[r.id],String(r.maximum),result.contributions[r.id]===null?'':String(result.contributions[r.id])])].map(row=>row.map(quote).join(',')).join('\r\n');
+        const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+        const a=document.createElement('a');a.href=url;a.download='slop8412-grade-plan.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      };
+      inputs.forEach(i=>i.disabled=false);clear.disabled=false;
+      this.addEventListener('input',onInput);this.addEventListener('keydown',onKey);clear.addEventListener('click',onClear);download.addEventListener('click',onExport);update(false);
+      this.dataset.ready='true';
+      this.cleanup=()=>{this.removeEventListener('input',onInput);this.removeEventListener('keydown',onKey);clear.removeEventListener('click',onClear);download.removeEventListener('click',onExport);};
+    }
+    disconnectedCallback(){this.cleanup?.();}
+  }
+  if(!customElements.get('grade-calculator'))customElements.define('grade-calculator',GradeCalculator);
+</script>
+<style>
+  grade-calculator {display:block;border-block:1px solid var(--at-primary);padding-block:2rem;margin-block:2rem 3rem;scroll-margin-top:8rem;}
+  h2 {font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.2;border:0;margin:0 0 1rem;color:var(--at-link);}
+  h3 {font-size:1.4rem;color:var(--at-link);margin-top:2rem;}
+  p {line-height:1.7;max-width:70ch;}
+  .gc-kicker,.gc-help,small,#gc-status {font-size:.8rem;line-height:1.65;}
+  .gc-kicker {font-family:var(--at-font-mono);color:var(--at-link);}
+  .gc-sheet {overflow-x:auto;border:1px solid var(--at-border);}
+  table {width:100%;border-collapse:collapse;table-layout:fixed;margin:0;}
+  caption {text-align:left;padding:1rem;font-size:.85rem;}
+  th,td {padding:.8rem .6rem;border-bottom:1px solid var(--at-border);text-align:right;vertical-align:middle;overflow-wrap:anywhere;font-size:.85rem;}
+  th:first-child {width:48%;text-align:left;font-weight:500;}
+  thead {background:var(--at-bg-alt);color:var(--at-link);}
+  thead th {font-size:.75rem;}
+  .gc-assessment {background:var(--at-bg-alt);color:var(--at-link);}
+  .gc-assessment th {font-weight:650;}
+  .gc-assessment span {display:block;font:.7rem/1.7 var(--at-font-mono);margin-top:.4rem;}
+  input {box-sizing:border-box;width:100%;min-height:44px;padding:.5rem .3rem;border:1px solid var(--at-border);border-radius:3px;background:var(--at-bg);color:var(--at-text);font:inherit;font-variant-numeric:tabular-nums;}
+  input[aria-invalid="true"] {outline:2px solid var(--at-link);outline-offset:2px;border-style:dashed;}
+  td {font-variant-numeric:tabular-nums;}
+  .gc-actions {display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;}
+  button {min-height:44px;padding:.6rem 1rem;color:var(--at-link);background:var(--at-bg);border:1px solid var(--at-primary);font:inherit;cursor:pointer;}
+  button:disabled {opacity:.5;cursor:not-allowed;}
+  :is(input,button,summary,.gc-sheet):focus-visible {outline:2px solid var(--at-link);outline-offset:3px;}
+  .gc-summary {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem;border-block:1px solid var(--at-border);padding:1.5rem 0;}
+  .gc-summary span,.gc-summary small {display:block;font-size:.75rem;}
+  .gc-summary strong {display:block;font-size:clamp(1.3rem,2.4vw,2rem);font-weight:500;color:var(--at-link);margin:.5rem 0;}
+  .gc-targets {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
+  .gc-targets section {padding:1rem;border:1px solid var(--at-border);min-width:0;}
+  h4 {display:flex;justify-content:space-between;gap:.5rem;color:var(--at-link);font-size:1.4rem;margin:0;}
+  h4 span {font:.75rem/2 var(--at-font-mono);}
+  .gc-targets p {font-size:.8rem;}
+  .gc-targets strong {font-size:1.2rem;color:var(--at-link);}
+  details {margin-top:1.5rem;font-size:.9rem;line-height:1.7;}
+  summary {cursor:pointer;color:var(--at-link);padding:.6rem 0;}
+  @media(max-width:550px){
+    .gc-summary,.gc-targets {grid-template-columns:1fr;gap:.8rem;}
+    .gc-summary>div {border-bottom:1px solid var(--at-border);padding-bottom:.8rem;}
+    th,td {padding:.6rem .3rem;font-size:.75rem;}
+    th:first-child {width:43%;}
+    thead th {font-size:.65rem;}
+    .gc-assessment th {font-size:.8rem;}
+  }
+</style>

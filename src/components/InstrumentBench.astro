@@ -9,22 +9,29 @@
  *
  * The first row is the one that makes the rest readable: R against a second
  * independent draw of R, so every column carries the number it produces when
- * nothing changed at all. A cell near its column's floor is a cell that
- * instrument cannot distinguish from no change, and both candidates are
- * invisible to one instrument each.
+ * the population distribution is unchanged. Labels use a two-baseline
+ * demonstration heuristic, not a calibrated detection or equivalence test.
  *
  * The numbers and the two claims are measured in
  * figures/instruments-reference.py and held by spec/instruments.test.ts.
  * Arithmetic is src/lib/bench.ts. Nothing here leaves the browser.
  */
+import '../styles/lecture-instruments.css';
+import ReportMethod from './ReportMethod.astro';
 interface Props {
   heading?: string;
 }
 const { heading } = Astro.props;
 ---
 
-<section class="instruments" data-xi aria-label={heading ?? "The instrument bench"}>
+<section class="instruments lecture-instrument lecture-workbench" data-xi aria-label={heading ?? "The instrument bench"}>
   {heading && <h2>{heading}</h2>}
+  <header class="instrument-intro">
+    <p class="instrument-kicker">Record → transform → compare</p>
+    <h3>Does the ranking survive a different instrument?</h3>
+    <p>Score the same sets of synthetic numerical sequences three ways. These sequences model temporal structure; they are not real images or videos.</p>
+    <dl class="instrument-definitions"><div><dt>E / Level shift</dt><dd>Add 1 to every frame value, preserving sequence order.</dd></div><div><dt>F / Reordered frames</dt><dd>Shuffle the values within each sequence, preserving the values themselves.</dd></div></dl>
+  </header>
 
   <noscript>
     <p>
@@ -35,6 +42,7 @@ const { heading } = Astro.props;
   </noscript>
 
   <form class="xi-controls" data-xi-controls>
+    <h3 class="instrument-step">1. Set the recordings</h3>
     <div class="xi-field">
       <label class="xi-label" for="xi-d">frames per sequence</label>
       <select id="xi-d" name="d">
@@ -58,11 +66,12 @@ const { heading } = Astro.props;
         <option value="0.9" selected>0.9</option>
       </select>
     </div>
-    <button type="button" data-xi-run>measure</button>
+    <div class="instrument-actions"><button type="button" data-xi-run>Measure all three instruments</button></div>
     <p class="xi-status" role="status" data-xi-status>
       One set of recordings, three instruments, nine numbers.
     </p>
   </form>
+  <h3>2. Inspect what changed</h3>
 
   <figure class="xi-plot">
     <div class="xi-toggle" role="group" aria-label="Which candidate to draw">
@@ -76,20 +85,19 @@ const { heading } = Astro.props;
       data-xi-sequences
       aria-label="Five reference sequences beside five sequences from the selected candidate"></svg>
     <figcaption data-xi-plot-caption>
-      Five recordings of each. Every frame value in F is a frame value R produced;
-      only the order is gone.
+      Press measure to draw the first five recordings from the scored sets.
     </figcaption>
   </figure>
 
+  <h3 class="instrument-result-title">3. Compare the measurements</h3>
+  <div class="xi-outcomes" data-xi-verdict aria-live="polite"><p>Press measure to compare the three rankings.</p></div>
   <p class="xi-tablenote">
-    Every cell is a score at the same N, from the same recordings, through one
-    instrument. The first row is what that instrument reports when nothing
-    changed at all. A cell is marked when it does not rise above that floor by
-    more than the floor itself moves between draws, which is the point at which
-    the instrument has told you nothing.
+    Each candidate's recordings are reused across all three columns. The first
+    row compares independent draws from R. Labels use a classroom heuristic,
+    not a significance test or proof that an instrument is blind.
   </p>
 
-  <div class="xi-scroll">
+  <div class="xi-scroll" role="region" aria-label="Nine measured scores" tabindex="0">
   <table class="xi-table">
     <caption>Nine scores, one set of recordings.</caption>
     <thead>
@@ -123,13 +131,17 @@ const { heading } = Astro.props;
   </table>
   </div>
 
-  <p class="xi-verdict" aria-live="polite" data-xi-verdict>
-    Press measure. Then decide which column you would put in a paper.
-  </p>
+  <details class="instrument-method"><summary>What each instrument measures</summary>
+    <dl class="instrument-definitions"><div><dt>Frame marginals</dt><dd>Pools individual values, discarding their order.</dd></div><div><dt>Frame to frame</dt><dd>Uses consecutive differences. A constant shift cancels.</dd></div><div><dt>Whole sequence</dt><dd>Uses all coordinates jointly, retaining their relationships.</dd></div></dl>
+    <div class="instrument-formula"><math display="block" aria-label="Delta x sub t equals x sub t plus one minus x sub t"><mi>Δ</mi><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><msub><mi>x</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>x</mi><mi>t</mi></msub></math></div>
+    <p>Here <var>x</var><sub>t</sub> is a frame value, <var>t</var> its position and Δ<var>x</var><sub>t</sub> the difference to the next frame. Each instrument fits a Gaussian to its resulting features.</p>
+  </details>
+  <details class="instrument-method"><summary>How the demonstration threshold works</summary><div data-xi-rule><ReportMethod thresholdOnly /></div></details>
 </section>
 
 <script>
-  import { ar1, belowFloor, instrumentTable, recordings, type SequenceCandidate } from "../lib/bench";
+  import { belowFloor, instrumentMeasurement, type SequenceCandidate } from "../lib/bench";
+  import { LENS_NAME } from "../lib/bench-report";
 
   const svgNS = "http://www.w3.org/2000/svg";
   const SHIFT = 1;
@@ -153,6 +165,8 @@ const { heading } = Astro.props;
 
     let showing: SequenceCandidate = "shuffle";
     let seed = 20260928;
+    let generation = 0;
+    let measured: ReturnType<typeof instrumentMeasurement> | null = null;
 
     const params = () => ({
       n: Number(nSelect.value),
@@ -178,10 +192,13 @@ const { heading } = Astro.props;
     };
 
     const drawSequences = () => {
-      const { n, d, rho } = params();
-      const reference = ar1(Math.min(n, 5), d, rho, seed);
-      const candidate = recordings(showing, { ...params(), n: Math.min(n, 5), seed: seed + 9973 });
       sequences.replaceChildren();
+      if (!measured) {
+        plotCaption.textContent = 'Press measure to draw the first five recordings from the scored sets.';
+        return;
+      }
+      const reference = measured.reference.slice(0,5);
+      const candidate = measured.candidates[showing].slice(0,5);
 
       const panels = [
         { x0: 34, x1: 268, rows: reference, colour: "var(--xi-ref)", name: "R, the reference" },
@@ -228,86 +245,70 @@ const { heading } = Astro.props;
           label("frame 1", { x: panel.x0, y: 230, fill: "var(--xi-axis-ink)" }),
         );
         sequences.append(
-          label(`frame ${params().d}`, { x: panel.x1, y: 230, fill: "var(--xi-axis-ink)", "text-anchor": "end" }),
+          label(`frame ${reference[0].length}`, { x: panel.x1, y: 230, fill: "var(--xi-axis-ink)", "text-anchor": "end" }),
         );
       }
       plotCaption.textContent =
         showing === "shift"
-          ? "Five recordings of each. E has the shape R produced, raised by the same amount at every frame."
-          : "Five recordings of each. Every frame value in F is a frame value R produced; only the order is gone.";
+          ? "First five scored recordings from R and E. E shifts an independent draw from R's process; these are not paired before-and-after traces."
+          : "First five scored recordings from R and F. F permutes an independent draw from R's process, not the reference traces shown on the left.";
     };
 
     const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
     const measure = async () => {
+      const current = ++generation;
+      const snapshot = params();
       runButton.disabled = true;
       status.textContent = "scoring nine cells…";
+      try {
       await frame();
-      const table = instrumentTable(params());
-      // A second, independent R-against-R draw. One floor says where a column
-      // sits; two say how much it moves, which is what "cannot distinguish"
-      // has to mean. Without it a column whose floor rounds to zero calls a
-      // cell that also rounds to zero a detection.
-      const second = instrumentTable({ ...params(), seed: (seed ^ 0x7f4a7c15) >>> 0 });
+      if (current !== generation || !section.isConnected) return;
+      measured = instrumentMeasurement(snapshot);
+      const {table} = measured;
+      drawSequences();
       const lenses = ["frame", "temporal", "joint"] as const;
       const kinds = ["plain", "shift", "shuffle"] as const;
-      const blindTo: Record<string, string[]> = { frame: [], temporal: [], joint: [] };
-      const seen: Record<string, Set<string>> = {
-        frame: new Set(),
-        temporal: new Set(),
-        joint: new Set(),
-      };
 
       for (const lens of lenses) {
-        const floors = [table.plain[lens], second.plain[lens]];
+        const floors = measured.floors[lens];
         for (const kind of kinds) {
           const value = table[kind][lens];
           const cell = pick<HTMLElement>(`[data-xi-cell="${kind}/${lens}"]`);
           // One floor rule for the whole course, in src/lib/bench.ts.
           const blind = kind !== "plain" && belowFloor(value, floors);
-          if (!blind && kind !== "plain") seen[lens].add(kind);
-          if (blind) blindTo[lens].push(kind === "shift" ? "E" : "F");
           cell.textContent = value.toFixed(3);
           cell.classList.toggle("xi-blind", blind);
           cell.classList.toggle("xi-seen", !blind && kind !== "plain");
           if (blind) {
             const note = document.createElement("span");
             note.className = "xi-note";
-            note.textContent = "indistinguishable from no change";
+            note.textContent = "not flagged by the heuristic";
             cell.append(note);
           }
         }
       }
 
-      const named = lenses
-        .filter((lens) => blindTo[lens].length > 0)
-        .map((lens) => {
-          const name =
-            lens === "frame" ? "Frame marginals" : lens === "temporal" ? "Frame to frame" : "Whole sequence";
-          return `${name} cannot tell ${blindTo[lens].join(" or ")} from no change.`;
-        });
-      // A ranking is only worth reporting when the candidate it puts on top
-      // is one that instrument can actually see. Two floor readings in a
-      // column are not an ordering, however they happen to fall.
-      const worst = (lens: "frame" | "temporal" | "joint") =>
-        table.shift[lens] > table.shuffle[lens] ? "shift" : "shuffle";
-      const ranks = (lens: "temporal" | "joint") =>
-        seen[lens].has(worst(lens)) ? worst(lens) : null;
-      const byChange = ranks("temporal");
-      const byWhole = ranks("joint");
-      const letter = (kind: string) => (kind === "shift" ? "E" : "F");
-      verdict.textContent =
-        (named.length ? named.join(" ") + " " : "Every instrument registered both candidates. ") +
-        (byChange && byWhole && byChange !== byWhole
-          ? `Frame to frame calls ${letter(byChange)} the worse candidate and whole sequence calls ${letter(byWhole)} the worse one, at the same N, from the same recordings.`
-          : byChange && byWhole
-            ? "The two instruments that can see both candidates agree on the order, this time."
-            : "One of these instruments reported nothing above its own floor for either candidate, so it has no ordering to give.");
-      status.textContent = "Nine numbers, one set of recordings. None of them is the score.";
-      runButton.disabled = false;
+      verdict.replaceChildren();
+      for(const lens of lenses){
+        const card=document.createElement('div'),name=document.createElement('p'),result=document.createElement('strong');
+        name.textContent=LENS_NAME[lens];
+        result.textContent=measured.verdicts[lens]==='neither'?'No ordering':measured.verdicts[lens]==='shift'?'E ranked higher':'F ranked higher';
+        card.dataset.xiLens=lens;card.append(name,result);verdict.append(card);
+      }
+      status.textContent = `Scored and plotted the same recordings. Seed ${snapshot.seed}; N = ${snapshot.n}; d = ${snapshot.d}; rho = ${snapshot.rho}.`;
+      } catch (error) {
+        if (current === generation) reset('Calculation failed. Measure again.');
+        console.error(error);
+      } finally {
+        if (current === generation) runButton.disabled = false;
+      }
     };
 
     const reset = (message: string) => {
+      generation++;
+      measured = null;
+      runButton.disabled = false;
       for (const cell of section.querySelectorAll<HTMLElement>("[data-xi-cell]")) {
         cell.textContent = " ";
         cell.classList.remove("xi-blind", "xi-seen");
@@ -392,22 +393,23 @@ const { heading } = Astro.props;
     padding: 0.25rem 0.4rem;
     border: 1px solid var(--at-border, #c9c2b4);
     border-radius: 3px;
-    background: var(--at-white, #fff);
+    background: var(--at-bg);
+    color: var(--at-text);
   }
 
   .xi-controls button,
   .xi-toggle button {
     padding: 0.4rem 0.9rem;
-    border-radius: 999px;
+    border-radius: 3px;
     border: 1px solid var(--at-primary);
     background: var(--at-primary);
-    color: var(--at-white, #fff);
+    color: var(--at-on-primary);
     cursor: pointer;
   }
 
   .xi-toggle button[aria-pressed="false"] {
     background: transparent;
-    color: var(--at-secondary, var(--at-primary));
+    color: var(--at-text);
   }
 
   .xi-controls button[disabled] {
@@ -488,13 +490,13 @@ const { heading } = Astro.props;
   /* The theme paints the header band itself; naming the brand colour here
      put gold text on gold. */
   .xi-table thead th {
-    text-transform: uppercase;
-    white-space: nowrap;
+    text-transform: none;
+    white-space: normal;
   }
 
   .xi-table tbody th {
     font-weight: normal;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .xi-table td {

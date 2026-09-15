@@ -5,6 +5,27 @@ interface Node {id:string;type:string;meta:Record<string,unknown>;body?:string}
 const {nodes}=JSON.parse(readFileSync('dist/api/index.json','utf8')) as {nodes:Node[]};
 const lectures=nodes.filter(n=>n.type==='lectures');
 describe('4+1 lecture rhythm',()=>{
+  it('links every lecture from its session catalogue entry and Course sequence',()=>{
+    const catalogue=readFileSync('dist/sessions/index.html','utf8');
+    const branches=(html:string)=>[...html.matchAll(/<a\b[^>]*class="lecture-branch"[^>]*href="([^"]+)"/g)].map(match=>match[1]);
+    expect(branches(catalogue)).toHaveLength(lectures.length);
+    for(const session of nodes.filter(n=>n.type==='sessions')){
+      const lecture=lectures.find(n=>n.meta.week===session.meta.week);
+      const entry=catalogue.match(new RegExp(`<article[^>]*id="session-week-${session.meta.week}"[\\s\\S]*?</article>`))?.[0];
+      expect(entry).toBeDefined();
+      const page=readFileSync(`dist/${session.id}/index.html`,'utf8');
+      const sequence=page.match(/<nav[^>]*class="session-scale"[\s\S]*?<\/nav>/)?.[0];
+      expect(sequence).toBeDefined();
+      for(const html of [entry!,sequence!]){
+        const links=branches(html);
+        expect(links).toHaveLength(lecture?1:0);
+        if(lecture){
+          expect(links[0]).toMatch(new RegExp(`/${lecture.id}/$`));
+          expect(existsSync(`dist/${lecture.id}/index.html`)).toBe(true);
+        }
+      }
+    }
+  });
   it('separates the live introduction from four spaced formal lectures',()=>{
     expect(lectures).toHaveLength(5);
     expect(lectures.filter(n=>n.meta.lecture_format==='demo').map(n=>n.meta.week)).toEqual([1]);

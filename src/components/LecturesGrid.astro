@@ -2,6 +2,7 @@
 import { getPublishedCollection } from "astro-course-university/content";
 import { withBase } from "astro-theme-university/url";
 import { formatCourseDate } from "../lib/dates";
+import OverviewHeader from './OverviewHeader.astro';
 
 const lectures = (await getPublishedCollection("lectures")).sort((a,b)=>a.data.week-b.data.week);
 const introductions = lectures.filter(lecture=>lecture.data.lecture_format==='demo');
@@ -16,12 +17,11 @@ const carriesInstrument = (lecture: (typeof lectures)[number]) => {
 ---
 
 <div class="lecture-programme">
-  <header class="programme-intro">
-    <p class="programme-kicker">SLOP8412 / Lecture programme</p>
-    <h2>The number stays.<br/>The questions change.</h2>
+  <OverviewHeader level="h2" kicker="SLOP8412 / Lecture programme">
+    <Fragment slot="title">The number stays.<br/>The questions change.</Fragment>
     <p>Deriving the score is only the first defence of it. Return with evidence from the bench to question the estimate, test the instrument and justify the report.</p>
-    <p class="programme-count">{formal.length} formal lectures <span aria-hidden="true">+</span> {introductions.length} live introduction</p>
-  </header>
+    <p slot="footer" class="programme-count">{formal.length} formal lectures <span aria-hidden="true">+</span> {introductions.length} live introduction</p>
+  </OverviewHeader>
   {introductions.map(lecture=>(
     <article class="programme-demo" data-lecture-week={lecture.data.week}>
       <div class="programme-date"><span>Week {String(lecture.data.week).padStart(2,'0')}</span><time datetime={lecture.data.date.toISOString().slice(0,10)}>{formatCourseDate(lecture.data.date)}</time></div>
@@ -47,25 +47,22 @@ const carriesInstrument = (lecture: (typeof lectures)[number]) => {
 </div>
 <style>
   .lecture-programme {color:var(--at-text);margin-block:1rem 3rem;}
-  .programme-intro {padding-block:1rem 2.5rem;}
   .programme-kicker,.programme-date,.programme-count,.programme-link,.programme-section-heading>span {font:.75rem/1.6 var(--at-font-mono,monospace);}
   .programme-kicker {color:var(--at-primary);letter-spacing:.06em;margin:0 0 .7rem;}
-  .programme-intro h2 {font-size:clamp(2.2rem,4.4vw,4rem);line-height:1.06;letter-spacing:-.045em;margin:0 0 1.4rem;color:var(--at-text);}
-  .programme-intro>p:not(.programme-kicker):not(.programme-count) {max-width:62ch;line-height:1.75;}
   .programme-count {margin:1.5rem 0 0;display:flex;gap:.85rem;flex-wrap:wrap;color:var(--at-primary);}
   .programme-demo,.programme-lecture {display:grid;grid-template-columns:6.5rem minmax(0,1fr) auto;align-items:center;gap:1.8rem;padding:2rem 0;}
   .programme-demo {border-block:1px solid var(--at-primary);margin-bottom:3rem;}
   .programme-date {display:flex;flex-direction:column;gap:.3rem;color:var(--at-primary);}
   .programme-date time {font-size:.65rem;color:var(--at-text);}
   h3 {font-size:clamp(1.35rem,2.2vw,2rem);line-height:1.2;letter-spacing:-.025em;margin:0 0 .7rem;}
-  h3 a {color:var(--at-text);text-decoration:none;}
+  h3 a {color:var(--at-primary);text-decoration:none;}
   h3 a:hover {color:var(--at-primary);text-decoration:underline;text-underline-offset:.2em;}
   .programme-demo p:not(.programme-kicker),.programme-body>p:not(.programme-kicker) {font-size:.95rem;line-height:1.7;max-width:58ch;margin:0;}
   .programme-link {display:inline-block;justify-self:start;text-decoration:none;border-bottom:1px solid var(--at-primary);padding:.6rem 0;min-height:2.75rem;box-sizing:border-box;}
   .programme-link:hover {color:var(--at-text);}
   .programme-link:focus-visible,h3 a:focus-visible {outline:2px solid var(--at-primary);outline-offset:5px;}
   .programme-section-heading {display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem;}
-  .programme-section-heading h2 {font-size:1.15rem;margin:0;border:0;padding:0;color:var(--at-text);}
+  .programme-section-heading h2 {font-size:1.15rem;margin:0;border:0;padding:0;color:var(--at-link);}
   .programme-section-heading>span {font-size:.65rem;color:var(--at-primary);}
   .programme-sequence {list-style:none;margin:0;padding:0;}
   .programme-sequence>li {margin:0;padding:0;border-bottom:1px solid var(--at-border);}
