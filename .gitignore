@@ -1,4 +1,6 @@
 node_modules/
+# pnpm's content store, if a local install ever puts it inside the repo
+.pnpm-store/
 dist/
 *.log
 

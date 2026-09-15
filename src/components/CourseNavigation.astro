@@ -1,0 +1,106 @@
+---
+import {getPublishedCollection} from 'astro-course-university/content';
+import {withBase} from 'astro-theme-university/url';
+const [lectures,sessions,assessments,people]=await Promise.all([
+  getPublishedCollection('lectures'),getPublishedCollection('sessions'),getPublishedCollection('assessments'),getPublishedCollection('people'),
+]);
+const weekly=(entries:typeof lectures|typeof sessions,collection:string)=>[...entries].sort((a,b)=>a.data.week-b.data.week).map(entry=>({href:`/${collection}/${entry.id}/`,label:`Week ${String(entry.data.week).padStart(2,'0')} · ${entry.data.title}`}));
+const groups=[
+  {id:'lectures',label:'Lectures',items:weekly(lectures,'lectures')},
+  {id:'sessions',label:'Sessions',items:weekly(sessions,'sessions')},
+  {id:'assessments',label:'Assessment',items:[...assessments].sort((a,b)=>a.id==='measurement-log'?-1:b.id==='measurement-log'?1:+a.data.due-+b.data.due).map(entry=>({href:`/assessments/${entry.id}/`,label:entry.data.title}))},
+  {id:'workspace',label:'Workspace',items:[{href:'/workspace/',label:'Python workspace'},{href:'/math-lab/',label:'Maths lab'},{href:'/image-lab/',label:'Image lab'}]},
+  {id:'people',label:'People',items:[...people].sort((a,b)=>a.data.title.localeCompare(b.data.title)).map(entry=>({href:`/people/${entry.id}/`,label:entry.data.title}))},
+];
+---
+<!-- Head-safe inert templates; the fixed university navigation remains the fallback. -->
+{groups.map(group=><template data-course-menu={group.id} data-course-target={withBase(`/${group.id}/`)} data-course-label={group.label}>
+  <div class="course-jump-panel" id={`course-jump-${group.id}`} popover="auto">
+    <p>{group.label} / Jump to a page</p>
+    <ul>{group.items.map(item=><li><a href={withBase(item.href)}>{item.label}</a></li>)}</ul>
+    {group.id!=='workspace' && <a class="course-jump-overview" href={withBase(`/${group.id}/`)}>All {group.label.toLowerCase()} →</a>}
+  </div>
+</template>)}
+<script>
+  let controller:AbortController|undefined;
+  function setupCourseNavigation(){
+    controller?.abort();
+    controller=new AbortController();
+    const {signal}=controller;
+    const nav=document.querySelector('.at-nav');
+    if(!nav)return;
+    // Reinitialisation is safe even without a document swap.
+    nav.querySelectorAll('[data-course-trigger],.course-jump-panel').forEach(el=>el.remove());
+    const panels:HTMLElement[]=[];
+    for(const template of document.querySelectorAll<HTMLTemplateElement>('template[data-course-menu]')){
+      const anchor=[...nav.querySelectorAll<HTMLAnchorElement>('.at-nav-links > li > a')].find(a=>a.getAttribute('href')===template.dataset.courseTarget);
+      if(!anchor)continue;
+      const item=anchor.parentElement!;
+      item.classList.add('course-jump-item');
+      item.append(template.content.cloneNode(true));
+      const panel=item.querySelector<HTMLElement>('.course-jump-panel')!;
+      const button=document.createElement('button');
+      button.type='button';button.dataset.courseTrigger=template.dataset.courseMenu;
+      button.className='course-jump-trigger';
+      button.setAttribute('aria-label',`Jump to ${template.dataset.courseLabel!.toLowerCase()}`);
+      button.setAttribute('aria-controls',panel.id);button.setAttribute('aria-expanded','false');
+      button.setAttribute('popovertarget',panel.id);
+      anchor.after(button);panels.push(panel);
+      for(const link of panel.querySelectorAll<HTMLAnchorElement>('a')){
+        if(new URL(link.href).pathname===location.pathname)link.setAttribute('aria-current','page');
+      }
+      const position=()=>{
+        const rect=button.getBoundingClientRect(),width=Math.min(370,innerWidth-24);
+        panel.style.width=`${width}px`;
+        panel.style.left=`${Math.max(12,Math.min(rect.right-width,innerWidth-width-12))}px`;
+        panel.style.top=`${rect.bottom+8}px`;
+        panel.style.maxHeight=`${Math.max(100,Math.min(520,innerHeight-rect.bottom-24))}px`;
+      };
+      panel.addEventListener('beforetoggle',event=>{
+        const open=(event as ToggleEvent).newState==='open';
+        if(open)position();
+        button.setAttribute('aria-expanded',String(open));
+      },{signal});
+      button.addEventListener('keydown',event=>{
+        if(event.key==='ArrowDown'){
+          event.preventDefault();panel.showPopover();
+          (panel.querySelector<HTMLAnchorElement>('[aria-current="page"]')??panel.querySelector<HTMLAnchorElement>('a'))?.focus();
+        }
+      },{signal});
+      panel.addEventListener('keydown',event=>{
+        const links=[...panel.querySelectorAll<HTMLAnchorElement>('a')],at=links.indexOf(document.activeElement as HTMLAnchorElement);
+        let next=at;
+        if(event.key==='ArrowDown')next=(at+1)%links.length;
+        else if(event.key==='ArrowUp')next=(at-1+links.length)%links.length;
+        else if(event.key==='Home')next=0;
+        else if(event.key==='End')next=links.length-1;
+        else return;
+        event.preventDefault();links[next]?.focus();
+      },{signal});
+    }
+    const close=()=>panels.forEach(panel=>{if(panel.matches(':popover-open'))panel.hidePopover();});
+    addEventListener('resize',close,{signal});
+    document.addEventListener('scroll',event=>{if(!panels.some(panel=>event.target instanceof Node&&panel.contains(event.target)))close();},{signal,capture:true});
+    nav.querySelector('.at-nav-toggle')?.addEventListener('click',close,{signal});
+    document.addEventListener('astro:before-swap',()=>{close();controller?.abort();},{signal,once:true});
+  }
+  setupCourseNavigation();
+  document.addEventListener('astro:page-load',setupCourseNavigation);
+</script>
+<style is:global>
+  /* Give direct links and dropdown groups the same row geometry. A dropdown
+     trigger is 44px high; plain Policies must share its centre, not sit above it. */
+  .at-nav-links>li {display:flex;align-items:center;gap:0;min-height:44px;}
+  .course-jump-trigger {display:grid;place-items:center;border:0;background:transparent;color:var(--at-link);font:inherit;min-width:28px;min-height:44px;padding:0 .2rem;cursor:pointer;}
+  .course-jump-trigger::after {content:'';width:.4rem;height:.4rem;border:solid currentColor;border-width:0 1px 1px 0;transform:translateY(-.1rem) rotate(45deg);}
+  .course-jump-trigger[aria-expanded="true"] {background:var(--at-bg-alt);}
+  .course-jump-trigger:focus-visible,.course-jump-panel a:focus-visible {outline:2px solid var(--at-link);outline-offset:-2px;}
+  .course-jump-panel {position:fixed;inset:auto;margin:0;padding:.8rem;box-sizing:border-box;border:1px solid var(--at-primary);border-radius:3px;background:var(--at-bg);color:var(--at-text);box-shadow:0 12px 40px #0003;overflow-y:auto;overscroll-behavior:contain;}
+  .course-jump-panel>p {font:.7rem var(--at-font-mono,monospace);text-transform:uppercase;color:var(--at-link);margin:.5rem .5rem .8rem;}
+  .course-jump-panel ul {list-style:none;padding:0;margin:0;}
+  .course-jump-panel li {margin:0;padding:0;}
+  .at-nav .course-jump-panel a {display:block;padding:.75rem .6rem;min-height:44px;box-sizing:border-box;font-size:.9rem;line-height:1.45;text-decoration:none;border-radius:0;white-space:normal;}
+  .at-nav .course-jump-panel a[aria-current="page"] {border-left:2px solid var(--at-primary);background:var(--at-bg-alt);color:var(--at-link);}
+  .course-jump-overview {border-top:1px solid var(--at-border);margin-top:.5rem;}
+  @media(max-width:639px){.course-jump-trigger {margin-left:auto;min-width:44px;}.course-jump-panel{max-width:calc(100vw - 24px);}}
+</style>

@@ -221,6 +221,28 @@ A third, found while building the week 8 grid:
   silently and only in the render, which is why it was found by looking at a
   screenshot rather than by any check.
 
+## A check proves the tree it ran on
+
+`pnpm check` reads the working tree, and the working tree holds whatever is
+lying in it, including other people's uncommitted work. On 15 September eight
+commits in a row went out after a green check while HEAD itself could not
+build: two of them had swept in edits importing layouts and a component that
+had never been committed, and another carried someone else's engine refactor
+under a message that did not mention it. Every check passed because every
+check ran on a machine where those files existed.
+
+- **Look before staging.** Run `git diff -- <file>` on every file about to be
+  committed. If the working copy carries edits that are not yours, either
+  leave the file out or say in the commit message exactly what else it
+  carries.
+- **Commit by path.** `git commit -- <paths>`, never a bulk add.
+- **Stage, check, then commit.** `spec/self-contained.test.ts` reads the git
+  index rather than the disk and fails when a tracked file imports an
+  untracked one, so running `pnpm check` with the commit staged tests the
+  commit rather than the desk it was made at.
+- **Before a ship, check HEAD alone.** Build a clean worktree of HEAD and run
+  `pnpm check` there. Nothing else proves the tree that will be marked.
+
 ## These rules become checks
 
 The brief asks for checks in `spec/` "protecting the promises your course makes
