@@ -1899,3 +1899,39 @@ Both slips were statements that were true of one page and false of the
 course, the same class as the home page's "same four distributions". No test
 in `spec/` can see that class, and reading non-adjacent weeks side by side is
 what found both, which is also exactly how the marker reads.
+
+## 2026-09-15 21:50 — Sessions, batch 2: week 9's price
+
+**Asked:**
+
+> yes proceed!
+
+**Result:**
+Week 9 argued that human evaluation lost to the score on price, and stated
+the price once. It now has a calculator: move the difference to detect and
+the trials, hours and dollars move with it, and each press of "halve it"
+reports the factor it multiplied the bill by. That is the refined response's
+third clause for a week that had none: the reader produces the argument
+instead of accepting a sentence.
+
+**Verified:**
+The formula was checked before it was trusted: simulating the experiment at
+the computed sizes detected the difference in 0.800, 0.798 and 0.802 of
+20,000 runs, against 0.80 promised. The browser holds Python's constants to
+twelve places. The spec also holds the session's own sentences to the
+calculator on the same page, and on its first run with the engine in place
+it failed on one: the prose said about 7,200 dollars where its arithmetic
+gives 7,360. Driven at both viewports; 185 of 185 tests.
+
+**Commit:** [`d96a3b9`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/d96a3b9)
+
+**What happened:**
+Two of the three things the tests caught were mine. I had asserted that
+halving the difference quadruples the cost everywhere, and at a 10% error
+rate it is 3.84; the session's word is right where the session uses it, so
+the claim was narrowed to where it holds and the page now reports the
+factor it measures. The driving found the rest: a status line that outlived
+the setting it described, a total that broke mid-figure on a phone, and a
+chart marker rounding $7,360 to "$7k" beside a readout and a sentence that
+both said otherwise. Each was a number disagreeing with its own label, the
+class this record keeps returning to.
