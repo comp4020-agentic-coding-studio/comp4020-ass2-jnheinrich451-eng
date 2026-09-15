@@ -3,7 +3,7 @@ import HeroBenchmark from "../components/HeroBenchmark.astro";
 import ZeroScore from "../components/ZeroScore.astro";
 import Card from "astro-theme-university/components/Card.astro";
 import CardGrid from "astro-theme-university/components/CardGrid.astro";
-import BaseLayout from "astro-theme-university/layouts/BaseLayout.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import TwelveWeeks from "../components/TwelveWeeks.astro";
 import benchFigure from "../assets/figures/fid-vs-invN.svg";
 import { courseMeta } from "../course-config";
@@ -27,9 +27,10 @@ const titleWords = courseMeta.title.split(" ");
         </p>
         <h1 id="course-title">{titleWords.map((word) => <span>{word}</span>)}</h1>
         <p class="audit-hero__claim">
-          FID governs what counts as progress in generative modelling. It is
-          biased, sample-size dependent, and routinely compared across
-          incompatible conditions.
+          FID decides what counts as progress in generative modelling. Change
+          the sample size and the score moves; change the network and the
+          ranking can reverse. A reported FID is a claim about a protocol, not
+          a property of a model.
         </p>
         <a class="audit-hero__action" href="#benchmark">Inspect the benchmark <span aria-hidden="true">&darr;</span></a>
       </div>
@@ -52,13 +53,13 @@ const titleWords = courseMeta.title.split(" ");
   <section class="audit-panel" id="benchmark" aria-labelledby="benchmark-title">
     <header class="audit-panel__header">
       <p>Benchmark 00 / closed-form truth</p>
-      <p class="audit-panel__status"><span aria-hidden="true"></span> Instrument online</p>
     </header>
     <div class="audit-panel__intro">
       <h2 id="benchmark-title">A perfect score can miss the shape.</h2>
       <p>
-        The candidates do not change. The instrument does. Every week asks
-        what the same four distributions let the score see, hide, or reverse.
+        The candidates you start with never change; the measurement does.
+        Each time the measurement is caught out, the bench gains a candidate
+        built to show how.
       </p>
     </div>
     <dl class="audit-panel__readout">
@@ -112,9 +113,10 @@ const titleWords = courseMeta.title.split(" ");
 
   <h2>The bench</h2>
   <p>
-    One reference set and three candidates, in the 2048 dimensions a feature
-    extractor would have produced, chosen so that every score on them has a
-    closed form and can be checked by hand.
+    It starts as one reference set and two candidates, in the 2048
+    dimensions a feature extractor would have produced, chosen so that every
+    score has a closed form and can be checked by hand. It does not stay that
+    size. Every candidate after B arrives in the week the score is caught out.
   </p>
   <dl class="bench">
     <dt>R</dt>
@@ -125,8 +127,23 @@ const titleWords = courseMeta.title.split(" ");
     <dd>N(0, 1.1&middot;I). Mean exact, covariance too wide. FID 4.88.</dd>
     <dt>C</dt>
     <dd>
-      A bimodal mixture with R&rsquo;s mean and R&rsquo;s covariance. FID 0,
-      and visibly wrong.
+      Week 6. A bimodal mixture with R&rsquo;s mean and R&rsquo;s covariance.
+      FID 0, and visibly wrong.
+    </dd>
+    <dt>D</dt>
+    <dd>
+      Week 6, and yours. Scores worse than A while looking closer to R, under
+      a measure you write down before you look at the number.
+    </dd>
+    <dt>E</dt>
+    <dd>
+      Week 8, once the recordings have time in them. Every frame raised by
+      the same amount.
+    </dd>
+    <dt>F</dt>
+    <dd>
+      Week 8. Every frame kept, their order destroyed. Two instruments
+      disagree about whether E or F is the worse candidate.
     </dd>
   </dl>
   <figure class="bench-figure">
@@ -143,18 +160,29 @@ const titleWords = courseMeta.title.split(" ");
     </figcaption>
   </figure>
 
-  <h2>Where to go next</h2>
+  <section class="home-destinations" aria-labelledby="home-destinations-title">
+  <h2 id="home-destinations-title">Where to go next</h2>
   <CardGrid columns={2}>
+    <Card title="Lectures" href="/lectures/">
+      <p>A live bench in week 1, then four lectures. From week 5 each puts an instrument in the page, so you produce the failure before the lecture names it.</p>
+    </Card>
     <Card title={sessionLabels.plural} href="/sessions/">
-      <p>The weekly schedule and what happens in each teaching session.</p>
+      <p>Twelve weeks on one bench, each re-scoring it with that week&rsquo;s method.</p>
     </Card>
     <Card title="Assessment" href="/assessments/">
-      <p>What is marked, what it is worth, and when it is due.</p>
+      <p>Reproduce a published number in week 5 and break one in week 9. The final report proposes what to print instead, and the measurement log runs under all of it.</p>
+    </Card>
+    <Card title="Workspace" href="/workspace/">
+      <p>Python and a maths lab in the browser, for the experiments the sessions set. Nothing to install.</p>
     </Card>
     <Card title="People" href="/people/">
-      <p>Who teaches the course and how to reach them.</p>
+      <p>The convenor, and the tutor who holds the seed and re-scores the bench every Monday.</p>
+    </Card>
+    <Card title="Policies" href="/policies/">
+      <p>The rules every assessment links to, stated once, and a calculator for planning your grade.</p>
     </Card>
   </CardGrid>
+  </section>
 </BaseLayout>
 
 <script>
@@ -403,20 +431,6 @@ const titleWords = courseMeta.title.split(" ");
 
   .audit-panel__header p {
     margin: 0;
-  }
-
-  .audit-panel__status {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .audit-panel__status span {
-    width: 0.5rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--at-success);
-    box-shadow: 0 0 0 3px var(--at-success-soft);
   }
 
   .audit-panel__intro {
