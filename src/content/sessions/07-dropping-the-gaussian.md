@@ -6,6 +6,7 @@ description:
 week: 7
 date: 2026-09-21
 arc: B
+instrument: three-scores
 required_reading: binkowski-2018
 further_reading: [kynkaanniemi-2019, naeem-2020]
 spec:
@@ -21,7 +22,8 @@ related:
 
 Score the bench three ways this week, on the same samples, at the same N,
 through the same instrument. FID∞, KID, and a precision and recall pair. Three
-numbers where there was one, and they will not agree about candidate C.
+numbers where there was one. They will agree about candidate C, which is the
+trouble, and they will not agree about A and B.
 
 ## Two numbers instead of one
 
@@ -54,12 +56,28 @@ estimated means and covariances, and the expected value of a nonlinear
 function is not that function of the expected value, so the sample size leaks
 into the answer and week 5 is the result.
 
-## What each one catches
+## What none of them catches
 
-C carries R's mean and R's covariance, so FID scores it 0 and FID∞ scores it 0
-as well, both being functions of the first two moments and nothing else. A
-polynomial kernel is not, and coverage is not. Both notice that C's samples
-sit in two lumps where R's sit in one.
+C carries R's mean and covariance, so FID and FID∞ both score it 0. The new
+scores do no better on this bench.
+
+KID's kernel is cubic, so it compares moments up to the third, and C was built
+to match R through the third: it is symmetric, so its third moments vanish as
+R's do. C first differs at the fourth moment, where a cubic kernel never looks.
+No sample size changes that.
+
+Density and coverage compare distances to nearest neighbours, and C differs
+from R along one coordinate in 2,048. Coverage notices C's missing middle in
+two dimensions and has lost it by sixteen.
+
+What the three disagree about is A against B. The closed form puts B closer.
+KID separates A from R and, at these sample sizes, not B. Density and coverage
+call B almost entirely missing: its samples sit slightly further out, and in
+2,048 dimensions that is enough to leave nearly every one of R's
+neighbourhoods.
+
+The instrument below runs all three, one press at a time. Look for C in each
+strip, then change the dimension.
 
 ## Exercise
 

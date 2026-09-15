@@ -6,6 +6,7 @@ import SpecList from "astro-course-university/components/SpecList.astro";
 import ContentLayout from "../../layouts/ContentLayout.astro";
 import EntryMeta from "../../components/EntryMeta.astro";
 import RatingCost from "../../components/RatingCost.astro";
+import ThreeScores from "../../components/ThreeScores.astro";
 import Readings from "../../components/Readings.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
 import SessionScale from "../../components/SessionScale.astro";
@@ -30,6 +31,7 @@ const arc = typeof loose.arc === "string" ? loose.arc : undefined;
 // `instrument` is another loose key: a session names the in-page instrument
 // it hands the reader, and the page renders only that one.
 const wantsRatingCost = loose.instrument === "rating-cost";
+const wantsThreeScores = loose.instrument === "three-scores";
 ---
 
 <ContentLayout
@@ -43,10 +45,12 @@ const wantsRatingCost = loose.instrument === "rating-cost";
     <span>On this page</span>
     {headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text.replace(/#$/, '').trim()}</a>)}
     {wantsRatingCost && <a href="#rating-cost">Cost a rating study</a>}
+    {wantsThreeScores && <a href="#three-scores">Does anything see C?</a>}
     {activity && <a href="#workspace-activity">Try it in the workspace</a>}
   </nav>
   <div class="session-reading"><Content /></div>
   {wantsRatingCost && <RatingCost />}
+  {wantsThreeScores && <ThreeScores />}
   {activity && <WorkspaceActivity activity={activity} />}
   <Readings required={loose.required_reading} further={loose.further_reading} />
   <SpecList spec={session.data.spec}>

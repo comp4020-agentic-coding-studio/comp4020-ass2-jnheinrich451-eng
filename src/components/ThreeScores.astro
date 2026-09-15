@@ -1,0 +1,375 @@
+---
+/**
+ * Does anything see C? Week 7's three scores, run in the page.
+ *
+ * The session scores the bench three ways and the reader expects the new
+ * scores to catch what FID missed. On the bench as built none of them does.
+ * Each press draws R, R again, A, B and C and scores the last four against R
+ * under KID, density and coverage; each score gets a strip with one dot per
+ * press per candidate, so the reader watches C land inside R-again's cloud in
+ * every strip while A and B are pulled apart, and pulled apart differently
+ * by each score. The dimension control is the other half of the lesson:
+ * coverage does see C at d = 2, where the one bimodal coordinate is half the
+ * distance, and loses it by d = 16.
+ *
+ * FID is shown in closed form rather than estimated: its blindness to C is
+ * exact by construction, and its estimate at d = 2048 is week 5's bias.
+ * Arithmetic is src/lib/bench.ts, pinned by spec/week7.test.ts.
+ */
+const CONFIGS = [
+  { d: 2, n: 1000 },
+  { d: 16, n: 1000 },
+  { d: 2048, n: 250 },
+];
+---
+
+<section class="three-scores" id="three-scores" data-ts aria-label="Does anything see C?">
+  <noscript>
+    <p>
+      The instrument needs JavaScript. It scores R drawn again, A, B and C
+      against R under KID, density and coverage, one press at a time.
+    </p>
+  </noscript>
+
+  <form class="ts-controls" data-ts-controls>
+    <div class="ts-field">
+      <label class="ts-label" for="ts-dim">dimensions d</label>
+      <select id="ts-dim" name="d">
+        {CONFIGS.map((c) => (
+          <option value={c.d} selected={c.d === 2048}>
+            {c.d === 2048 ? `${c.d}, the bench (N = ${c.n})` : `${c.d} (N = ${c.n})`}
+          </option>
+        ))}
+      </select>
+    </div>
+    <button type="button" data-ts-run>draw and score</button>
+    <button type="button" class="ts-ghost" data-ts-clear>clear</button>
+    <p class="ts-status" role="status" data-ts-status>
+      Each press draws R, then scores R drawn again, A, B and C against it.
+    </p>
+  </form>
+
+  <p class="ts-fid" data-ts-fid>&nbsp;</p>
+  <p class="ts-legend">
+    In every strip the rows run, top to bottom,
+    <span class="ts-key ts-key--r">R drawn again</span>, <span class="ts-key ts-key--ab">A</span>,
+    <span class="ts-key ts-key--ab">B</span> and <span class="ts-key ts-key--c">C</span>. One dot is
+    one press.
+  </p>
+
+  <div class="ts-strips">
+    <figure>
+      <figcaption><strong>KID</strong>, cubic kernel. Higher is further from R.</figcaption>
+      <svg viewBox="0 0 560 150" role="img" data-ts-strip="kid" aria-label="KID for each candidate, one dot per press"></svg>
+    </figure>
+    <figure>
+      <figcaption><strong>Density</strong>. Near 1 is like R; lower means fewer samples where R's are.</figcaption>
+      <svg viewBox="0 0 560 150" role="img" data-ts-strip="density" aria-label="Density for each candidate, one dot per press"></svg>
+    </figure>
+    <figure>
+      <figcaption><strong>Coverage</strong>. Near R-again's value is like R; lower means parts of R are missed.</figcaption>
+      <svg viewBox="0 0 560 150" role="img" data-ts-strip="coverage" aria-label="Coverage for each candidate, one dot per press"></svg>
+    </figure>
+  </div>
+
+  <p class="ts-verdict" aria-live="polite" data-ts-verdict>
+    Press a few times. Then look for C in each strip.
+  </p>
+</section>
+
+<script>
+  import { benchClosedForm, prepareReference, sampleBench, scoreAgainst, type BenchKind } from "../lib/bench";
+
+  type Score = "kid" | "density" | "coverage";
+  const SCORES: Score[] = ["kid", "density", "coverage"];
+  const ROWS: BenchKind[] = ["R", "A", "B", "C"];
+  const LABEL: Record<BenchKind, string> = { R: "R again", A: "A", B: "B", C: "C" };
+  const N_FOR: Record<number, number> = { 2: 1000, 16: 1000, 2048: 250 };
+  const svgNS = "http://www.w3.org/2000/svg";
+
+  // The theme runs Astro's ClientRouter, so this module is not re-executed
+  // when a visitor navigates back; everything lives in setup().
+  function setup() {
+    const section = document.querySelector("[data-ts]");
+    if (!(section instanceof HTMLElement) || section.dataset.tsReady === "true") return;
+    section.dataset.tsReady = "true";
+
+    const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
+    const dim = pick<HTMLSelectElement>("#ts-dim");
+    const status = pick<HTMLElement>("[data-ts-status]");
+    const verdict = pick<HTMLElement>("[data-ts-verdict]");
+    const fid = pick<HTMLElement>("[data-ts-fid]");
+    const runButton = pick<HTMLButtonElement>("[data-ts-run]");
+
+    let seed = 20260921;
+    let presses: Array<Record<BenchKind, Record<Score, number>>> = [];
+
+    const node = (name: string, attrs: Record<string, string | number>) => {
+      const element = document.createElementNS(svgNS, name);
+      for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
+      return element;
+    };
+    const label = (text: string, attrs: Record<string, string | number>) => {
+      const element = node("text", { "font-size": 12, "font-family": "var(--at-font-mono, monospace)", ...attrs });
+      element.textContent = text;
+      return element;
+    };
+    const fmt = (score: Score, value: number) => (score === "kid" ? value.toFixed(4) : value.toFixed(3));
+
+    const drawStrip = (score: Score) => {
+      const svg = pick<SVGSVGElement>(`[data-ts-strip="${score}"]`);
+      svg.replaceChildren();
+      const left = 86;
+      const right = 540;
+      const values = presses.flatMap((p) => ROWS.map((r) => p[r][score]));
+      let lo = values.length ? Math.min(...values) : 0;
+      let hi = values.length ? Math.max(...values) : 1;
+      if (hi - lo < 1e-9) {
+        lo -= 0.5;
+        hi += 0.5;
+      }
+      const pad = (hi - lo) * 0.06;
+      lo -= pad;
+      hi += pad;
+      const x = (v: number) => left + ((right - left) * (v - lo)) / (hi - lo);
+      ROWS.forEach((row, index) => {
+        const y = 28 + index * 32;
+        svg.append(node("line", { x1: left, x2: right, y1: y, y2: y, stroke: "var(--ts-rule)" }));
+        svg.append(label(LABEL[row], { x: left - 10, y: y + 4, "text-anchor": "end", fill: row === "C" ? "var(--ts-c)" : "var(--ts-ink)" }));
+        for (const p of presses) {
+          svg.append(
+            node("circle", {
+              cx: x(p[row][score]).toFixed(1),
+              cy: y,
+              r: row === "C" ? 5.5 : 4.5,
+              fill: row === "C" ? "var(--ts-c)" : row === "R" ? "var(--ts-r)" : "var(--ts-ab)",
+              opacity: 0.8,
+            }),
+          );
+        }
+      });
+      if (values.length) {
+        svg.append(label(fmt(score, lo + pad), { x: left, y: 146, fill: "var(--ts-ink)" }));
+        svg.append(label(fmt(score, hi - pad), { x: right, y: 146, fill: "var(--ts-ink)", "text-anchor": "end" }));
+      }
+    };
+
+    // Whether a candidate's dots overlap R-again's on these presses: a plain
+    // description of what the strip shows, not a significance test.
+    const separates = (row: BenchKind, score: Score) => {
+      const r = presses.map((p) => p.R[score]);
+      const c = presses.map((p) => p[row][score]);
+      return Math.max(Math.min(...r), Math.min(...c)) > Math.min(Math.max(...r), Math.max(...c));
+    };
+
+    const describe = () => {
+      if (presses.length < 3) {
+        verdict.textContent = `${presses.length} press${presses.length === 1 ? "" : "es"}. Press a few more before reading the strips.`;
+        return;
+      }
+      const parts = SCORES.map((score) => {
+        const apart = (["A", "B", "C"] as BenchKind[]).filter((row) => separates(row, score));
+        const name = score === "kid" ? "KID" : score === "density" ? "Density" : "Coverage";
+        return apart.length ? `${name} pulls ${apart.join(" and ")} away from R again.` : `${name} separates nothing from R again.`;
+      });
+      const cSeen = SCORES.filter((score) => separates("C", score));
+      verdict.textContent =
+        `On these ${presses.length} presses: ${parts.join(" ")} ` +
+        (cSeen.length
+          ? `C's dots leave R-again's range under ${cSeen.map((s) => (s === "kid" ? "KID" : s)).join(" and ")}.`
+          : "C's dots stay inside R-again's range under all three.");
+    };
+
+    const redraw = () => {
+      for (const score of SCORES) drawStrip(score);
+      describe();
+    };
+
+    const showFid = () => {
+      const d = Number(dim.value);
+      fid.textContent =
+        `FID in closed form at d = ${d}: R 0, A ${benchClosedForm("A", d).toFixed(d < 16 ? 4 : 2)}, ` +
+        `B ${benchClosedForm("B", d).toFixed(d < 16 ? 4 : 2)}, C 0. C's zero is exact; that is week 6.`;
+    };
+
+    const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    const run = async () => {
+      runButton.disabled = true;
+      const d = Number(dim.value);
+      const n = N_FOR[d] ?? 250;
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      status.textContent = `drawing R and preparing its neighbourhoods in ${d.toLocaleString("en-US")} dimensions…`;
+      await frame();
+      const ref = prepareReference(sampleBench("R", n, d, seed));
+      const press = {} as Record<BenchKind, Record<Score, number>>;
+      for (const [i, row] of ROWS.entries()) {
+        status.textContent = `scoring ${LABEL[row]}…`;
+        await frame();
+        press[row] = scoreAgainst(ref, sampleBench(row, n, d, (seed + 7919 * (i + 1)) >>> 0));
+      }
+      presses.push(press);
+      status.textContent = `Press ${presses.length} at d = ${d}, N = ${n}.`;
+      redraw();
+      runButton.disabled = false;
+    };
+
+    const reset = (message: string) => {
+      presses = [];
+      status.textContent = message;
+      showFid();
+      redraw();
+      verdict.textContent = "Press a few times. Then look for C in each strip.";
+    };
+
+    runButton.addEventListener("click", () => void run());
+    pick<HTMLButtonElement>("[data-ts-clear]").addEventListener("click", () => reset("Cleared."));
+    dim.addEventListener("change", () =>
+      reset("A different dimension is a different bench. The last dots would not belong on these strips."),
+    );
+    reset("Each press draws R, then scores R drawn again, A, B and C against it.");
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .three-scores {
+    --ts-r: #9d968b;
+    --ts-ab: #c9782a;
+    --ts-c: #b5495b;
+    --ts-rule: var(--at-border, #e4ddd0);
+    --ts-ink: var(--at-text-muted, #6f675c);
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+    scroll-margin-top: calc(var(--at-nav-height, 4rem) + 7rem);
+  }
+
+  .ts-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-sm) var(--at-spacing-lg);
+    align-items: end;
+    border-block-end: 1px solid var(--at-border, #e4ddd0);
+    padding-block-end: var(--at-spacing-sm);
+  }
+
+  .ts-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .ts-label,
+  .ts-status,
+  .three-scores button {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.07em;
+  }
+
+  .ts-label {
+    text-transform: uppercase;
+  }
+
+  .ts-field select {
+    font: inherit;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+  }
+
+  .three-scores button {
+    white-space: nowrap;
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: var(--at-primary);
+    color: var(--at-white, #fff);
+    cursor: pointer;
+  }
+
+  .three-scores button.ts-ghost {
+    background: transparent;
+    color: var(--at-secondary, var(--at-primary));
+  }
+
+  .three-scores button[disabled] {
+    opacity: 0.5;
+    cursor: progress;
+  }
+
+  .ts-status {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--at-text-muted, #6f675c);
+    letter-spacing: 0.02em;
+  }
+
+  .ts-fid {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    margin-block: var(--at-spacing-md, 1rem);
+  }
+
+  /* The strips' own row labels are too small to read on a phone, and on
+     this instrument which row is C is the whole question, so the order is
+     also stated in page text, which stays legible at any width. */
+  .ts-legend {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    margin-block: 0 var(--at-spacing-md, 1rem);
+  }
+
+  .ts-key {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-weight: 600;
+  }
+
+  .ts-key--r {
+    color: var(--ts-r);
+  }
+
+  .ts-key--ab {
+    color: var(--ts-ab);
+  }
+
+  .ts-key--c {
+    color: var(--ts-c);
+  }
+
+  .ts-strips {
+    display: grid;
+    gap: var(--at-spacing-lg);
+  }
+
+  .ts-strips figure {
+    margin: 0;
+  }
+
+  .ts-strips figcaption {
+    font-size: var(--at-font-size-sm);
+    margin-block-end: var(--at-spacing-xs);
+  }
+
+  .ts-strips svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklab, var(--at-primary) 4%, transparent);
+    border: 1px solid var(--at-border, #e4ddd0);
+    border-radius: 4px;
+  }
+
+  .ts-verdict {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+    margin-block-start: var(--at-spacing-lg);
+  }
+</style>

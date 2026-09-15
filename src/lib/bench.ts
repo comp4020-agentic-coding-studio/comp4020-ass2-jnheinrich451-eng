@@ -227,15 +227,12 @@ export function score(
 
 // --- the week 5 extrapolator ----------------------------------------------
 // Week 1 shows that an estimate at one N disagrees with the truth. Week 5
-// asks what the disagreement is made of, and the answer is a bias that falls
-// like 1/N on top of noise that does not. Averaging several draws at each of
-// several sample sizes and fitting a straight line against 1/N reads the
-// bias off at the intercept: the score the estimator would report with
-// unlimited samples.
+// asks what the disagreement is made of. A linear fit in 1/N models the
+// leading bias trend; sampling variation and higher-order bias can remain.
+// Its intercept estimates the unlimited-sample limit, not the bias itself.
 //
-// Both halves of that are pinned in spec/bench-extrapolation.test.ts,
-// including the half a demonstration is tempted to omit - the intercept is
-// unbiased but not precise.
+// spec/bench-extrapolation.test.ts checks numerical agreement and variability,
+// not a proof of unbiasedness for finite sample-size ladders.
 
 /** Independent seeds for rung i, trial j of a ladder started at `seed`. */
 function ladderSeed(seed: number, rung: number, trial: number): number {
@@ -407,22 +404,44 @@ export function lensScore(lens: Lens, reference: Recording, candidate: Recording
   return frechet(left.mean, left.cov, right.mean, right.cov);
 }
 
-/** Every candidate through every instrument, the grid the lecture shows. */
-export function instrumentTable(
-  params: RecordingParams,
-): Record<SequenceCandidate, Record<Lens, number>> {
+export type InstrumentTable = Record<SequenceCandidate, Record<Lens, number>>;
+
+/** The recordings and their scores travel together; plots must use these rows. */
+export function instrumentExperiment(params: RecordingParams) {
   const reference = ar1(params.n, params.d, params.rho, params.seed);
-  const out = {} as Record<SequenceCandidate, Record<Lens, number>>;
+  const table = {} as InstrumentTable;
+  const candidates = {} as Record<SequenceCandidate, Recording>;
   const kinds: SequenceCandidate[] = ["plain", "shift", "shuffle"];
   const lenses: Lens[] = ["frame", "temporal", "joint"];
   kinds.forEach((kind, index) => {
     // Every candidate is drawn independently of the reference, so a cell
     // never borrows luck from the draw it is compared against.
     const drawn = recordings(kind, { ...params, seed: (params.seed + 9973 * (index + 1)) >>> 0 });
-    out[kind] = {} as Record<Lens, number>;
-    for (const lens of lenses) out[kind][lens] = lensScore(lens, reference, drawn);
+    candidates[kind] = drawn;
+    table[kind] = {} as Record<Lens, number>;
+    for (const lens of lenses) table[kind][lens] = lensScore(lens, reference, drawn);
   });
-  return out;
+  return {reference, candidates, table};
+}
+
+/** Compatibility wrapper for the numerical reference checks. */
+export function instrumentTable(params: RecordingParams): InstrumentTable {
+  return instrumentExperiment(params).table;
+}
+
+/** Shared two-baseline protocol for both the grid and every claim-checker run. */
+export function instrumentMeasurement(params: RecordingParams) {
+  const experiment = instrumentExperiment(params);
+  const secondSeed = (params.seed ^ 0x7f4a7c15) >>> 0;
+  const reference = ar1(params.n, params.d, params.rho, secondSeed);
+  const plain = recordings('plain', {...params, seed: (secondSeed + 9973) >>> 0});
+  const floors = {} as Record<Lens, number[]>;
+  const verdicts = {} as Record<Lens, Verdict>;
+  for (const lens of ['frame','temporal','joint'] as Lens[]) {
+    floors[lens] = [experiment.table.plain[lens], lensScore(lens, reference, plain)];
+    verdicts[lens] = verdictFor(lens, experiment.table, floors[lens]);
+  }
+  return {...experiment, floors, verdicts};
 }
 
 // --- week 11: what a declared protocol actually supports -------------------
@@ -432,12 +451,8 @@ export function instrumentTable(
 // the week 11 checker and the test suite cannot disagree about them.
 
 /**
- * Is this score indistinguishable from the instrument's own floor?
- *
- * A floor reading says where a column sits. Two of them say how far it moves
- * between draws, and a cell has to clear both to count as a detection. The
- * last term is the precision the pages print, so a column whose floor rounds
- * to zero cannot call another rounding-to-zero cell a detection.
+ * Classroom heuristic, not a significance test or proof of equal distributions.
+ * The constants define a demonstration threshold; they are not confidence levels.
  */
 export function belowFloor(value: number, floors: number[]): boolean {
   const highest = Math.max(...floors);
@@ -477,12 +492,148 @@ export function reportRuns(params: RecordingParams, repeats: number): ReportRuns
   const floors = { frame: [], temporal: [], joint: [] } as Record<Lens, number[]>;
   let last = {} as Record<SequenceCandidate, Record<Lens, number>>;
   for (let i = 0; i < repeats; i++) {
-    const table = instrumentTable({ ...params, seed: (params.seed + 104729 * (i + 1)) >>> 0 });
+    const measured = instrumentMeasurement({ ...params, seed: (params.seed + 104729 * (i + 1)) >>> 0 });
+    const {table} = measured;
     for (const lens of lenses) {
       floors[lens].push(table.plain[lens]);
-      verdicts[lens].push(verdictFor(lens, table));
+      verdicts[lens].push(measured.verdicts[lens]);
     }
     last = table;
   }
   return { verdicts, floors, last };
+}
+
+// --- week 7: does anything see C? -----------------------------------------
+// Week 7 scores the bench three ways. The course once claimed KID and
+// coverage both notice C's two lumps; measured, on the bench as built,
+// neither does. KID's kernel is cubic and C matches R in every moment up to
+// order three; density and coverage compare nearest-neighbour distances, in
+// which C's one bimodal coordinate is diluted among the rest. What the three
+// scores disagree about at d = 2048 is A against B. Pinned against numpy in
+// spec/week7.test.ts (figures/week7-reference.py).
+
+export type BenchKind = "R" | "A" | "B" | "C";
+
+/** N draws of one bench member in d dimensions: R, A, B, or the mixture C. */
+export function sampleBench(kind: BenchKind, n: number, d: number, seed: number): number[][] {
+  const normal = gaussian(rng(seed));
+  const coin = rng((seed ^ 0x1f123bb5) >>> 0);
+  const spread = Math.sqrt(1.1);
+  const component = Math.sqrt(0.19);
+  const out: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row = new Array<number>(d);
+    for (let j = 0; j < d; j++) row[j] = normal();
+    if (kind === "A") for (let j = 0; j < d; j++) row[j] += 0.05;
+    else if (kind === "B") for (let j = 0; j < d; j++) row[j] *= spread;
+    else if (kind === "C") row[0] = (coin() < 0.5 ? -0.9 : 0.9) + component * normal();
+    out.push(row);
+  }
+  return out;
+}
+
+/** The population FID of a bench member in d dimensions; C's is exactly zero. */
+export function benchClosedForm(kind: BenchKind, d: number): number {
+  if (kind === "A") return closedForm({ shift: 0.05, v: 1, d });
+  if (kind === "B") return closedForm({ shift: 0, v: 1.1, d });
+  return 0;
+}
+
+function flatten(rows: number[][]): Float64Array {
+  const n = rows.length;
+  const d = rows[0].length;
+  const out = new Float64Array(n * d);
+  for (let i = 0; i < n; i++) for (let j = 0; j < d; j++) out[i * d + j] = rows[i][j];
+  return out;
+}
+
+/** Inner products of every row of a against every row of b. */
+function inner(a: Float64Array, na: number, b: Float64Array, nb: number, d: number, symmetric: boolean): Float64Array {
+  const g = new Float64Array(na * nb);
+  for (let i = 0; i < na; i++) {
+    const oi = i * d;
+    for (let j = symmetric ? i : 0; j < nb; j++) {
+      const oj = j * d;
+      let s = 0;
+      for (let k = 0; k < d; k++) s += a[oi + k] * b[oj + k];
+      g[i * nb + j] = s;
+      if (symmetric) g[j * nb + i] = s;
+    }
+  }
+  return g;
+}
+
+/** The reference half of every score, computed once per draw of R. */
+export interface PreparedReference {
+  n: number;
+  d: number;
+  k: number;
+  flat: Float64Array;
+  norms: Float64Array;
+  /** Sum over i != j of the cubic kernel on R against itself. */
+  kernelSum: number;
+  /** Distance from each reference point to its k-th nearest neighbour. */
+  radius: Float64Array;
+}
+
+export function prepareReference(real: number[][], k = 5): PreparedReference {
+  const n = real.length;
+  const d = real[0].length;
+  const flat = flatten(real);
+  const g = inner(flat, n, flat, n, d, true);
+  const norms = new Float64Array(n);
+  for (let i = 0; i < n; i++) norms[i] = g[i * n + i];
+  let kernelSum = 0;
+  const radius = new Float64Array(n);
+  const row = new Float64Array(n - 1);
+  for (let i = 0; i < n; i++) {
+    let c = 0;
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      kernelSum += (g[i * n + j] / d + 1) ** 3;
+      row[c++] = Math.sqrt(Math.max(norms[i] + norms[j] - 2 * g[i * n + j], 0));
+    }
+    radius[i] = row.slice().sort()[k - 1];
+  }
+  return { n, d, k, flat, norms, kernelSum, radius };
+}
+
+/** KID (unbiased, cubic kernel), density and coverage of one candidate draw. */
+export function scoreAgainst(
+  ref: PreparedReference,
+  fake: number[][],
+): { kid: number; density: number; coverage: number } {
+  const { n, d, k } = ref;
+  const m = fake.length;
+  const flat = flatten(fake);
+  const gff = inner(flat, m, flat, m, d, true);
+  const gfr = inner(flat, m, ref.flat, n, d, false);
+  let fakeSum = 0;
+  for (let i = 0; i < m; i++) for (let j = 0; j < m; j++) if (i !== j) fakeSum += (gff[i * m + j] / d + 1) ** 3;
+  let crossSum = 0;
+  let inside = 0;
+  const covered = new Uint8Array(n);
+  for (let j = 0; j < m; j++) {
+    const fn = gff[j * m + j];
+    for (let i = 0; i < n; i++) {
+      const dot = gfr[j * n + i];
+      crossSum += (dot / d + 1) ** 3;
+      if (Math.sqrt(Math.max(fn + ref.norms[i] - 2 * dot, 0)) <= ref.radius[i]) {
+        inside++;
+        covered[i] = 1;
+      }
+    }
+  }
+  let coveredCount = 0;
+  for (let i = 0; i < n; i++) coveredCount += covered[i];
+  return {
+    kid: ref.kernelSum / (n * (n - 1)) + fakeSum / (m * (m - 1)) - (2 * crossSum) / (n * m),
+    density: inside / (k * m),
+    coverage: coveredCount / n,
+  };
+}
+
+/** Convenience for one pair of draws. */
+export function threeScores(real: number[][], fake: number[][], k = 5) {
+  return scoreAgainst(prepareReference(real, k), fake);
 }
