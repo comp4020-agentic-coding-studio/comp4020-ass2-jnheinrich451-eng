@@ -114,10 +114,15 @@ describe("twelve weeks that do not repeat one another", () => {
     expect(new Set(descs).size).toBe(descs.length);
   });
 
-  it("has no stub weeks", () => {
+  // The range the author sets in CLAUDE.md: 300 to 800 words. A week with no
+  // lecture has to teach in the session, so the ceiling is generous, and the
+  // floor refuses a stub. Both ends are checked: a session that quietly grows
+  // past the ceiling is as much a drift as one that was never written.
+  it("keeps every session inside the author's word range", () => {
     for (const s of sessions) {
       const n = words(body(s));
-      expect(n, `week ${week(s)} (${s.id}) has ${n} words`).toBeGreaterThanOrEqual(250);
+      expect(n, `week ${week(s)} (${s.id}) has ${n} words`).toBeGreaterThanOrEqual(300);
+      expect(n, `week ${week(s)} (${s.id}) has ${n} words`).toBeLessThanOrEqual(800);
     }
   });
 });
