@@ -6,6 +6,7 @@ import SpecList from "astro-course-university/components/SpecList.astro";
 import ContentLayout from "../../layouts/ContentLayout.astro";
 import EntryMeta from "../../components/EntryMeta.astro";
 import RatingCost from "../../components/RatingCost.astro";
+import RankAgreement from "../../components/RankAgreement.astro";
 import ThreeScores from "../../components/ThreeScores.astro";
 import Readings from "../../components/Readings.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
@@ -32,6 +33,7 @@ const arc = typeof loose.arc === "string" ? loose.arc : undefined;
 // it hands the reader, and the page renders only that one.
 const wantsRatingCost = loose.instrument === "rating-cost";
 const wantsThreeScores = loose.instrument === "three-scores";
+const wantsRankAgreement = loose.instrument === "rank-agreement";
 ---
 
 <ContentLayout
@@ -46,11 +48,13 @@ const wantsThreeScores = loose.instrument === "three-scores";
     {headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text.replace(/#$/, '').trim()}</a>)}
     {wantsRatingCost && <a href="#rating-cost">Cost a rating study</a>}
     {wantsThreeScores && <a href="#three-scores">Does anything see C?</a>}
+    {wantsRankAgreement && <a href="#rank-agreement">What a study can see</a>}
     {activity && <a href="#workspace-activity">Try it in the workspace</a>}
   </nav>
   <div class="session-reading"><Content /></div>
   {wantsRatingCost && <RatingCost />}
   {wantsThreeScores && <ThreeScores />}
+  {wantsRankAgreement && <RankAgreement />}
   {activity && <WorkspaceActivity activity={activity} />}
   <Readings required={loose.required_reading} further={loose.further_reading} />
   <SpecList spec={session.data.spec}>

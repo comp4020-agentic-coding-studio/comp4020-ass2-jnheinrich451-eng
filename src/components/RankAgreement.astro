@@ -1,0 +1,397 @@
+---
+/**
+ * What a correlation study can see: week 10's question, run in the page.
+ *
+ * The session reports that no metric correlated strongly with human judgement,
+ * and then says what such studies rarely say: every metric score in them was
+ * computed at some N, and every human ranking was paid for in trials. Both
+ * rankings are measurements, so the agreement a study reports is a statement
+ * about its budgets as much as about the metric.
+ *
+ * Each press runs one study on models whose true ranking is known. The bump
+ * chart shows the two rankings side by side, so a reader sees which models
+ * crossed; the three numbers say how well each ranking agrees with the other
+ * and with the truth; the strip keeps every press, because one study's
+ * agreement is a draw from a wide distribution and that is the point.
+ *
+ * Arithmetic is src/lib/ranking.ts, pinned by spec/week10.test.ts.
+ */
+const PARAMS = { spread: 0.3, slopeLo: 200, slopeHi: 1400, p0: 0.34, k: 0.22, sigma: 0.02 };
+---
+
+<section class="rank-agreement" id="rank-agreement" data-ra aria-label="What a correlation study can see">
+  <noscript>
+    <p>
+      The instrument needs JavaScript. It runs a correlation study on models
+      whose true ranking is known, at a budget you choose.
+    </p>
+  </noscript>
+
+  <form class="ra-controls" data-ra-controls>
+    <div class="ra-field">
+      <label class="ra-label" for="ra-models">models compared</label>
+      <select id="ra-models" name="models">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+    <div class="ra-field">
+      <label class="ra-label" for="ra-trials">human trials per model</label>
+      <select id="ra-trials" name="trials">
+        <option value="400" selected>400</option>
+        <option value="4000">4,000</option>
+        <option value="40000">40,000</option>
+      </select>
+    </div>
+    <div class="ra-field">
+      <label class="ra-label" for="ra-n">metric computed at N</label>
+      <select id="ra-n" name="n">
+        <option value="5000" selected>5,000</option>
+        <option value="50000">50,000</option>
+      </select>
+    </div>
+    <button type="button" data-ra-run>run a study</button>
+    <button type="button" class="ra-ghost" data-ra-clear>clear</button>
+    <p class="ra-status" role="status" data-ra-status>
+      Every model here has a known true quality. The study does not get to see it.
+    </p>
+  </form>
+
+  <div class="ra-panes">
+    <figure class="ra-bump">
+      <figcaption>
+        Left: the order the metric reports. Right: the order people gave. A line
+        crossing is a pair the two rankings disagree about.
+      </figcaption>
+      <svg viewBox="0 0 320 300" role="img" data-ra-bump
+        aria-label="The metric's ranking beside the human ranking, with a line per model"></svg>
+    </figure>
+    <div>
+      <dl class="ra-taus" aria-live="polite">
+        <div><dt>metric against people</dt><dd class="ra-headline" data-ra-mh>&nbsp;</dd></div>
+        <div><dt>metric against the truth</dt><dd data-ra-mt>&nbsp;</dd></div>
+        <div><dt>people against the truth</dt><dd data-ra-ht>&nbsp;</dd></div>
+      </dl>
+      <p class="ra-note">
+        Kendall&rsquo;s tau: 1 is the same order, 0 is no relation, &minus;1 is
+        reversed.
+      </p>
+      <figure class="ra-strip">
+        <svg viewBox="0 0 340 160" role="img" data-ra-strip
+          aria-label="Metric-against-people agreement from every study run so far"></svg>
+        <figcaption data-ra-strip-caption>
+          One dot per study, all at the same budget. Run it a few times.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <p class="ra-verdict" aria-live="polite" data-ra-verdict>
+    Run a study. Then change a budget and run it again.
+  </p>
+</section>
+
+<script>
+  import { simulateStudy, type StudyParams } from "../lib/ranking";
+
+  const PARAMS = { spread: 0.3, slopeLo: 200, slopeHi: 1400, p0: 0.34, k: 0.22, sigma: 0.02 };
+  const svgNS = "http://www.w3.org/2000/svg";
+
+  // As on the other benches: the theme runs Astro's ClientRouter, so this
+  // module is not re-executed when a visitor navigates back.
+  function setup() {
+    const section = document.querySelector("[data-ra]");
+    if (!(section instanceof HTMLElement) || section.dataset.raReady === "true") return;
+    section.dataset.raReady = "true";
+
+    const pick = <T extends Element>(sel: string) => section.querySelector(sel) as T;
+    const modelsSelect = pick<HTMLSelectElement>("#ra-models");
+    const trialsSelect = pick<HTMLSelectElement>("#ra-trials");
+    const nSelect = pick<HTMLSelectElement>("#ra-n");
+    const bump = pick<SVGSVGElement>("[data-ra-bump]");
+    const strip = pick<SVGSVGElement>("[data-ra-strip]");
+    const status = pick<HTMLElement>("[data-ra-status]");
+    const verdict = pick<HTMLElement>("[data-ra-verdict]");
+    const stripCaption = pick<HTMLElement>("[data-ra-strip-caption]");
+
+    let seed = 20261012;
+    let history: number[] = [];
+
+    const params = (): StudyParams => ({
+      ...PARAMS,
+      models: Number(modelsSelect.value),
+      trials: Number(trialsSelect.value),
+      n: Number(nSelect.value),
+    });
+
+    const node = (name: string, attrs: Record<string, string | number>) => {
+      const element = document.createElementNS(svgNS, name);
+      for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
+      return element;
+    };
+    const label = (text: string, attrs: Record<string, string | number>) => {
+      const element = node("text", { "font-size": 11, "font-family": "var(--at-font-mono, monospace)", ...attrs });
+      element.textContent = text;
+      return element;
+    };
+    const order = (values: number[]) =>
+      values.map((_, i) => i).sort((a, b) => values[a] - values[b]);
+
+    const drawBump = (study: ReturnType<typeof simulateStudy> | null) => {
+      bump.replaceChildren();
+      const left = 74;
+      const right = 246;
+      const top = 34;
+      const bottom = 276;
+      bump.append(label("metric", { x: left, y: 20, "text-anchor": "middle", fill: "var(--ra-metric)" }));
+      bump.append(label("people", { x: right, y: 20, "text-anchor": "middle", fill: "var(--ra-human)" }));
+      if (!study) return;
+      const m = study.rows.length;
+      // Better first in both columns: lowest metric, highest human error rate.
+      const metricOrder = order(study.rows.map((row) => row.metric));
+      const humanOrder = order(study.rows.map((row) => -row.human));
+      const y = (rank: number) => top + ((bottom - top) * rank) / Math.max(m - 1, 1);
+      metricOrder.forEach((model, rank) => {
+        const other = humanOrder.indexOf(model);
+        const moved = Math.abs(other - rank) > 0;
+        bump.append(
+          node("line", {
+            x1: left + 10,
+            x2: right - 10,
+            y1: y(rank),
+            y2: y(other),
+            stroke: moved ? "var(--ra-moved)" : "var(--ra-still)",
+            "stroke-width": moved ? 1.6 : 1,
+            opacity: moved ? 0.85 : 0.5,
+          }),
+        );
+      });
+      metricOrder.forEach((model, rank) => {
+        bump.append(node("circle", { cx: left, cy: y(rank), r: 4, fill: "var(--ra-metric)" }));
+        bump.append(label(String(model + 1), { x: left - 12, y: y(rank) + 4, "text-anchor": "end", fill: "var(--ra-ink)" }));
+      });
+      humanOrder.forEach((model, rank) => {
+        bump.append(node("circle", { cx: right, cy: y(rank), r: 4, fill: "var(--ra-human)" }));
+        bump.append(label(String(model + 1), { x: right + 12, y: y(rank) + 4, fill: "var(--ra-ink)" }));
+      });
+    };
+
+    const drawStrip = () => {
+      strip.replaceChildren();
+      const left = 30;
+      const right = 320;
+      const y = (tau: number) => 120 - 90 * ((tau + 1) / 2);
+      for (const tick of [-1, 0, 1]) {
+        strip.append(node("line", { x1: left, x2: right, y1: y(tick), y2: y(tick), stroke: "var(--ra-rule)", "stroke-dasharray": tick === 0 ? "4 4" : "none" }));
+        strip.append(label(String(tick), { x: left - 8, y: y(tick) + 4, "text-anchor": "end", fill: "var(--ra-ink)" }));
+      }
+      strip.append(label("agreement, metric against people", { x: left, y: 148, fill: "var(--ra-ink)" }));
+      history.forEach((tau, i) => {
+        strip.append(
+          node("circle", {
+            cx: left + 16 + ((right - left - 32) / 19) * (i % 20),
+            cy: y(tau),
+            r: 5,
+            fill: "var(--ra-moved)",
+            opacity: 0.85,
+          }),
+        );
+      });
+    };
+
+    const run = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      const p = params();
+      const study = simulateStudy(p, seed);
+      history.push(study.metricHuman);
+      if (history.length > 20) history.shift();
+      pick<HTMLElement>("[data-ra-mh]").textContent = study.metricHuman.toFixed(2);
+      pick<HTMLElement>("[data-ra-mt]").textContent = study.metricTruth.toFixed(2);
+      pick<HTMLElement>("[data-ra-ht]").textContent = study.humanTruth.toFixed(2);
+      drawBump(study);
+      drawStrip();
+      status.textContent = `Study ${history.length}: ${p.models} models, ${p.trials.toLocaleString("en-US")} trials each, metric at N = ${p.n.toLocaleString("en-US")}.`;
+
+      const spread = history.length > 2 ? Math.max(...history) - Math.min(...history) : 0;
+      verdict.textContent =
+        `This study saw ${study.metricHuman.toFixed(2)} between the metric and the people, while the metric ranked the true quality at ${study.metricTruth.toFixed(2)} and the people ranked it at ${study.humanTruth.toFixed(2)}. ` +
+        (history.length > 2
+          ? `Across ${history.length} studies at this budget the agreement has ranged over ${spread.toFixed(2)}, which is what a single reported number hides.`
+          : "Run it again before reading anything into one number.");
+      stripCaption.textContent =
+        history.length > 2
+          ? `${history.length} studies, same budget, same metric. The spread is the budget, not the metric.`
+          : "One dot per study, all at the same budget. Run it a few times.";
+    };
+
+    const reset = (message: string) => {
+      history = [];
+      for (const key of ["mh", "mt", "ht"]) pick<HTMLElement>(`[data-ra-${key}]`).textContent = " ";
+      status.textContent = message;
+      verdict.textContent = "Run a study. Then change a budget and run it again.";
+      stripCaption.textContent = "One dot per study, all at the same budget. Run it a few times.";
+      drawBump(null);
+      drawStrip();
+    };
+
+    for (const control of [modelsSelect, trialsSelect, nSelect]) {
+      control.addEventListener("change", () =>
+        reset("A different budget is a different study. The last dots would not belong on this strip."),
+      );
+    }
+    pick<HTMLButtonElement>("[data-ra-run]").addEventListener("click", run);
+    pick<HTMLButtonElement>("[data-ra-clear]").addEventListener("click", () => reset("Cleared."));
+    reset("Every model here has a known true quality. The study does not get to see it.");
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .rank-agreement {
+    --ra-metric: #c9782a;
+    --ra-human: #3a7d44;
+    --ra-moved: #b5495b;
+    --ra-still: #9d968b;
+    --ra-rule: var(--at-border, #e4ddd0);
+    --ra-ink: var(--at-text-muted, #6f675c);
+    border: 1px solid var(--at-border, #d8d2c6);
+    border-radius: 6px;
+    padding: var(--at-spacing-lg);
+    margin-block: var(--at-spacing-xl);
+    scroll-margin-top: calc(var(--at-nav-height, 4rem) + 7rem);
+  }
+
+  .ra-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--at-spacing-sm) var(--at-spacing-lg);
+    align-items: end;
+    border-block-end: 1px solid var(--at-border, #e4ddd0);
+    padding-block-end: var(--at-spacing-sm);
+    margin-block-end: var(--at-spacing-lg);
+  }
+
+  .ra-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .ra-label,
+  .ra-status,
+  .ra-taus dt,
+  .rank-agreement button {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.07em;
+  }
+
+  .ra-label,
+  .ra-taus dt {
+    text-transform: uppercase;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .ra-field select {
+    font: inherit;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--at-border, #c9c2b4);
+    border-radius: 3px;
+    background: var(--at-white, #fff);
+  }
+
+  .rank-agreement button {
+    white-space: nowrap;
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--at-primary);
+    background: var(--at-primary);
+    color: var(--at-white, #fff);
+    cursor: pointer;
+  }
+
+  .rank-agreement button.ra-ghost {
+    background: transparent;
+    color: var(--at-secondary, var(--at-primary));
+  }
+
+  .ra-status {
+    flex-basis: 100%;
+    margin: 0;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--at-text-muted, #6f675c);
+  }
+
+  .ra-panes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--at-spacing-lg);
+  }
+
+  @media (max-width: 640px) {
+    .ra-panes {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .rank-agreement figure {
+    margin: 0;
+  }
+
+  .rank-agreement svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklab, var(--at-primary) 4%, transparent);
+    border: 1px solid var(--at-border, #e4ddd0);
+    border-radius: 4px;
+  }
+
+  .rank-agreement figcaption {
+    font-size: var(--at-font-size-sm);
+    margin-block-end: var(--at-spacing-xs);
+    max-width: 68ch;
+  }
+
+  .ra-strip figcaption {
+    margin-block: var(--at-spacing-xs) 0;
+  }
+
+  .ra-taus {
+    display: grid;
+    gap: var(--at-spacing-sm);
+    margin: 0 0 var(--at-spacing-xs);
+  }
+
+  .ra-taus dd {
+    margin: 0.2rem 0 0;
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.3rem;
+    white-space: nowrap;
+  }
+
+  .ra-headline {
+    color: var(--ra-moved);
+    font-size: 1.9rem !important;
+  }
+
+  .ra-note,
+  .ra-verdict {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    max-width: 68ch;
+  }
+
+  .ra-note {
+    color: var(--at-text-muted, #6f675c);
+    margin-block: 0 var(--at-spacing-md, 1rem);
+  }
+
+  .ra-verdict {
+    margin-block-start: var(--at-spacing-lg);
+  }
+</style>

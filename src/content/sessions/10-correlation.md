@@ -6,6 +6,7 @@ description:
 week: 10
 date: 2026-10-12
 arc: C
+instrument: rank-agreement
 required_reading: stein-2023
 further_reading: [kynkaanniemi-2023]
 spec:
@@ -59,6 +60,12 @@ one of those metric scores was computed at some N. Whether the comparison was
 N-honest is almost never stated. Where it was not, some part of the
 disagreement being reported is the estimator rather than the metric, and
 nobody can say which part.
+
+The instrument below runs that study on models whose true ranking is known,
+which no real study has. Choose how many models it covers, how many trials
+bought the human ranking, and what N the metric was computed at. Then run it
+twice without changing anything, and see how much of the number was the
+study.
 
 ## Exercise
 

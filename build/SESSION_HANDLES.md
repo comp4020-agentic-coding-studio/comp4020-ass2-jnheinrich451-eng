@@ -25,6 +25,8 @@ it. Untracked on purpose; delete or commit it when the batches are done.
 | KID (cubic kernel) cannot see C at any N: C matches R through the third moment, first differs at the fourth | week 7 | 07 prose, spec/week7.test.ts |
 | At d = 2048 no score in week 7 sees C; they disagree about A and B (KID sees A, density and coverage call B missing, FID puts B closer) | week 7 | 07 prose, three-scores instrument |
 | Coverage sees C at d = 2 and loses it by d = 16 | week 7 | 07 prose, three-scores instrument |
+| A correlation study's verdict follows its budgets: 10 models, 400 trials, metric at N = 5,000 gives tau about 0.44 over [0.13, 0.69]; 40,000 trials and N = 50,000 give 0.94 | week 10 | 10 prose, rank-agreement instrument |
+| At a small budget the metric tracks the truth (0.65) better than the study can see (0.44) | week 10 | 10 prose, rank-agreement instrument |
 
 ## Per session
 
@@ -39,7 +41,7 @@ it. Untracked on purpose; delete or commit it when the batches are done.
 | 07 | B | 05 FID∞, 06 C, 02 Gaussian | KID, density/coverage → 12; "nobody sees C" → 12's question about C | three scores on one bench, and none sees C | three-scores instrument (batch 3) | binkowski-2018 |
 | 08 | B | 03 instrument, 05 bias and N-honest | temporal failure → lecture 8, 11 | FVD as a swapped instrument | lecture 8 instruments | unterthiner-2019 |
 | 09 | C | 01–08 bench has no images | human protocol → 10, lecture 11, 12 | the cost arithmetic | rating-cost calculator (batch 2) | stein-2023 |
-| 10 | C | 03 term, 05 slopes and N-honest, 09 protocol | N-honest correlation study → 12 | | **none** | stein-2023 |
+| 10 | C | 03 term, 05 slopes and N-honest, 09 protocol | N-honest correlation study → 12 | rank agreement as a measurement with its own budget | rank-agreement instrument (batch 4) | stein-2023 |
 | 11 | C | 01 table, 02 values, 03 reading | the case for the row → 12, final report | | lecture 11 claim checker | kynkaanniemi-2023 |
 | 12 | C | 04 pin, 05 fit, 06 C, 07 scores, 09 protocol | final report | the last log entry | **none** | jayasumana-2024 |
 
@@ -50,6 +52,8 @@ it. Untracked on purpose; delete or commit it when the batches are done.
    one sentence pointing at their lecture's instrument.
 2. Week 9 cost calculator. Done: the prose's $7,200 was corrected to $7,400
    by its own arithmetic, and "quadruples" was measured rather than assumed.
+4. Week 10: what a correlation study can see, built on week 5's bias slopes
+   and week 9's trial budget. The verdict changes on budget alone.
 3. Week 7: C scored by FID, KID and coverage. Done, and it reversed the
    week's claim: measured, KID and coverage do not see C on the bench. The
    author chose "nobody sees C" as the week's argument; the prose now says so
