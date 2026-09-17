@@ -19,9 +19,10 @@ related:
   - assessments/a2-break-the-number
 ---
 
-The bench has no images in it. It never has. R, A, B and C are vectors of
-numbers standing in for what a network would have produced had there been
-images, and every closed form this course has used depends on that.
+The bench has no images in it. It never has. R, A, B, and the C you built in
+week 6, are vectors of numbers standing in for what a network would have
+produced had there been images, and every closed form this course has used
+depends on that.
 
 From this week there are no closed forms. Arc C is about the thing the score
 was standing in for, and that thing is a person looking at a picture.

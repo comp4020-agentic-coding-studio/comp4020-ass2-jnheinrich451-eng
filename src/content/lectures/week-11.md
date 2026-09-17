@@ -40,8 +40,8 @@ editable under **Reproduce this experiment**: rerunning the same settings and se
 choose a new seed for fresh recordings. Keep the seed fixed when comparing
 instruments on the same evidence.
 
-The experiment summary starts with a conclusion and counts of supporting,
-contradicting and unranked repeats. The strip preserves each individual
+The experiment summary starts with a conclusion and counts of the repeats
+that support the claim, contradict it, or give no ordering. The strip preserves each individual
 outcome. The comparison table shows all three instruments on the same
 recordings at the same N, so a reversal is visible beside the selected result.
 This is a calculated summary using fixed wording, not an AI-written report.
