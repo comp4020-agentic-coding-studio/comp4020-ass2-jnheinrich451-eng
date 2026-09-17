@@ -79,5 +79,6 @@ Build a fourth candidate D that scores worse than A's 5.12 and is visibly
 closer to R than A is, under any per-sample measure you are willing to define
 and defend.
 
-Record FID and FID∞ for D N-honestly against the bench. Write down the
-per-sample measure before you look at either number.
+Record FID and FID∞ for D N-honestly against the bench, with the sample size
+and the implementation, in your [measurement log](/assessments/measurement-log/).
+Write down the per-sample measure before you look at either number.

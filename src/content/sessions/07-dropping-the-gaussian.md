@@ -84,5 +84,7 @@ strip, then change the dimension.
 Score A, B and C under FID∞, KID, and density and coverage, N-honestly, at a
 sample size you state.
 
-Report the three orderings beside each other. Where two disagree, say which
-quantity each was measuring rather than which one you trust.
+Report the three orderings beside each other, and keep the three numbers and
+their sample size in your [measurement log](/assessments/measurement-log/).
+Where two disagree, say which quantity each was measuring rather than which
+one you trust.
