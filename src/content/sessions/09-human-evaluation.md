@@ -6,6 +6,8 @@ description:
 week: 9
 date: 2026-10-05
 arc: C
+log: >-
+  the rating protocol you designed, its cost in hours and dollars, and the assumptions behind both
 instrument: rating-cost
 required_reading: stein-2023
 spec:

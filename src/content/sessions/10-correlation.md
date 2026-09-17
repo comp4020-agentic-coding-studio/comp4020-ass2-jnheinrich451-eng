@@ -6,6 +6,8 @@ description:
 week: 10
 date: 2026-10-12
 arc: C
+log: >-
+  the method section for an N-honest correlation study, and everything you had to specify that the papers did not
 instrument: rank-agreement
 required_reading: stein-2023
 further_reading: [kynkaanniemi-2023]

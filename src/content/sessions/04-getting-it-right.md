@@ -6,6 +6,8 @@ description:
 week: 4
 date: 2026-08-24
 arc: A
+log: >-
+  the four numbers from float32 and float64 under both square roots, and the implementation you pinned
 required_reading: parmar-2022
 spec:
   - you can produce two scores for the same images that differ only in the

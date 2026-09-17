@@ -6,6 +6,8 @@ description:
 week: 1
 date: 2026-08-03
 arc: A
+log: >-
+  the two scores, their sample size, and the implementation that produced them
 required_reading: heusel-2017
 spec:
   - you can name three things a reported FID depends on besides the model

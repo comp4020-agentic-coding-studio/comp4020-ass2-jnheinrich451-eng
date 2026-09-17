@@ -6,6 +6,8 @@ description:
 week: 8
 date: 2026-09-28
 arc: B
+log: >-
+  what you would have to re-run, from weeks 1 to 7, before trusting a published FVD table
 required_reading: unterthiner-2019
 further_reading: [chong-forsyth-2020]
 spec:

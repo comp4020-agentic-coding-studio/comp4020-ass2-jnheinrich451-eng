@@ -6,6 +6,8 @@ description:
 week: 11
 date: 2026-10-19
 arc: C
+log: >-
+  the paragraph justifying omission, and how you expect a reviewer to read it
 required_reading: kynkaanniemi-2023
 further_reading: [heusel-2017]
 spec:

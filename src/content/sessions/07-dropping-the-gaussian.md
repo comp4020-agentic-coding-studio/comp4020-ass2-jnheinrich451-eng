@@ -6,6 +6,8 @@ description:
 week: 7
 date: 2026-09-21
 arc: B
+log: >-
+  the three orderings under FID∞, KID, and density and coverage, at the sample size you state
 instrument: three-scores
 required_reading: binkowski-2018
 further_reading: [kynkaanniemi-2019, naeem-2020]
@@ -84,7 +86,5 @@ strip, then change the dimension.
 Score A, B and C under FID∞, KID, and density and coverage, N-honestly, at a
 sample size you state.
 
-Report the three orderings beside each other, and keep the three numbers and
-their sample size in your [measurement log](/assessments/measurement-log/).
-Where two disagree, say which quantity each was measuring rather than which
-one you trust.
+Report the three orderings beside each other. Where two disagree, say which
+quantity each was measuring rather than which one you trust.

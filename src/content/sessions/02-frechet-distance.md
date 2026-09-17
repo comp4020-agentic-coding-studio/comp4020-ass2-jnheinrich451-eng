@@ -6,6 +6,8 @@ description:
 week: 2
 date: 2026-08-10
 arc: A
+log: >-
+  both estimates with their N, beside the population values you derived by hand
 required_reading: heusel-2017
 further_reading: [binkowski-2018]
 spec:

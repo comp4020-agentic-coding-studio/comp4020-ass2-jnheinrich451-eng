@@ -6,6 +6,8 @@ description:
 week: 5
 date: 2026-08-31
 arc: B
+log: >-
+  the sampling protocol, the seed, N and repetitions, beside the population baseline
 required_reading: chong-forsyth-2020
 further_reading: [binkowski-2018, heusel-2017]
 spec:

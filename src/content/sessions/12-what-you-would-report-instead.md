@@ -6,6 +6,8 @@ description:
 week: 12
 date: 2026-10-26
 arc: C
+log: >-
+  every score this course has used, on A, B and C, N-honestly beside the closed forms
 required_reading: jayasumana-2024
 further_reading: [stein-2023, chong-forsyth-2020]
 spec:
