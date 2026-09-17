@@ -2023,3 +2023,39 @@ a dry run that never reached the link check was reported as passing. The
 class fix is the rule in `CLAUDE.md`, a check proves the tree it ran on, and a
 spec that reads the index so the next commit is tested rather than the desk it
 was made at.
+
+## 2026-09-17 11:50 — Week 10, the last empty week
+
+**Asked:**
+
+> for week 10, your design is an empty teaching week? Yes let see the results
+> as you planned
+
+**Result:**
+Week 10 had no lecture, no workspace activity and no instrument, and it is the
+week that asks whether the previous nine were worth doing. It now runs the
+correlation study it describes, on models whose true ranking is known.
+
+Exploring the parameters first decided the design. A study's agreement depends
+on three budgets: how many models it covers, how many human trials paid for
+the ranking, and what N the metric was computed at. At ten models, 400 trials
+and N = 5,000 the agreement is about 0.44 across a [0.13, 0.69] band; at
+40,000 trials and N = 50,000 it is 0.94. The metric never changed. That is
+week 10's own complaint, that these studies rarely say at what N their scores
+were computed, turned into something a reader presses.
+
+**Verified:**
+400 studies per setting in numpy across the eighteen the page offers; the
+browser held to those means within six standard errors. The spec was written
+before the engine and failed on the missing module, then passed, then failed
+again when Kendall's tau was broken on purpose. Full check clean with the
+commit staged, so the self-contained guard tested the commit. Driven at 1920
+and 390.
+
+**Commit:** [`873d7a7`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/873d7a7)
+
+**What happened:**
+The exploration caught a sign error of mine before any of it was written: I had
+negated both sides of the human-against-truth comparison, so a perfect
+correlation read as -1. It was obvious in a column of numbers and would have
+been invisible in a page that only ever shows one study at a time.
