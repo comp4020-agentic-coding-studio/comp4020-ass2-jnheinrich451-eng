@@ -4,16 +4,14 @@
 
 SLOP8412, *Advanced Fréchet Inception Distance*: a twelve-week course that
 audits one number. It runs on a bench, one reference distribution and three
-candidates in 2048 dimensions where every score has a closed form, re-scored
-every week with that week's method. There is no separate curriculum document;
-the site carries the whole course.
+candidates in 2048 dimensions, re-scored every week with that week's method. There is no curriculum document; the site carries the course.
 
-I chose the topic for the brief's own constraint, narrow enough that no real
-university would run it. FID fits because it has three layers, the mathematics,
-an implementation and a use in computer vision, so the difficulty can rise in
-that order and the concepts stay related. It is level 8 because it assumes
-probability and code. Every score having a closed form is what let me tell
-whether what the agent wrote was true.
+I chose the topic for the brief's constraint, narrow enough that no real
+university would run it. FID has three layers, the mathematics, an
+implementation and a use in computer vision, so difficulty rises in that order
+and the concepts stay related. Level 8 because it assumes probability and code.
+Every score on the bench having a closed form is what let me tell whether the
+agent's output was true.
 
 ## How I got here
 
@@ -26,10 +24,9 @@ anything symbolic or cut it, and make non-adjacent weeks need each other
 My anchor was week 5. I read three papers first, logged each in `readings.ts`
 with a verified date, and wrote that page myself before anything else existed.
 Everything else was written against it: structure in `build/SPINE.md`, facts in
-`build/CONTENT.md`, and the agent brought the repo into agreement with them
-instead of inventing content ([`c942868`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c942868)).
+`build/CONTENT.md`, and the agent brought the repo into agreement with them ([`c942868`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c942868)).
 
-From there the build was plain, and I would rather describe it honestly than
+From there the build was plain, and I would rather say so than
 dress it up as breakthroughs. It was a loop. I gave instructions; the agent
 built them and checked them against the spec; discrepancies came back; I
 decided. A lateness rule two pages stated differently became one sentence on the
@@ -39,19 +36,17 @@ could fail
 
 Most of the bugs were one bug: a check that could not fail. A coherence test was
 green because it read a field the API does not carry ([`224688b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/224688b)). A bias fit
-looked tidy and missed the true value by 35 times ([`3c9eb4b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3c9eb4b)). The rule we settled on:
-add the check, run it before the fix, and ask what it has to see in order to
-fail. Even that was not enough: a deck check compared a fixed
+looked tidy and missed the true value by 35 times ([`3c9eb4b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3c9eb4b)). The rule: add the check, run it
+before the fix, and ask what it must see to fail. Even that was not enough: a deck check compared a fixed
 box against its own height, and I found the clipped slides myself ([`1fc21a1`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/1fc21a1)).
 
 A number teaches nothing by itself, so the second half asked how to make it
-visible, and how to let a student reach it alone. The labs and lecture instruments are that
-experiment, runnable in the page, with indexes and a menu into the week it
-needs ([`30f9e85`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/30f9e85)).
+visible, and how a student could reach it alone. The labs and lecture instruments are that
+experiment, runnable in the page, with indexes into the week it needs ([`30f9e85`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/30f9e85)).
 
 Building them added a step: measure first, pin the numbers, build second. Week 5's ladder reports its own imprecision because that is what the
 measurement showed ([`df3ef05`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/df3ef05)). Week 7 went further: the page claimed two
-newer scores catch what FID misses, and measured, neither does. A cubic kernel
+newer scores catch what FID misses; measured, neither does. A cubic kernel
 cannot see past the third moment, and the candidate matches three. The week's
 argument changed to the true one ([`2b2ffc2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/2b2ffc2)).
 
