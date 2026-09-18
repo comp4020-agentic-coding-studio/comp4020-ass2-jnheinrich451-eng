@@ -37,6 +37,21 @@ is checked against this sentence before it is checked against the build, and
 the older pages it now sits beside are checked again, because a new increment
 can make a page that was fine read as outdated.
 
+### Instructions before the panel, the result in a fold
+
+"Before the prose names it" governs the result, not the instructions. A
+student facing a panel needs to know what to press and what to watch, so that
+comes first, in the prose. The outcome the panel was built to show does not.
+It goes in a closed `<details class="expected-results">` with the summary
+"Expected results", after the instructions and before the panel, so the
+student predicts, runs, and then checks their own reading against it.
+
+This does not overrule Rule 1. A page still opens with its claim ("a third
+score is only worth having if it sees something the first two did not"). What
+moves into the fold is the observed outcome ("C's dots sit inside R-again's
+range in all three strips"). `spec/expected-results.test.ts` holds this for
+every page whose panel exists to show a failure.
+
 The three rules below are how this sentence is enforced across twenty pages.
 
 ## Why these three rules

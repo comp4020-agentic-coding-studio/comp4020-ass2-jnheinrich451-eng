@@ -24,8 +24,9 @@ related:
 
 Score the bench three ways this week, on the same samples, at the same N,
 through the same instrument. FID∞, KID, and a precision and recall pair. Three
-numbers where there was one. They will agree about candidate C, which is the
-trouble, and they will not agree about A and B.
+numbers where there was one, and a third number is only worth having if it
+sees something the first two did not. The instrument at the end of this page
+puts that to candidate C.
 
 ## Two numbers instead of one
 
@@ -58,7 +59,29 @@ estimated means and covariances, and the expected value of a nonlinear
 function is not that function of the expected value, so the sample size leaks
 into the answer and week 5 is the result.
 
-## What none of them catches
+## Exercise
+
+Score A, B and C under FID∞, KID, and density and coverage, N-honestly, at a
+sample size you state.
+
+Report the three orderings beside each other. Where two disagree, say which
+quantity each was measuring rather than which one you trust.
+
+## Before you press
+
+Predict first. For each of the three scores, write down whether it will
+separate C from R, and which of A and B it will call closer to R. The closed
+form already answers the second question for FID∞.
+
+Each press of **draw and score** draws R, a second independent draw of R that
+the strips call R-again, and A, B and C, then adds one dot per candidate to
+each strip. Start at d = 2048 and press five times. In each strip, find C's
+dots and decide whether they sit inside the spread of R-again's dots or
+clear of it. Then set the dimensions to 2 and to 16 and press again. Compare what you
+recorded with your predictions, then open the fold.
+
+<details class="expected-results">
+<summary>Expected results</summary>
 
 C carries R's mean and covariance, so FID and FID∞ both score it 0. The new
 scores do no better on this bench.
@@ -78,13 +101,4 @@ call B almost entirely missing: its samples sit slightly further out, and in
 2,048 dimensions that is enough to leave nearly every one of R's
 neighbourhoods.
 
-The instrument below runs all three, one press at a time. Look for C in each
-strip, then change the dimension.
-
-## Exercise
-
-Score A, B and C under FID∞, KID, and density and coverage, N-honestly, at a
-sample size you state.
-
-Report the three orderings beside each other. Where two disagree, say which
-quantity each was measuring rather than which one you trust.
+</details>

@@ -1,0 +1,28 @@
+/* The fold that holds what a panel was built to show. The prose above it says
+   what to press and what to watch; the student opens this after running the
+   panel, to check their reading. Markdown content carries no scoped
+   attribute, so this is a plain global stylesheet imported by both the
+   session and the lecture templates. */
+.expected-results {
+  max-width: 68ch;
+  margin-block: 1.5rem;
+  border-inline-start: 2px solid var(--at-primary);
+  background: var(--at-bg-alt);
+  padding: 0 1.1rem;
+}
+
+.expected-results > summary {
+  cursor: pointer;
+  padding-block: 0.8rem;
+  color: var(--at-link);
+  font-weight: 600;
+}
+
+.expected-results > summary:focus-visible {
+  outline: 2px solid var(--at-link);
+  outline-offset: 2px;
+}
+
+.expected-results[open] {
+  padding-block-end: 0.4rem;
+}

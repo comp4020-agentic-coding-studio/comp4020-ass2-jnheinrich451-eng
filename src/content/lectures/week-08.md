@@ -66,11 +66,21 @@ where a particular finite-sample score lands.
 
 ## The disagreement
 
-At the default settings, look for frame-to-frame scoring to rank F higher
-and whole-sequence scoring to rank E higher. Record the actual scores rather
-than assuming a fixed ratio or verdict for every draw. The same recordings
-can support different rankings because the feature maps preserve different
-properties before the Gaussian formula is applied.
+Before you run it, write down which of E and F you expect each instrument to
+call further from R. Then press **Measure all three instruments** at the
+default settings and record, for each instrument, the two scores and which candidate it ranks higher.
+Record the actual scores, not only the order; another draw will not repeat
+them exactly. Compare them with your prediction, then open the fold.
+
+<details class="expected-results">
+<summary>Expected results</summary>
+
+Frame to frame should rank F higher, and whole sequence should rank E higher.
+Expect that direction, not a fixed ratio or the same verdict on every draw.
+The same recordings can support different rankings because the feature maps
+preserve different properties before the Gaussian formula is applied.
+
+</details>
 
 Set the correlation to zero and run it again. Permuting independent,
 identically distributed frames preserves their population distribution.
