@@ -87,18 +87,6 @@ const titleWords = courseMeta.title.split(" ");
     </p>
   </section>
 
-  <TwelveWeeks />
-
-  <h2>What you will do</h2>
-  <p>
-    Build a bench in week 1: a reference distribution and two candidates, small
-    enough to run on a laptop and simple enough that every score has a closed
-    form. Re-score it every week with that week&rsquo;s method. Reproduce a
-    published number and account for the gap. Construct a candidate the score
-    gets wrong. Propose a replacement and judge it by the same standard. Keep a
-    log.
-  </p>
-
   <h2>Who it is for</h2>
   <p>
     Postgraduates who have trained or evaluated a generative model at least
@@ -110,6 +98,30 @@ const titleWords = courseMeta.title.split(" ");
     Not for anyone who wants to learn to build generative models; this course
     never trains one. Not for anyone who needs the number to be fine.
   </p>
+
+  <h2>What you will do</h2>
+  <p>
+    Build a bench in week 1: a reference distribution and two candidates, small
+    enough to run on a laptop and simple enough that every score has a closed
+    form. Re-score it every week with that week&rsquo;s method. Reproduce a
+    published number and account for the gap. Construct a candidate the score
+    gets wrong. Propose a replacement and judge it by the same standard. Keep a
+    log.
+  </p>
+
+  <h2>What you leave with</h2>
+  <p>
+    You can read a reported FID and say what it depends on: the number of
+    samples, the network that made the features, the reference set and the
+    seed. You can estimate how far a score at your N sits above its limit, and
+    tell whether the gap between two models is larger than that. You can build
+    a distribution the score gets wrong, and write a report that states the
+    protocol beside the number. A results table that leaves the protocol out
+    will read to you as unfinished, and that change is what the twelve weeks
+    are for.
+  </p>
+
+  <TwelveWeeks />
 
   <h2>The bench</h2>
   <p>
