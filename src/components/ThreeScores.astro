@@ -50,12 +50,9 @@ const CONFIGS = [
   </form>
 
   <p class="ts-fid" data-ts-fid>&nbsp;</p>
-  <p class="ts-legend">
-    In every strip the rows run, top to bottom,
-    <span class="ts-key ts-key--r">R drawn again</span>, <span class="ts-key ts-key--ab">A</span>,
-    <span class="ts-key ts-key--ab">B</span> and <span class="ts-key ts-key--c">C</span>. One dot is
-    one press.
-  </p>
+  <!-- One line on purpose: Astro drops the whitespace at a line break between
+       inline elements, which rendered "bottom,R" and "A,B" with no spaces. -->
+  <p class="ts-legend">In every strip the rows run, top to bottom, <span class="ts-key ts-key--r">R drawn again</span>, <span class="ts-key ts-key--ab">A</span>, <span class="ts-key ts-key--ab">B</span> and <span class="ts-key ts-key--c">C</span>. One dot is one press.</p>
 
   <div class="ts-strips">
     <figure>
