@@ -54,6 +54,8 @@ run in the page ([`30f9e85`](https://github.com/comp4020-agentic-coding-studio/c
 Week 7 claimed two newer scores catch what FID misses; measured, neither does,
 and the argument changed to the true one ([`2b2ffc2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/2b2ffc2)).
 
+![Week 7's instrument at the bench's 2048 dimensions after five presses: KID separates A, density and coverage separate B, and C's dots sit inside R-again's range in all three strips.](docs/process/week7-nobody-sees-c.png)
+
 The worst failure was the same bug one level up. Every check ran on my working
 tree, which held uncommitted files, so eight commits went out green while HEAD
 could not build. The repair was at the harness level: a check that reads the
