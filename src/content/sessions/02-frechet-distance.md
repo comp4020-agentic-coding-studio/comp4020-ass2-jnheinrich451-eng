@@ -9,7 +9,7 @@ arc: A
 log: >-
   both estimates with their N, beside the population values you derived by hand
 required_reading: heusel-2017
-further_reading: [binkowski-2018]
+further_reading: [binkowski-2018, dowson-landau-1982]
 spec:
   - you can derive the closed form from the definition without notes
   - you can say which step requires the Gaussian assumption and what

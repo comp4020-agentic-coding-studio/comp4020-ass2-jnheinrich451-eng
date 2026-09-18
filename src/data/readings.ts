@@ -78,6 +78,14 @@ export const readings = {
     year: 2024,
     url: "https://openaccess.thecvf.com/content/CVPR2024/papers/Jayasumana_Rethinking_FID_Towards_a_Better_Evaluation_Metric_for_Image_Generation_CVPR_2024_paper.pdf",
     verified: "2026-09-03",
+  },
+  "dowson-landau-1982": {
+    authors: "Dowson, D. C. and Landau, B. V.",
+    title: "The Fréchet distance between multivariate normal distributions",
+    venue: "Journal of Multivariate Analysis",
+    year: 1982,
+    url: "https://doi.org/10.1016/0047-259X(82)90077-X",
+    verified: "2026-09-18",
   }
 
 } as const;

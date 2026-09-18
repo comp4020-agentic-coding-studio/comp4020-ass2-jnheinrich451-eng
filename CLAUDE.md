@@ -313,8 +313,16 @@ provides their refinement instructions.
 
 ## Citations
 Readings come from `src/data/readings.ts` only, referenced by key.
-Never write an author, title, venue or year into a page.
-If a week needs a reading not in that file, stop and ask.
+A page may name an author, or give a year beside one, only when
+`readings.ts` carries that reading with a verified date. Titles and venues
+stay in `readings.ts`. If a week needs a reading not in that file, stop and
+ask. `spec/citations.test.ts` holds this.
+
+This used to read "never write an author or a year into a page". The pages
+broke that wording twenty times, and all but one of those names had a
+verified reading behind them, so the rule now says what it was for: no name
+on a page without a checked source. The one it caught was a source in my own
+notes that never became an entry.
 
 ## Prose
 Session bodies are drafted by the agent against build/SPINE.md and

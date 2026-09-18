@@ -34,7 +34,7 @@ deck is retained pending the author's separate refinement direction.
 | Session | required_reading | further_reading |
 |---|---|---|
 | 01-the-number | heusel-2017 | |
-| 02-frechet-distance | heusel-2017 | binkowski-2018 |
+| 02-frechet-distance | heusel-2017 | binkowski-2018, dowson-landau-1982 |
 | 03-the-instrument | kynkaanniemi-2023 | binkowski-2018 |
 | 04-getting-it-right | parmar-2022 | |
 | 05-the-bias | chong-forsyth-2020 | binkowski-2018, heusel-2017 |
