@@ -33,3 +33,52 @@ export function reportSentence(params:RecordingParams, lens:Lens, claim:'shift'|
     (['frame','temporal','joint'] as Lens[]).filter(other=>other!==lens).map(other=>verdictSummary(other,verdicts[other])).join(' ')+
     ` ${HEURISTIC_NOTE} These finite repeats do not establish certainty or instrument-independent quality.`;
 }
+
+const LETTER = {shift:'E', shuffle:'F'} as const;
+const capitalise = (text:string) => text.charAt(0).toUpperCase() + text.slice(1);
+
+/** One instrument's majority call across the repeats: a candidate, no ordering, or a tie. */
+function majority(calls:Verdict[]):Verdict|'tie' {
+  const c=tallyVerdicts(calls);
+  const top=Math.max(c.shift,c.shuffle,c.neither);
+  const leaders=(['shift','shuffle','neither'] as const).filter(k=>c[k]===top);
+  return leaders.length===1 ? leaders[0] : 'tie';
+}
+
+function describe(calls:Verdict[]):string {
+  const c=tallyVerdicts(calls);
+  const m=majority(calls);
+  return m==='neither' ? `gave no ordering in ${c.neither} of ${calls.length}`
+    : m==='tie' ? `split its repeats with no majority`
+    : `scored ${LETTER[m]} higher in ${c[m]} of ${calls.length}`;
+}
+
+/**
+ * The page's experiment summary, in words a reader need not decode: the
+ * instrument by name, the counts against the claim, what they amount to, and
+ * whether another instrument read the same recordings the other way. The
+ * repeats show consistency under a demonstration heuristic, not certainty.
+ */
+export function claimVerdict(claim:'shift'|'shuffle', lens:Lens, verdicts:Record<Lens,Verdict[]>):string {
+  const calls=verdicts[lens];
+  const c=tallyVerdicts(calls);
+  const opposite=claim==='shift'?'shuffle':'shift';
+  const total=calls.length;
+  const counts=`You claimed ${LETTER[claim]} scores higher. Under ${LENS_NAME[lens]}, ${c[claim]} of ${total} repeats agreed; ${c[opposite]} scored ${LETTER[opposite]} higher; ${c.neither} gave no ordering.`;
+  const verdict = c.neither===total ? 'This instrument gives no evidence either way.'
+    : c[claim]>c[opposite] ? 'Under this instrument the evidence supports your claim.'
+    : c[claim]<c[opposite] ? 'Under this instrument the evidence contradicts your claim.'
+    : 'Under this instrument the evidence is split, with no majority.';
+  const lenses=['frame','temporal','joint'] as Lens[];
+  const mine=majority(calls);
+  const differing=lenses.filter(other=>other!==lens && majority(verdicts[other])!==mine);
+  const supporting=lenses.filter(other=>majority(verdicts[other])===claim).length;
+  const listed=differing.map(other=>`${capitalise(LENS_NAME[other])} ${describe(verdicts[other])}.`).join(' ');
+  // The closing sentence follows from how many instruments back the claim,
+  // so it can never say a claim holds somewhere when it holds nowhere.
+  const closing = supporting===lenses.length ? 'All three instruments support the claim under this protocol.'
+    : supporting===0 ? 'No instrument supports the claim under this protocol.'
+    : 'The claim holds under some instruments and not others, so a report must name the one it used.';
+  const others = differing.length===0 ? `The other two instruments read these recordings the same way. ${closing}` : `${listed} ${closing}`;
+  return `${counts} ${verdict} ${others}`;
+}

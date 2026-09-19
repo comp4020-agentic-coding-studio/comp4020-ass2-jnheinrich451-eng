@@ -102,14 +102,14 @@ const { heading } = Astro.props;
       <div><strong data-rp-none>—</strong><span>give no ordering</span></div>
     </div>
   <div class="rp-runs">
-    <p class="rp-label">your protocol, run by run</p>
+    <p class="rp-label">which candidate each repeat scored higher</p>
     <p class="rp-strip" data-rp-strip>
       <span class="rp-empty">not run yet</span>
     </p>
     <p class="rp-legend" aria-hidden="true">
-      <span class="rp-key rp-key--supports">&#9679;</span> supports the claim
-      <span class="rp-key rp-key--against">&#9679;</span> says the opposite
-      <span class="rp-key rp-key--none">&#9679;</span> no ordering in this run
+      <span class="rp-key rp-key--supports">&#9679;</span> agrees with your claim
+      <span class="rp-key rp-key--against">&#9679;</span> the opposite of your claim
+      <span class="rp-key rp-key--none">&#9679;</span> no ordering in this repeat
     </p>
   </div>
 
@@ -138,7 +138,7 @@ const { heading } = Astro.props;
 
 <script>
   import { instrumentMeasurement, reportRuns, type Lens } from "../lib/bench";
-  import { LENS_NAME, reportOutcome, tallyVerdicts } from "../lib/bench-report";
+  import { LENS_NAME, claimVerdict, tallyVerdicts } from "../lib/bench-report";
 
   const REPEATS = 12;
   const SIZES = [100, 400, 800];
@@ -228,7 +228,7 @@ const { heading } = Astro.props;
         }
         const counts = tallyVerdicts(calls);
         status.textContent = `${counts[claim]}/${REPEATS} runs support the claim; ${REPEATS-counts[claim]-counts.neither} contradict it; ${counts.neither} give no ordering under the heuristic.`;
-        outcome.textContent = reportOutcome(claim,calls);
+        outcome.textContent = claimVerdict(claim,lens,results.verdicts);
         [counts[claim],REPEATS-counts[claim]-counts.neither,counts.neither].forEach((value,i)=>countOutputs[i].textContent=String(value));
         const fields=[['Claim',`${claim==='shift'?'E':'F'} scores higher`],['Instrument',LENS_NAME[lens]],['Data','Synthetic AR(1) recordings'],['Sample size',`N = ${snapshot.n} independent sequences per set`],['Sequence length',`d = ${snapshot.d} frames`],['Correlation',`rho = ${snapshot.rho}`],['Candidates',`E shift = ${snapshot.shift}; F permutes each sequence`],['Replay',`base seed = ${snapshot.seed}`],['Repetitions',`${REPEATS} repeats`],['Extra checks','One additional trial per sample size; seed rule below.']];
         for(const [label,value] of fields){const entry=document.createElement('div');entry.append(cell('dt',label),cell('dd',value));protocol.append(entry);}
@@ -278,7 +278,7 @@ const { heading } = Astro.props;
   .report button[disabled] {opacity:.5;cursor:progress;}
   .report :is(button,select,input,summary):focus-visible,.rp-table-wrap:focus-visible {outline:2px solid var(--at-link);outline-offset:4px;}
   .rp-status {font-size:.9rem;margin:.75rem 0 0;max-width:65ch;}
-  .rp-outcome {font-size:clamp(1.1rem,2vw,1.4rem);line-height:1.5;max-width:55ch;margin:1.5rem 0;}
+  .rp-outcome {font-size:clamp(1rem,1.4vw,1.15rem);line-height:1.7;max-width:62ch;margin:1.5rem 0;}
   .rp-counts {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;padding:1.5rem 0;margin:1rem 0 2rem;border-block:1px solid var(--at-border);}
   .rp-counts>div {display:flex;flex-direction:column;gap:.5rem;}
   .rp-counts strong {font-size:2.5rem;line-height:1;font-weight:500;font-variant-numeric:tabular-nums;}

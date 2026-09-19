@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {describe,it,expect} from 'vitest';
 import {instrumentMeasurement,lensScore,reportRuns,verdictFor,type Lens,type Verdict} from '../src/lib/bench';
-import {reportOutcome,reportSentence,verdictSummary} from '../src/lib/bench-report';
+import {claimVerdict,reportOutcome,reportSentence,verdictSummary} from '../src/lib/bench-report';
 const params={n:100,d:16,rho:0.9,shift:1,seed:51};
 const lenses:Lens[]=['frame','temporal','joint'];
 describe('lecture gadget evidence contracts',()=>{
@@ -38,6 +38,27 @@ describe('lecture gadget evidence contracts',()=>{
     for(const value of ['N = 100','d = 16','rho = 0.9','E shift = 1','base seed = 51','3 repeats','Demonstration heuristic v1','two independent','do not establish certainty'])expect(text).toContain(value);
     expect(text).toContain('F in 1/3; no ordering under the heuristic in 1/3');
     expect(text).toContain(reportOutcome('shift',calls as Verdict[]));
+  });
+  it('names the instrument and the disagreement in the summary, so nothing needs decoding',()=>{
+    // The page once said only "More repeats contradicted the claim than
+    // supported it", with no instrument named and no word that another
+    // instrument read the same recordings the other way.
+    const E=Array(12).fill('shift') as Verdict[], F=Array(12).fill('shuffle') as Verdict[], none=Array(12).fill('neither') as Verdict[];
+    const correlated={frame:E,temporal:F,joint:E};
+    const claimE=claimVerdict('shift','joint',correlated);
+    expect(claimE).toContain('You claimed E scores higher. Under whole-sequence scoring, 12 of 12 repeats agreed');
+    expect(claimE).toContain('supports your claim');
+    expect(claimE).toContain('Frame-to-frame differences scored F higher in 12 of 12.');
+    expect(claimE).toContain('holds under some instruments and not others');
+    const claimF=claimVerdict('shuffle','joint',correlated);
+    expect(claimF).toContain('You claimed F scores higher. Under whole-sequence scoring, 0 of 12 repeats agreed; 12 scored E higher');
+    expect(claimF).toContain('holds under some instruments and not others');
+    expect(claimF).toContain('contradicts your claim');
+    const independent=claimVerdict('shift','joint',{frame:E,temporal:none,joint:E});
+    expect(independent).toContain('Frame-to-frame differences gave no ordering in 12 of 12.');
+    // A claim that no instrument backs must never be told it holds somewhere.
+    expect(claimVerdict('shuffle','joint',{frame:E,temporal:none,joint:E})).toContain('No instrument supports the claim');
+    expect(claimVerdict('shift','joint',{frame:E,temporal:E,joint:E})).toContain('All three instruments support the claim');
   });
   it('does not suppress mixed outcomes when the first repeat gives no ordering',()=>{
     expect(verdictSummary('temporal',['neither','shift','shuffle'])).toContain('E ranked higher in 1/3 runs; F in 1/3');
