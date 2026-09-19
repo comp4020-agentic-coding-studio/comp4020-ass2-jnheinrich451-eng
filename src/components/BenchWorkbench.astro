@@ -94,10 +94,11 @@ const { heading } = Astro.props;
         </div>
       </div>
       <figure class="wb-strip">
-        <svg viewBox="0 0 340 170" role="img" data-wb-strip aria-label="Estimates accumulating above the true value"></svg>
+        <svg viewBox="0 0 340 170" role="img" tabindex="0" data-wb-strip aria-label="Estimates accumulating above the true value. Point at a dot, or focus here and use the arrow keys, to read its estimate."></svg>
+        <p class="wb-sr" aria-live="polite" data-wb-strip-readout></p>
         <figcaption>
           Every press adds a point. This is week 5&rsquo;s figure, built by
-          your own clicks. Changing any setting clears it, because points are
+          your own clicks. Point at a dot to read its estimate. Changing any setting clears it, because points are
           only comparable when every press measured the same thing.
         </figcaption>
       </figure>
@@ -135,6 +136,15 @@ const { heading } = Astro.props;
     let seed = 20260808;
     let mixture = false;
     let history: number[] = [];
+    // Presses since the strip was last cleared. The strip keeps only the last
+    // 30, so a dot's press number is counted from here, not from its index.
+    let presses = 0;
+    // The dot whose estimate is showing, or null. Hover and the arrow keys
+    // share it, so a reader on either sees the same readout.
+    let active: number | null = null;
+    let marks: SVGCircleElement[] = [];
+    let tag: SVGTextElement | null = null;
+    const stripReadout = el<HTMLElement>("[data-wb-strip-readout]");
 
     const params = () => ({
       shift: Math.max(-2, Math.min(2, read("shift", 0.05))),
@@ -162,7 +172,9 @@ const { heading } = Astro.props;
       const truth = mixture ? 0 : closedForm({ shift, v, d });
       const result = score(candidate, d, n, seed);
       history.push(result.estimate);
+      presses += 1;
       if (history.length > 30) history.shift();
+      active = null;
 
       trueOut.textContent = truth.toFixed(3);
       estOut.textContent = result.estimate.toFixed(2);
@@ -200,13 +212,84 @@ const { heading } = Astro.props;
       label.setAttribute("font-size", "11");
       label.setAttribute("font-family", "var(--at-font-mono, monospace)");
       strip.append(label);
-      history.forEach((value, i) => {
-        strip.append(dot(24 + (306 / 29) * i, y(value), 4.5, "var(--wb-cand)"));
+      marks = history.map((value, i) => {
+        const x = 24 + (306 / 29) * i;
+        const mark = dot(x, y(value), 4.5, "var(--wb-cand)");
+        // A wider transparent target over each dot: 4.5 units is too small
+        // to find with a pointer, let alone a finger.
+        const hit = dot(x, y(value), 10, "transparent");
+        hit.addEventListener("pointerenter", () => show(i));
+        hit.addEventListener("pointerleave", hide);
+        strip.append(mark, hit);
+        return mark;
       });
+      tag = document.createElementNS(svgNS, "text");
+      tag.setAttribute("fill", "var(--at-text)");
+      tag.setAttribute("font-size", "12");
+      tag.setAttribute("font-family", "var(--at-font-mono, monospace)");
+      tag.setAttribute("text-anchor", "middle");
+      tag.setAttribute("pointer-events", "none");
+      // A halo in the panel's own background keeps the number legible where
+      // it crosses a neighbouring dot.
+      tag.setAttribute("stroke", "var(--at-bg)");
+      tag.setAttribute("stroke-width", "4");
+      tag.setAttribute("paint-order", "stroke");
+      strip.append(tag);
+      stripReadout.textContent = "";
     };
 
+    // Show one press's estimate beside its dot, and hand the same words to a
+    // screen reader. Called from hover and from the arrow keys.
+    const show = (i: number) => {
+      if (!tag || !marks[i]) return;
+      if (active !== null) marks[active]?.removeAttribute("stroke");
+      active = i;
+      const mark = marks[i];
+      mark.setAttribute("stroke", "var(--at-text)");
+      mark.setAttribute("stroke-width", "1.5");
+      const x = Number(mark.getAttribute("cx"));
+      const cy = Number(mark.getAttribute("cy"));
+      const words = `press ${presses - history.length + i + 1}: ${history[i].toFixed(2)}`;
+      tag.textContent = words;
+      // The dots cluster near the top of the strip, so the label sits below
+      // its dot unless that would reach the true-value line's label row.
+      tag.setAttribute("x", String(Math.min(270, Math.max(64, x))));
+      tag.setAttribute("y", String(cy + 24 > 150 ? cy - 12 : cy + 24));
+      stripReadout.textContent = `Estimate for ${words}`;
+    };
+
+    const hide = () => {
+      if (active !== null) marks[active]?.removeAttribute("stroke");
+      active = null;
+      if (tag) tag.textContent = "";
+    };
+
+    strip.addEventListener("focus", () => show(active ?? history.length - 1));
+    strip.addEventListener("blur", hide);
+    strip.addEventListener("keydown", (event) => {
+      if (!history.length) return;
+      const last = history.length - 1;
+      const from = active ?? last;
+      const next =
+        event.key === "ArrowLeft" ? Math.max(0, from - 1)
+        : event.key === "ArrowRight" ? Math.min(last, from + 1)
+        : event.key === "Home" ? 0
+        : event.key === "End" ? last
+        : null;
+      if (event.key === "Escape") {
+        hide();
+        return;
+      }
+      if (next === null) return;
+      event.preventDefault();
+      show(next);
+    });
+
     const rescore = (clear: boolean) => {
-      if (clear) history = [];
+      if (clear) {
+        history = [];
+        presses = 0;
+      }
       seed = (seed * 1664525 + 1013904223) >>> 0;
       render();
     };
@@ -367,5 +450,20 @@ const { heading } = Astro.props;
 
   .wb-est {
     color: #b5495b;
+  }
+
+  [data-wb-strip]:focus-visible {
+    outline: 2px solid var(--at-link);
+    outline-offset: 3px;
+  }
+
+  .wb-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 </style>
