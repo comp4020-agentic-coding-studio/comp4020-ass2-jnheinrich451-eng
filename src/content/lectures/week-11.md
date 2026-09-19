@@ -7,6 +7,13 @@ week: 11
 date: 2026-10-19
 arc: C
 report: true
+activity_lead: >-
+  The protocol above could be run twelve times because every number in it was
+  synthetic and every setting was declared. The activity below has neither
+  advantage: one image comparison, on pixels you choose, measured once. What
+  carries over is the order of work. Write the claim and the result that would
+  contradict it before you measure, and keep every setting beside the number
+  when you export it.
 lecture_format: formal
 lecture_stage: ready
 related:
