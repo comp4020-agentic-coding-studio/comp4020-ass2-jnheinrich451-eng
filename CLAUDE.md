@@ -255,6 +255,11 @@ check ran on a machine where those files existed.
   index rather than the disk and fails when a tracked file imports an
   untracked one, so running `pnpm check` with the commit staged tests the
   commit rather than the desk it was made at.
+- **A commit runs only if the check exits 0.** Put the commit inside the
+  condition, never after the check in the same line: 994a836 went out while
+  `pnpm check` failed on a type error, because the commit was chained after
+  it and the log was read for test counts only. Read the exit code, not the
+  summary lines.
 - **Before a ship, check HEAD alone.** Build a clean worktree of HEAD and run
   `pnpm check` there. Nothing else proves the tree that will be marked.
 
