@@ -12,54 +12,50 @@ and the concepts stay related. Level 8 because it assumes probability and code.
 Every score on the bench having a closed form is what let me tell whether the
 agent's output was true.
 
-A good course, I decided, is one idea carried all the way. Assignment 1 lost most on response, the idea in my head and not on the page,
-so the harness came first.
+The next step was to turn the spec into guidelines that both the agent and I could understand.
 
 ## Guidelines
 
-Three rules went into `CLAUDE.md` before any content:
-argue instead of setting a mood, earn anything symbolic or cut it, and make
-non-adjacent weeks need each other ([`3dde85d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3dde85d)). Later the course team's advice became one sentence at its top that every page
-is judged against ([`ca3e465`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/ca3e465)).
+Three rules went into `CLAUDE.md`:
+Rule 1, argue instead of setting a mood; Rule 2, earn anything symbolic or cut it; and Rule 3, make
+non-adjacent weeks need each other ([`3dde85d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3dde85d)). Later the course team's advice on the response criterion became one sentence that every page is judged against ([`ca3e465`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/ca3e465)).
 
 A rule I kept re-applying by hand became a check. A coined term never appears
-before the week that coins it ([`390f6be`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/390f6be)); a course-wide rule is stated once
-and linked everywhere else ([`0c29cbd`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/0c29cbd)); a lecture marked ready carries a deck
-or an instrument ([`df3ef05`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/df3ef05)); every week names its measurement-log entry
+before the week that coins it ([`390f6be`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/390f6be)); every week names its measurement-log entry
 ([`7772ffa`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/7772ffa)).
 
-Some things I left out on purpose. Rule 1 has no check: whether a paragraph
-argues or sets a mood is judgement, and a test for it would pass mood, so I read
-against it myself. Week 12 has no instrument, because its work is the defence.
+The rules serve as the overall skeleton. First, after later modifications some sections no longer followed the instructions, and manual verification brought them back. Second, some parts are exceptions: the week 12 session has no instrument.
 
-I read the spec for what it allows as well as what it requires, and checked each
-edge before crossing it. The platform is fixed, so its one divergence is a
-gated variable that CI never sets ([`901d147`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/901d147)). The spec asks for one real deck; three more lectures carry an instrument
-instead, labelled so none promises slides.
+I checked the spec for what it requires at minimum. The spec requires one real slide deck, so the week 2 lecture has one and the other lectures carry instruments. The course has twelve sessions and four formal lectures three weeks apart, in weeks 2, 5, 8 and 11, which avoids twelve repetitive lectures.
+
 
 ## How I got here
 
-My anchor was week 5: I read three papers and wrote that page myself, and
+My anchor was week 5: I read three papers and wrote that page myself ([`3dde85d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/3dde85d)), and
 everything else was written against it ([`c942868`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/c942868)).
 
-The build was plain, and I would rather say so than dress it up. It was a loop
-in stages: an idea, then a paragraph or a picture, then I checked the design
-and accepted it or pushed back. I directed by prompt, by instruction file and
-by looking at the render.
+I used the mathematics and the papers as the course's structure. It was a loop: for each session an idea, then paragraphs, then a check that I accepted or pushed back on. I directed by prompt, by instruction file and by looking at the render.
 
-Most bugs were one bug: a check that could not fail. A coherence test read a
-field the API does not carry ([`224688b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/224688b)); I found clipped slides by eye before any test did ([`1fc21a1`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/1fc21a1)). A number teaches nothing by itself,
-so the second half let a student reach it alone, in labs and instruments that
-run in the page ([`30f9e85`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/30f9e85)). That added a step: measure first, then build.
-Week 7 claimed two newer scores catch what FID misses; measured, neither does,
-and the argument changed to the true one ([`2b2ffc2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/2b2ffc2)).
+Three representative issues show how I worked. Each was diagnosed, and
+each ended in a change to the harness, not a one-off repair.
+
+- **The text was wrong; a measurement caught it** ([`2b2ffc2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/2b2ffc2)). Week 7
+  claimed KID and coverage catch C, which FID scores as zero. Measured at 2048
+  dimensions, C sits inside R-again's range in every strip: KID's cubic kernel
+  stops at the third moment, where C still matches R. I took the argument the
+  measurement supported, that nobody sees C.
 
 ![Week 7's instrument at the bench's 2048 dimensions after five presses: KID separates A, density and coverage separate B, and C's dots sit inside R-again's range in all three strips.](docs/process/week7-nobody-sees-c.png)
 
-The worst failure was the same bug one level up. Every check ran on my working
-tree, which held uncommitted files, so eight commits went out green while HEAD
-could not build. The repair was at the harness level: a check that reads the
-git index, and a rule that a check proves the tree it ran on ([`dbad4d6`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/dbad4d6)).
+- **The checks were wrong; the harness caught it** ([`dbad4d6`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/dbad4d6)). Eight
+  commits went out green while HEAD could not build, because every check ran
+  on a working tree holding uncommitted files. The fix was a check that reads
+  the git index, and a rule that a check proves only the tree it ran on.
 
-No single step was hard. The work was keeping my instructions, the site and the
-checks in agreement, and that is mostly what the commit history shows.
+- **The agent was half right; I corrected it** ([`626b7b2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass2-jnheinrich451-eng/commit/626b7b2)). It found that
+  every page named its result before the reader could click, against my own
+  sentence, and proposed reworking six pages. I objected that students need
+  instructions first. Instructions stayed; only the observed outcome moved into
+  a closed "Expected results" fold, on two pages, held by a check.
+
+Other changes followed the guidelines. For a large design, I first discussed the idea with the agent, mostly its feasibility. For fixes, I probed the bug first, then guided the fix through the harness and the prompt.
