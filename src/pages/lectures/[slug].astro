@@ -31,6 +31,9 @@ const wantsWorkbench = loose.workbench === true;
 const wantsExtrapolator = loose.extrapolator === true;
 const wantsInstruments = loose.instruments === true;
 const wantsReport = loose.report === true;
+// A lecture may bridge its instrument to the workspace activity that follows
+// it, so the two read as one argument rather than two blocks.
+const activityLead = typeof loose.activity_lead === "string" ? loose.activity_lead : null;
 const isOutline = lecture.data.lecture_stage === 'outline';
 const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
 ---
@@ -45,12 +48,14 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
   {wantsExtrapolator && <BenchExtrapolator />}
   {wantsInstruments && <InstrumentBench />}
   {wantsReport && <ReportBench />}
+  {activity && activityLead && <p class="activity-lead">{activityLead}</p>}
   {activity && <WorkspaceActivity activity={activity} />}
   <TeachingTeam teachers={lecture.data.teachers} />
   <RelatedContent entry={lecture} collections={graphCollections} />
 </ContentLayout>
 
 <style>
+  .activity-lead {max-width:68ch;margin-block:2.5rem 1rem;line-height:1.75;}
   .lecture-preview {border-left:2px solid var(--at-primary);padding:.9rem 1.2rem;margin-block:1.5rem;background:var(--at-bg);}
   .lecture-preview strong {color:var(--at-primary);font:.8rem var(--at-font-mono,monospace);}
   .lecture-preview p {font-size:.9rem;line-height:1.7;margin:.5rem 0 0;}

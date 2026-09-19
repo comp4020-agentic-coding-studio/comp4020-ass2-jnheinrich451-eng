@@ -205,10 +205,15 @@ const SIZES = [60, 100, 200, 400, 800];
       );
       plot.append(node("line", { x1: left, x2: left, y1: bottom, y2: top, stroke: "var(--xp-axis)" }));
       plot.append(text("estimated FID", { x: left, y: 16, fill: "var(--xp-axis-ink)" }));
-      // Sits on the row below the N labels: anchored at the axis it names, and
-      // clear of N=800, which lands almost on top of it.
+      // The tick labels are bare numbers so all five share one row: "N=400"
+      // and "N=800" collided at 1/N spacing and had to be staggered. The row
+      // below names the axis at both ends, where 1/N = 0 is the reach the
+      // fitted line makes.
       plot.append(
         text("1/N = 0", { x: left - 14, y: bottom + 32, fill: "var(--xp-fit)", "text-anchor": "start" }),
+      );
+      plot.append(
+        text("sample size N", { x: right, y: bottom + 32, fill: "var(--xp-axis-ink)", "text-anchor": "end" }),
       );
       for (const n of SIZES) {
         const at = x(1 / n);
@@ -216,9 +221,9 @@ const SIZES = [60, 100, 200, 400, 800];
           node("line", { x1: at, x2: at, y1: bottom, y2: bottom + 4, stroke: "var(--xp-axis)" }),
         );
         plot.append(
-          text("N=" + n, {
+          text(String(n), {
             x: at,
-            y: bottom + (n === 400 ? 32 : 18),
+            y: bottom + 18,
             fill: "var(--xp-axis-ink)",
             "text-anchor": "middle",
           }),

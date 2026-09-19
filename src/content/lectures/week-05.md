@@ -7,6 +7,14 @@ week: 5
 date: 2026-08-31
 arc: B
 extrapolator: true
+activity_lead: >-
+  The ladder above spent its draws across five sample sizes and fitted a line
+  to estimate where the bias runs out. The activity below spends them
+  differently: the distributions stay fixed, and you change only the seed,
+  then only the number of repetitions. Watch which part of the gap moves.
+  Repetition tightens the spread around what the estimator expects to report.
+  It leaves that expectation where it was, above the population value, at
+  every sample size you hold fixed.
 lecture_format: formal
 lecture_stage: ready
 related:
