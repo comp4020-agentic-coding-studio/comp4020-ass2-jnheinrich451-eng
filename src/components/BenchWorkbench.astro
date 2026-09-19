@@ -44,6 +44,17 @@ const { heading } = Astro.props;
     </p>
   </noscript>
 
+  <dl class="wb-key" aria-label="The distributions the buttons set">
+    <dt>R</dt>
+    <dd>N(0, I) in d dimensions. The reference every candidate is scored against.</dd>
+    <dt>A</dt>
+    <dd>N(0.05&middot;1, I). Every coordinate&rsquo;s mean shifted by 0.05, variance untouched. True FID 0.160 at d&nbsp;=&nbsp;64, and 5.12 at the bench&rsquo;s 2048.</dd>
+    <dt>B</dt>
+    <dd>N(0, 1.1&middot;I). Mean exact, every coordinate&rsquo;s variance 1.1. True FID 0.152 at d&nbsp;=&nbsp;64, and 4.88 at 2048.</dd>
+    <dt>C</dt>
+    <dd>Week 6&rsquo;s candidate. R&rsquo;s mean and covariance, but the first coordinate splits into two lumps at &minus;0.9 and +0.9. True FID 0.</dd>
+  </dl>
+
   <form class="wb-controls" data-wb-controls>
     <div class="wb-field">
       <label for="wb-shift">mean shift</label>
@@ -465,5 +476,26 @@ const { heading } = Astro.props;
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+
+  /* The key to the preset buttons: the letter in mono, as the home page's
+     bench list sets it, so R, A, B and C read as labels. */
+  .wb-key {
+    display: grid;
+    grid-template-columns: 1.75rem 1fr;
+    gap: 0.35rem 0.75rem;
+    max-width: 68ch;
+    margin: 0 0 1.5rem;
+    font-size: 0.92rem;
+  }
+
+  .wb-key dt {
+    font-family: var(--at-font-mono, ui-monospace, monospace);
+    font-weight: 600;
+    color: var(--at-primary);
+  }
+
+  .wb-key dd {
+    margin: 0;
   }
 </style>
