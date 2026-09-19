@@ -48,9 +48,9 @@ function majority(calls:Verdict[]):Verdict|'tie' {
 function describe(calls:Verdict[]):string {
   const c=tallyVerdicts(calls);
   const m=majority(calls);
-  return m==='neither' ? `gave no ordering in ${c.neither} of ${calls.length}`
-    : m==='tie' ? `split its repeats with no majority`
-    : `scored ${LETTER[m]} higher in ${c[m]} of ${calls.length}`;
+  return m==='shift' || m==='shuffle' ? `scored ${LETTER[m]} higher in ${c[m]} of ${calls.length}`
+    : m==='neither' ? `gave no ordering in ${c.neither} of ${calls.length}`
+    : `split its repeats with no majority`;
 }
 
 /**
