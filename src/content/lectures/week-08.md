@@ -7,6 +7,13 @@ week: 8
 date: 2026-09-28
 arc: B
 instruments: true
+activity_lead: >-
+  The bench above shuffled frames inside each sequence, and only an instrument
+  that reads order could tell. The activity below shuffles something else: the
+  order of whole images in a collection, in the image lab, with real Inception
+  features. Predict what that shuffle can change before you press it, and keep
+  the two kinds of order apart when you bring the result back to the pooled
+  frames and the whole sequence.
 lecture_format: formal
 lecture_stage: ready
 related:
