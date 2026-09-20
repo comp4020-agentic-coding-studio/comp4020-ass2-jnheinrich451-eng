@@ -1,0 +1,38 @@
+<!-- Enhance the theme's dialog without replacing its search or keyboard handling. -->
+<script>
+  const initialized = new WeakSet<HTMLDialogElement>();
+
+  function initializeSearchDismissal() {
+    document.querySelectorAll<HTMLDialogElement>('[data-at-search-dialog]').forEach(dialog => {
+      if (initialized.has(dialog)) return;
+      const panel = dialog.querySelector<HTMLElement>('.at-search-panel');
+      if (!panel) return;
+      initialized.add(dialog);
+      let startedOutside = false;
+
+      const outsidePanel = (event: MouseEvent) => {
+        if (event.target instanceof Node && panel.contains(event.target)) return false;
+        const bounds = panel.getBoundingClientRect();
+        return event.clientX < bounds.left || event.clientX > bounds.right
+          || event.clientY < bounds.top || event.clientY > bounds.bottom;
+      };
+
+      dialog.addEventListener('pointerdown', event => {
+        startedOutside = dialog.open && event.isPrimary && event.button === 0 && outsidePanel(event);
+      });
+      dialog.addEventListener('click', event => {
+        const dismiss = startedOutside && event.button === 0 && outsidePanel(event);
+        startedOutside = false;
+        if (dialog.open && dismiss) dialog.close();
+      });
+      dialog.addEventListener('pointercancel', () => { startedOutside = false; });
+      dialog.addEventListener('close', () => { startedOutside = false; });
+      dialog.dataset.searchDismissalReady = 'true';
+      // Native dialog cancellation and the theme's Escape handler remain intact.
+      // close() also retains the theme's query reset and browser focus restoration.
+    });
+  }
+
+  initializeSearchDismissal();
+  document.addEventListener('astro:page-load', initializeSearchDismissal);
+</script>

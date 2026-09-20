@@ -1,0 +1,167 @@
+% SLOP8412 optional final-report starter. Compile twice with pdfLaTeX.
+% Replace every prompt and placeholder. The assessment brief is authoritative.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=23mm,headheight=28pt,headsep=14pt]{geometry}
+\usepackage{graphicx,xcolor,amsmath,amssymb,booktabs,tabularx}
+\usepackage{fancyhdr,titlesec,enumitem,needspace}
+\usepackage{hyperref}
+\definecolor{SlopGold}{HTML}{996514}
+\definecolor{PromptGrey}{HTML}{505050}
+\definecolor{RuleGold}{HTML}{B97D1C}
+\hypersetup{colorlinks=true,urlcolor=SlopGold,linkcolor=SlopGold,citecolor=SlopGold,
+  pdftitle={SLOP8412 Final Report Template},pdfauthor={Slop University}}
+
+% Replace these fields. A compact title block counts within the report pages.
+\newcommand{\reporttitle}{[Your report title]}
+\newcommand{\studentname}{[Your name]}
+\newcommand{\studentid}{[Student ID]}
+\newcommand{\reportdate}{[Submission date]}
+% Replace this URL with the deployed course URL if your copy lives elsewhere.
+\newcommand{\courseurl}{https://comp4020-agentic-coding-studio.github.io/comp4020-ass2-jnheinrich451-eng}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\raisebox{-7pt}{\includegraphics[height=25pt]{slop-crest.png}}\hspace{8pt}\textsf{Slop / University}}
+\fancyhead[R]{\small\textsf{SLOP8412 / Final report}}
+\fancyfoot[L]{\small\textsf{\studentid}}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{RuleGold}\leaders\hrule height\headrulewidth\hfill}}
+\titleformat{\section}{\Large\sffamily\bfseries\color{SlopGold}}{}{0pt}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{14pt}{7pt}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlist[itemize]{leftmargin=*,nosep,topsep=4pt}
+\newcommand{\prompt}[1]{{\small\color{PromptGrey}\textit{Writing prompt: #1}\par}}
+\newcommand{\blank}{\textemdash}
+
+\begin{document}
+{\small\sffamily\color{SlopGold}ADVANCED FR\'ECHET INCEPTION DISTANCE}
+
+{\LARGE\sffamily\bfseries\reporttitle\par}
+\vspace{8pt}
+\studentname\enspace / \studentid\hfill\reportdate
+
+{\small\textbf{Optional starter, not a completed submission.}
+Replace all prompts, empty cells and example objects. Submit at most six pages
+plus references, together with a separate archive that scores the bench from a
+seed. This title block is part of the report, not an extra cover page.
+The \href{\courseurl/assessments/final-report/}{assessment brief} governs the task;
+the \href{\courseurl/policies/}{policies page} governs reporting and tool disclosure.
+Delete this guidance paragraph before submission.}
+
+\section{Part A. The proposal [25 points]}
+\prompt{State what a paper should report in place of FID and which failure it
+addresses. Define the proposal precisely enough to implement and evaluate it.
+For an existing method, cite its source and identify your contribution.}
+
+\subsection{Definition and intended use}
+\prompt{Name the inputs, parameters, output, units and direction of improvement.
+Say which comparisons are meaningful. Replace the equation placeholder below.}
+\begin{equation}
+  \widehat{Q}_{\theta}(\mathcal{X}_R,\mathcal{X}_G)
+  = \text{[define your proposed metric here]}.
+  \label{eq:proposal}
+\end{equation}
+\prompt{Explain each symbol in Equation~\ref{eq:proposal}. A reporting protocol
+may need a precise procedure rather than a single scalar equation.}
+
+\section{Part B. The evaluation [45 points]}
+\prompt{Evaluate the proposal against the course's standard. Address each of the
+four questions below, or justify its absence. An empty subsection is not a
+justification. Keep measured evidence separate from proposed experiments.}
+
+\subsection{Measurement protocol}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Setting & Your specification \\
+\midrule
+Reference and candidates & [Bench R; candidates A, B and C; construction] \\
+Sample counts & [$N_R$, $N_G$, and the sample-size ladder for extrapolation] \\
+Implementation & [Code version, estimator, precision and dependencies] \\
+Representation & [Feature map; preprocessing, or why it is not applicable] \\
+Randomness & [Seeds, repetitions, and fixed versus redrawn reference] \\
+Extrapolation & [Fit, range, residual checks and sensitivity for FID$_\infty$] \\
+\bottomrule
+\end{tabularx}
+
+\Needspace{11\baselineskip}
+\subsection{Bench comparison}
+\prompt{Score A, B and C under the proposal beside FID and FID$_\infty$.
+Identify the protocol for each row. Empty cells below are placeholders, not
+zero scores. Explain the direction and units of your proposed score; its scale
+need not be comparable to FID's.}
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXXXX@{}}
+\toprule
+Candidate & Protocol & FID & FID$_\infty$ & Proposed $Q$ \\
+\midrule
+A & \blank & \blank & \blank & \blank \\
+B & \blank & \blank & \blank & \blank \\
+C & \blank & \blank & \blank & \blank \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Estimator bias / Week 5}
+\prompt{How does the estimate change with sample size? Separate sampling
+variation from bias. State what the measurements support and what remains
+unknown; justify any missing evaluation.}
+
+\subsection{Blind spots / Week 6}
+\prompt{Describe a construction that challenges your proposal. Distinguish a
+failure of the estimator from a limitation of the quantity it estimates.
+Explain what happens to C, without assuming that a new metric must detect it.}
+
+\subsection{Correlation with human judgement / Week 10}
+\prompt{Evaluate the evidence for agreement with people. A synthetic bench is
+not a human study. If you did not run a study, justify that absence and specify
+what evidence would be needed instead; do not invent human ratings.}
+
+\subsection{Cost of adoption / Week 11}
+\prompt{What would a paper pay in computation, data, human effort and lost
+comparability to adopt the proposal? State the assumptions behind the account.}
+
+% Example figure container only; replace with an actual figure and caption.
+% For a PDF/PNG figure use: \includegraphics[width=.85\linewidth]{your-figure.pdf}
+\begin{figure}[htbp]
+  \centering
+  \fbox{\parbox[c][18mm][c]{0.88\linewidth}{\centering\small
+    [Replace with your diagnostic figure]\par
+    No measurements are supplied by this placeholder.}}
+  \caption{[Explain the claim this figure tests, the protocol and uncertainty.
+  State what the reader can and cannot conclude.]}
+  \label{fig:evidence}
+\end{figure}
+
+\section{Part C. Where it fails [30 points]}
+\prompt{Name the condition under which you would still report FID. State how
+badly the proposal fails and which of the four evaluation criteria exposes
+that failure. If your answer is ``never'', revisit Part B.}
+
+\subsection{The boundary of the claim}
+\prompt{State the strongest claim your evidence supports, then name a claim it
+does not support. Explain the practical consequence of that distinction.}
+
+\subsection{Reproducing this report}
+\prompt{Point to the separate archive: entry command, seed, environment,
+expected outputs and the files behind your tables and figures. Follow the
+linked policies for reporting and any tool-use disclosure; this template does
+not create a second set of course rules.}
+
+% References are in addition to the six-page report limit. This explicit break
+% makes the boundary visible; do not put extra report content in this section.
+\clearpage
+\section*{References}
+\prompt{Replace this prompt with the sources actually used. Cite them where
+their ideas enter the report. No references or results have been fabricated
+for this starter. You may use BibTeX, biblatex, or the manual example below.}
+% \begin{thebibliography}{9}
+% \bibitem{your-key} Author. Title. Venue, year.
+% \end{thebibliography}
+\end{document}

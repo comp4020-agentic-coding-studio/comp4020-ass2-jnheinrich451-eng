@@ -1,0 +1,187 @@
+---
+import {withBase} from 'astro-theme-university/url';
+import {selfChecks} from '../lib/self-check';
+import {teachingComics} from '../data/teaching-comics';
+import artwork from '../data/comic-artwork.json';
+const groups = [{prefix:'L',name:'Lectures',count:5},{prefix:'S',name:'Sessions',count:12}];
+---
+<div class="comic-collection" data-comic-collection>
+  <header class="collection-intro">
+    <p class="collection-kicker">SLOP8412 / Optional collection / 17 teaching comics</p>
+    <h2>Small comics.<br />Same hard questions.</h2>
+    <p>A correct calculation can still support the wrong conclusion. GPT and Claude meet seventeen ways that happens, one short conversation at a time.</p>
+    <p class="collection-help">Use a code from a lecture or session self-check. Codes already unlocked in this browser appear automatically. This is ungraded, with no account or submission.</p>
+  </header>
+  <form class="collection-entry" data-code-form hidden novalidate>
+    <label for="comic-code">Your collection code</label>
+    <div><input id="comic-code" name="code" type="text" placeholder="SLOP-L01" autocomplete="off" spellcheck="false" maxlength="40" aria-describedby="code-help" /><button type="submit">Unlock comic ↗</button></div>
+    <p class="collection-help" id="code-help">Paste the code, including its hyphen. Letter case and surrounding spaces do not matter.</p>
+  </form>
+  <p class="collection-status" data-collection-status role="status" aria-live="polite" aria-atomic="true"></p>
+  <p class="collection-help" data-collection-storage role="status"></p>
+  <noscript><p>Collecting and previewing comics needs JavaScript. The links below still take you to each lesson and its answer explanation; no teaching or assessment material is locked.</p></noscript>
+  <div class="collection-toolbar" data-collection-controls hidden>
+    <p><strong data-collected-total>0 / 17</strong> collected in this browser <button class="collection-reset" type="button" data-reset-collection aria-expanded="false" aria-controls="collection-reset-confirm">Reset</button></p>
+    <div><button type="button" data-expand-comics>Expand available comics</button><button type="button" data-collapse-comics>Collapse all</button></div>
+  </div>
+  <div class="collection-reset-confirm" id="collection-reset-confirm" data-reset-confirm hidden role="group" aria-labelledby="collection-reset-question">
+    <p id="collection-reset-question">Reset all comic unlocks in this browser?</p>
+    <p class="collection-help">This also resets the matching quiz unlock flags and ends Spoilers. Your theme, workspace and lab settings are untouched. You can unlock comics again with the same codes.</p>
+    <div><button type="button" data-cancel-reset>Keep my collection</button><button type="button" data-confirm-reset>Reset collection</button></div>
+  </div>
+  <aside class="collection-preview" data-preview-banner hidden>
+    <p><strong>Preview mode · All 17 visible</strong><br />Preview does not add cards to your collection. Refreshing or leaving ends this mode.</p>
+    <button type="button" data-exit-preview>Return to my collection</button>
+  </aside>
+  <nav class="collection-jump" aria-label="Collection groups"><a href="#comics-L">Lectures · 5</a><a href="#comics-S">Sessions · 12</a></nav>
+  {groups.map(group => (
+    <details class="comic-group" id={`comics-${group.prefix}`} open data-comic-group={group.prefix}>
+      <summary><span>{group.name}</span><span class="collection-kicker" data-group-count={group.prefix}>0 / {group.count} collected</span></summary>
+      {selfChecks.filter(q => q.id.startsWith(group.prefix)).map(q => {
+        const comic = teachingComics.find(c => c.id === q.id)!;
+        const art = artwork.find(c => c.id === q.id)!;
+        const takeaway = q.explanation.find(p => p.startsWith('Teaching takeaway:'))!.replace('Teaching takeaway: ', '');
+        return <details class="comic-card" id={`comic-${q.id}`} data-comic-id={q.id}>
+          <summary><span class="collection-kicker">{q.id} / Week {Number(q.id.slice(1))}</span><span class="comic-card-title">{comic.title}</span><span class="comic-state" data-card-state>Locked</span></summary>
+          <div class="comic-lock" data-card-lock><p>Find this card's code in the optional self-check for <a href={withBase(`${q.route}#self-check-${q.id}`)}>{q.title}</a>. You can solve the question or review its explanation.</p></div>
+          <div class="comic-content" data-card-content hidden>
+              <figure class="comic-artwork">
+                <img data-preview-src={withBase(`/comics/${q.id}-preview.webp`)} alt={`${comic.title}. ${art.scene}`} width="640" height="960" loading="lazy" decoding="async" />
+                <figcaption>Six-panel comic · Read left to right, then down.</figcaption>
+              </figure>
+              <div class="comic-reading-actions">
+                <button type="button" data-read-comic data-full-src={withBase(`/comics/${q.id}-full.webp`)} data-title={`${q.id} · ${comic.title}`} data-note={[takeaway, comic.note].filter(Boolean).join(' ')} aria-haspopup="dialog">Read comic ↗</button>
+                <span class="collection-help">Open the large reader to zoom, or read the text below.</span>
+              </div>
+              <details class="comic-transcript" data-comic-transcript>
+                <summary>Read transcript</summary>
+                <p>{art.scene}</p>
+                <ol>{(art.dialogue.length ? art.dialogue : comic.panels.map(panel => `${panel.speaker}: ${panel.line}`)).map(line => <li>{line}</li>)}</ol>
+                <p class="collection-help">Teaching labels: {comic.panels.map(p => p.prop).join(' · ')}</p>
+              </details>
+            <p class="comic-takeaway"><strong>Keep this:</strong> {takeaway}</p>
+            {comic.note && <p class="comic-note">{comic.note}</p>}
+            <div class="comic-links"><a href={withBase(`${q.route}#self-check-${q.id}`)}>Revisit the self-check ↗</a><a href={withBase(`/self-checks/#self-check-${q.id}`)}>Read the answer and teaching notes ↗</a></div>
+          </div>
+        </details>;
+      })}
+    </details>
+  ))}
+  <details class="collection-spoilers" data-collection-spoilers>
+    <summary>Spoilers</summary>
+    <p>This optional shortcut reveals every comic without collecting it. Press the button three times; no rapid clicking is required. Keyboard activation works too.</p>
+    <button type="button" data-reveal-preview hidden>Reveal preview · 0 / 3</button>
+    <p data-preview-status role="status" aria-live="polite"></p>
+    <a href={withBase('/self-checks/')}>Review all 17 questions and explanations ↗</a>
+  </details>
+  <footer class="collection-footer">
+    <p>Only unlock flags are saved locally. They do not sync across devices; clearing browser data removes them. These playful locks are not security or proof of learning.</p>
+    <p>These are scripted teaching conversations using the supplied GPT and Claude character avatars, not live AI responses or official character endorsements. Comics are AI-generated illustrations with readable transcripts; decorative plots and props are not measured experimental results.</p>
+  </footer>
+  <dialog class="comic-reader" data-comic-reader aria-labelledby="comic-reader-title" aria-describedby="comic-reader-help">
+    <div class="reader-shell">
+      <header class="reader-header">
+        <h2 id="comic-reader-title" data-reader-title>Comic reader</h2>
+        <button type="button" data-reader-close autofocus>Close ×</button>
+      </header>
+      <div class="reader-controls" role="group" aria-label="Comic zoom">
+        <button type="button" data-reader-smaller aria-label="Zoom out">−</button>
+        <span data-reader-zoom aria-live="polite">Fit width</span>
+        <button type="button" data-reader-larger aria-label="Zoom in">+</button>
+        <button type="button" data-reader-reset>Fit width</button>
+        <button type="button" data-reader-transcript>Read transcript</button>
+      </div>
+      <p class="reader-help" id="comic-reader-help">Scroll to read. Zoom for detail; scroll sideways when enlarged. Escape or click outside to close.</p>
+      <div class="reader-viewport" data-reader-viewport tabindex="0" role="region" aria-label="Scrollable comic image">
+        <p data-reader-status role="status"></p>
+        <img data-reader-image alt="" width="1024" height="1536" hidden />
+      </div>
+      <footer class="reader-footer">
+        <p data-reader-note></p>
+        <a data-reader-original target="_blank" rel="noopener">Open image in a new tab ↗</a>
+      </footer>
+    </div>
+  </dialog>
+</div>
+<script>
+  import {readCollection, saveCard, questionForCode, resetCollection} from '../lib/comic-collection';
+  import {initializeCollection} from '../lib/comic-collection-ui';
+  import {initializeComicReader} from '../lib/comic-reader';
+  const initialized = new WeakSet<HTMLElement>();
+  function setup() {
+    const root = document.querySelector<HTMLElement>('[data-comic-collection]');
+    if (!root || initialized.has(root)) return;
+    initialized.add(root);
+    initializeCollection(root, {readCollection, saveCard, questionForCode, resetCollection});
+    initializeComicReader(root);
+  }
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>
+<style>
+  .comic-collection {max-width:1100px;}
+  .comic-collection [hidden] {display:none !important;}
+  .collection-intro {max-width:72ch;margin-bottom:2rem;}
+  .collection-kicker {font:.75rem/1.6 var(--at-font-mono,monospace);color:var(--at-primary);}
+  .collection-intro h2 {font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.12;color:var(--at-primary);margin:1rem 0 1.25rem;}
+  .comic-collection p {line-height:1.7;}
+  .collection-help,.collection-footer,.comic-note {font-size:.85rem;color:var(--at-text-muted);}
+  .collection-entry {border-block:1px solid var(--at-border);padding-block:1.5rem;}
+  .collection-entry label {display:block;margin-bottom:.6rem;}
+  .collection-entry>div,.collection-toolbar,.collection-toolbar>div,.collection-preview,.comic-links {display:flex;align-items:center;flex-wrap:wrap;gap:.75rem 1rem;}
+  .collection-entry input {box-sizing:border-box;width:19rem;max-width:100%;padding:.8rem;border:1px solid var(--at-border);background:var(--at-bg);color:var(--at-text);font:1rem var(--at-font-mono,monospace);}
+  .comic-collection button {padding:.7rem 1rem;border:1px solid var(--at-primary);background:var(--at-bg);color:var(--at-primary);font:.8rem/1.6 var(--at-font-mono,monospace);cursor:pointer;}
+  .comic-collection button:disabled {cursor:default;opacity:.65;}
+  .comic-collection :is(input,button,a,summary):focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+  .collection-status:empty,[data-collection-storage]:empty,[data-preview-status]:empty {display:none;}
+  .collection-status {border-left:2px solid var(--at-primary);padding:.5rem 1rem;}
+  .collection-toolbar {justify-content:space-between;margin-block:1.5rem;}
+  .collection-toolbar strong {color:var(--at-primary);font-family:var(--at-font-mono,monospace);}
+  .comic-collection .collection-reset {margin-left:.5rem;padding:.2rem .4rem;min-height:44px;font-size:.7rem;border-color:transparent;text-decoration:underline;text-underline-offset:.2em;}
+  .collection-reset-confirm {border:1px solid var(--at-border);padding:1rem;margin-bottom:1.5rem;}
+  .collection-reset-confirm p:first-child {margin-top:0;}
+  .collection-reset-confirm>div {display:flex;flex-wrap:wrap;gap:.75rem;}
+  .collection-preview {border-left:3px solid var(--at-primary);background:var(--at-bg-alt);padding:1rem;justify-content:space-between;}
+  .collection-preview p {margin:0;}
+  .collection-jump {display:flex;gap:1.5rem;margin-block:1.5rem;}
+  .comic-group {margin-block:2rem;scroll-margin-top:calc(var(--at-nav-height) + 1.5rem);}
+  .comic-group>summary {font-size:1.5rem;color:var(--at-primary);cursor:pointer;border-bottom:1px solid var(--at-primary);padding-block:.8rem;}
+  .comic-group>summary .collection-kicker {margin-left:1rem;white-space:nowrap;}
+  .comic-card {border-bottom:1px solid var(--at-border);scroll-margin-top:calc(var(--at-nav-height) + 1.5rem);}
+  .comic-card>summary {cursor:pointer;padding:1.2rem .25rem;line-height:1.6;}
+  .comic-card-title {font-size:1.1rem;margin-inline:1rem;}
+  .comic-state {font:.7rem/1.6 var(--at-font-mono,monospace);color:var(--at-text-muted);white-space:nowrap;}
+  .comic-lock {padding:.5rem 1rem 1rem;border-left:2px solid var(--at-border);}
+  .comic-content {padding-block:.5rem 1.5rem;}
+  .comic-artwork {width:100%;max-width:640px;margin:0 auto;}
+  .comic-artwork img {display:block;width:100%;max-width:100%;height:auto;margin:0;background:#fffdf4;border:1px solid var(--at-border);}
+  .comic-artwork figcaption {font-size:.75rem;color:var(--at-text-muted);margin-top:.5rem;text-align:center;}
+  .comic-reading-actions {display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.75rem;margin-block:1rem;text-align:center;}
+  .comic-transcript {border-block:1px solid var(--at-border);padding:.8rem 0;}
+  .comic-transcript summary {cursor:pointer;color:var(--at-primary);}
+  .comic-transcript li {margin-block:.7rem;line-height:1.7;}
+  .comic-reader {padding:0;border:1px solid var(--at-border);border-radius:0;background:var(--at-bg);color:var(--at-text);width:min(1120px,calc(100vw - 2rem));max-width:none;height:94dvh;max-height:1100px;overflow:hidden;}
+  .comic-reader::backdrop {background:rgb(0 0 0 / .8);}
+  .reader-shell {height:100%;display:flex;flex-direction:column;min-height:0;}
+  .reader-header {display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 1rem;border-bottom:1px solid var(--at-border);}
+  .reader-header h2 {font-size:1rem;line-height:1.4;margin:0;color:var(--at-primary);}
+  .reader-header button {flex-shrink:0;}
+  .reader-controls {display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;padding:.5rem 1rem;}
+  .reader-controls button {padding:.4rem .7rem;min-width:44px;min-height:44px;}
+  .reader-controls span {min-width:5.5em;text-align:center;font:.8rem var(--at-font-mono,monospace);}
+  .comic-reader .reader-help {font-size:.75rem;line-height:1.4;margin:0;padding:0 1rem .6rem;color:var(--at-text-muted);}
+  .reader-viewport {flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;background:var(--at-bg-alt);}
+  .reader-viewport img {display:block;max-width:none;width:100%;height:auto;}
+  .reader-viewport p {padding:1rem;}
+  .reader-viewport p:empty {display:none;}
+  .reader-footer {padding:.6rem 1rem;border-top:1px solid var(--at-border);font-size:.75rem;max-height:18%;overflow:auto;}
+  .reader-footer p {margin:0 0 .35rem;}
+  @media(max-width:500px){.comic-reader{width:calc(100vw - 1rem);height:96dvh;}.reader-header,.reader-controls{padding:.5rem;}.reader-header h2{font-size:.85rem;}.reader-footer{max-height:15%;}}
+  .comic-takeaway {border-left:2px solid var(--at-primary);padding:.75rem 1rem;background:var(--at-bg-alt);}
+  .comic-takeaway strong {color:var(--at-primary);}
+  .comic-links {font-size:.8rem;}
+  .collection-spoilers {margin-top:3rem;border-top:1px solid var(--at-border);padding-top:1rem;}
+  .collection-spoilers summary {cursor:pointer;color:var(--at-primary);}
+  .collection-footer {margin-top:2rem;border-top:1px solid var(--at-border);padding-top:1rem;}
+  @media(max-width:700px){.comic-card-title{display:block;margin:.3rem 0;}.comic-card>summary{padding-inline:.3rem;}.comic-group>summary .collection-kicker{display:block;margin:.3rem 0 0;}}
+</style>

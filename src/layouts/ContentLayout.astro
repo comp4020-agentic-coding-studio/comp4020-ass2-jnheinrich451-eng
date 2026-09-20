@@ -1,9 +1,11 @@
 ---
 import ThemeLayout,{type ContentLayoutProps} from 'astro-theme-university/layouts/ContentLayout.astro';
 import CourseNavigation from '../components/CourseNavigation.astro';
+import SearchDismissal from '../components/SearchDismissal.astro';
+import DefaultTheme from '../components/DefaultTheme.astro';
 type Props=ContentLayoutProps;
 ---
 <ThemeLayout {...Astro.props}>
-  <Fragment slot="head"><CourseNavigation /><slot name="head" /></Fragment>
+  <Fragment slot="head"><DefaultTheme /><CourseNavigation /><SearchDismissal /><slot name="head" /></Fragment>
   <slot />
 </ThemeLayout>

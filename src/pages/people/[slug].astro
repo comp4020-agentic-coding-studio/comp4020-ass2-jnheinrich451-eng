@@ -37,7 +37,11 @@ const description = person.data.description;
   heroImageAlt={photoAlt}
   {...siteConfig}
 >
-  <dl>
+  <aside class="profile-notice" aria-label="Prototype context">
+    Fictional teaching staff for the Slop University course prototype.
+    Research backgrounds, group affiliations and contact details are illustrative.
+  </aside>
+  <dl class="profile-contact">
     {roleLabel && (
       <>
         <dt>Role</dt>
@@ -70,5 +74,17 @@ const description = person.data.description;
     <dd>{person.data.contact}</dd>
   </dl>
 
-  <Content />
+  <div class="profile-body"><Content /></div>
 </ContentLayout>
+
+<style>
+  .profile-notice {border-left:2px solid var(--at-primary);padding:.5rem 1rem;margin-block:0 2rem;font-size:.85rem;line-height:1.6;color:var(--at-text-muted);}
+  .profile-contact {display:grid;grid-template-columns:7rem minmax(0,1fr);gap:.7rem 1.5rem;border-block:1px solid var(--at-border);padding-block:1.5rem;margin-block:0 2.5rem;}
+  .profile-contact dt {color:var(--at-primary);font:.8rem/1.7 var(--at-font-mono,monospace);}
+  .profile-contact dd {margin:0;overflow-wrap:anywhere;line-height:1.7;}
+  .profile-body {max-width:70ch;}
+  .profile-body :global(h2) {color:var(--at-primary);font-size:clamp(1.4rem,3vw,1.8rem);line-height:1.25;margin-block:2.5rem 1rem;}
+  .profile-body :global(p) {line-height:1.8;}
+  .profile-body :global(> p:first-child) {font-size:1.15rem;}
+  @media(max-width:520px) {.profile-contact {grid-template-columns:minmax(0,1fr);gap:.25rem;}.profile-contact dd {margin-bottom:.75rem;}}
+</style>

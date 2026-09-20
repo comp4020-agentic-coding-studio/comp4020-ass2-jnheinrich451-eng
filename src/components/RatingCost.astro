@@ -18,7 +18,13 @@
 const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
 ---
 
-<section class="rating-cost" id="rating-cost" data-rc aria-label="What a rating study costs">
+<section class="rating-cost" id="rating-cost" data-rc aria-labelledby="rc-title">
+  <header class="rc-intro">
+    <h2 id="rc-title">What would human evaluation cost?</h2>
+    <p>If FID can disagree with people, why not ask people instead? Detecting a small difference between two generators can require many paid judgements. This calculator estimates that workload and its cost.</p>
+    <p><strong>The dollars are payment for human evaluators</strong>, not a student fee or the cost of computing FID. One trial means one person judging one image as real or fake. The trial count is not the number of distinct participants.</p>
+    <p class="rc-start"><strong>Start here:</strong> the default compares 30% versus 30.5% human error rates, a gap of 0.5 percentage points. Press <strong>halve it</strong> to see what detecting an even smaller gap would cost.</p>
+  </header>
   <noscript>
     <p>
       The calculator needs JavaScript. The worked example above is its default
@@ -36,7 +42,7 @@ const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
       </div>
     </div>
     <div class="rc-field">
-      <label class="rc-label" for="rc-difference">difference to detect</label>
+      <label class="rc-label" for="rc-difference">difference / percentage points</label>
       <div class="rc-step">
         <button type="button" class="rc-ghost" data-rc-halve>halve it</button>
         <select id="rc-difference" name="difference">
@@ -66,10 +72,12 @@ const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
       <input id="rc-seconds" name="seconds" type="number" min="1" max="60" step="1" value="4" />
     </div>
     <div class="rc-field">
-      <label class="rc-label" for="rc-wage">dollars per hour</label>
+      <label class="rc-label" for="rc-wage">evaluator pay / dollars per hour</label>
       <input id="rc-wage" name="wage" type="number" min="1" max="200" step="1" value="25" />
     </div>
   </form>
+
+  <p class="rc-cost-rule">Total judgements × seconds per judgement ÷ 3,600 × hourly pay = estimated evaluator payment.</p>
 
   <p class="rc-status" role="status" data-rc-status>
     The default is the session's worked example. Press halve it.
@@ -79,9 +87,15 @@ const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
     <div><dt>trials per candidate</dt><dd data-rc-per>&nbsp;</dd></div>
     <div><dt>trials in total</dt><dd data-rc-total>&nbsp;</dd></div>
     <div><dt>hours of paid attention</dt><dd data-rc-hours>&nbsp;</dd></div>
-    <div class="rc-dollars"><dt>dollars, before screening</dt><dd data-rc-dollars>&nbsp;</dd></div>
+    <div class="rc-dollars"><dt>evaluator payment / dollars</dt><dd data-rc-dollars>&nbsp;</dd></div>
   </dl>
   <p class="rc-versus">The number it competes with: one score, about a minute of compute.</p>
+  <details class="rc-assumptions">
+    <summary>What this estimate assumes</summary>
+    <p>Human error rate is the percentage of incorrect real-or-fake judgements. Significance sets the target false-positive rate when the true rates are equal; power sets the chance of detecting the specified difference when it exists.</p>
+    <p>The sample-size calculation approximates a comparison of two proportions with independent judgements and equal trial counts per candidate. Repeated ratings by the same person can violate that independence assumption.</p>
+    <p>The default $25 hourly pay is an editable example, not a prescribed rate. Screening, training and rejected work are not included, so this is a planning estimate rather than a complete study budget.</p>
+  </details>
 
   <figure class="rc-plot">
     <svg
@@ -97,7 +111,7 @@ const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
   </figure>
 
   <div class="rc-budget">
-    <label class="rc-label" for="rc-budget">your budget, in dollars</label>
+    <label class="rc-label" for="rc-budget">your evaluator-payment budget / dollars</label>
     <input id="rc-budget" name="budget" type="number" min="100" step="100" value="1000" />
     <p aria-live="polite" data-rc-budget-out>&nbsp;</p>
   </div>
@@ -289,6 +303,43 @@ const DIFFERENCES = [0.125, 0.25, 0.5, 1, 2, 4, 8];
     align-items: end;
     border-block-end: 1px solid var(--at-border, #e4ddd0);
     padding-block-end: var(--at-spacing-sm);
+  }
+
+  .rc-intro h2 {
+    color: var(--at-primary);
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    line-height: 1.25;
+    margin: 0 0 1rem;
+  }
+
+  .rc-intro p,
+  .rc-assumptions p {
+    max-width: 68ch;
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    margin: 0 0 1rem;
+  }
+
+  .rc-start {
+    border-inline-start: 2px solid var(--at-primary);
+    padding-inline-start: 1rem;
+  }
+
+  .rc-cost-rule {
+    font-size: var(--at-font-size-sm);
+    line-height: 1.7;
+    margin: 1rem 0;
+  }
+
+  .rc-assumptions {
+    margin-block: 0 var(--at-spacing-lg);
+    font-size: var(--at-font-size-sm);
+  }
+
+  .rc-assumptions summary {
+    color: var(--at-primary);
+    cursor: pointer;
+    margin-bottom: .75rem;
   }
 
   .rc-field {

@@ -1,0 +1,32 @@
+<!-- Keep the platform's auto mode and toggle; change only the unset preference. -->
+<script is:inline data-astro-rerun data-course-default-theme>
+  (function () {
+    var theme = 'dark';
+    try {
+      var saved = localStorage.getItem('at-theme');
+      if (saved === 'light' || saved === 'dark') theme = saved;
+    } catch (_) { /* No storage: first-visit default still works. */ }
+    document.documentElement.dataset.theme = theme;
+  })();
+</script>
+<script>
+  // Set the incoming document before a client-side swap, then label the toggle
+  // after the footer exists. The existing theme continues to handle clicks.
+  document.addEventListener('astro:before-swap', event => {
+    let theme = 'dark';
+    try {
+      const saved = localStorage.getItem('at-theme');
+      if (saved === 'light' || saved === 'dark') theme = saved;
+    } catch { /* Use the default. */ }
+    event.newDocument.documentElement.dataset.theme = theme;
+  });
+  const labelToggle = () => {
+    const label = document.documentElement.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+    document.querySelectorAll('.at-footer-theme-toggle').forEach(button => {
+      button.setAttribute('aria-label', label);
+      button.setAttribute('title', label);
+    });
+  };
+  labelToggle();
+  document.addEventListener('astro:page-load', labelToggle);
+</script>

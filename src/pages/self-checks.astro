@@ -1,0 +1,45 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import SelfCheck from '../components/SelfCheck.astro';
+import {selfChecks} from '../lib/self-check';
+import {siteConfig} from '../site-config';
+import {withBase} from 'astro-theme-university/url';
+---
+<PageLayout title="Full quiz list" description="Seventeen optional questions with their answers and teaching feedback." {...siteConfig}>
+  <div class="check-review" data-pagefind-ignore>
+    <h2>Questions and explanations</h2>
+    <p>Five lectures and twelve sessions. These self-checks are optional and ungraded; there are none on assessment pages. This list reads the same question bank as the teaching pages and does not read or change code-unlock progress.</p>
+    <p>This page reviews the questions and explanations. <a href={withBase('/memes/')}>Open the teaching-comic collection</a>; its Spoilers section offers a separate preview that does not change collection progress.</p>
+    <div class="review-actions" hidden><button type="button" data-expand-checks>Expand all answers</button><button type="button" data-collapse-checks>Collapse all answers</button></div>
+    <nav aria-label="Review questions"><a href="#lecture-checks">5 lecture questions</a><a href="#session-checks">12 session questions</a></nav>
+    <h2 id="lecture-checks">Lectures</h2>
+    {selfChecks.filter(q => q.id.startsWith('L')).map(question => <SelfCheck question={question} preview />)}
+    <h2 id="session-checks">Sessions</h2>
+    {selfChecks.filter(q => q.id.startsWith('S')).map(question => <SelfCheck question={question} preview />)}
+  </div>
+</PageLayout>
+<script>
+  const initialized = new WeakSet<HTMLElement>();
+  function setupReview() {
+    const root = document.querySelector<HTMLElement>('.check-review');
+    if (!root || initialized.has(root)) return;
+    initialized.add(root);
+    root.querySelector<HTMLElement>('.review-actions')!.hidden = false;
+    for (const [selector, open] of [['[data-expand-checks]', true], ['[data-collapse-checks]', false]] as const) {
+      root.querySelector(selector)!.addEventListener('click', () => {
+        root.querySelectorAll<HTMLDetailsElement>('.sc-explanation').forEach(d => { d.open = open; });
+      });
+    }
+  }
+  setupReview();
+  document.addEventListener('astro:page-load', setupReview);
+</script>
+<style>
+  .check-review {max-width:72ch;}
+  .check-review h2 {color:var(--at-primary);scroll-margin-top:calc(var(--at-nav-height) + 2rem);}
+  .check-review p {line-height:1.75;}
+  .review-actions,nav {display:flex;flex-wrap:wrap;gap:1rem;margin-block:1.5rem;}
+  .review-actions[hidden] {display:none;}
+  button {font:inherit;padding:.6rem 1rem;border:1px solid var(--at-primary);background:var(--at-bg);color:var(--at-primary);cursor:pointer;}
+  button:focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+</style>

@@ -144,3 +144,21 @@ describe("the week 9 session agrees with its own calculator", () => {
     expect(body).toContain(`about ${figure(roundTo(costing.dollars, 100))} dollars`);
   });
 });
+
+describe("the calculator explains its purpose before asking for inputs", () => {
+  const component = readFileSync(resolve('src/components/RatingCost.astro'), 'utf8');
+  it("names human evaluation and distinguishes participant pay from FID compute", () => {
+    expect(component).toContain('What would human evaluation cost?');
+    expect(component).toContain('payment for human evaluators');
+    expect(component).toContain('not a student fee or the cost of computing FID');
+    expect(component.indexOf('id="rc-title"')).toBeLessThan(component.indexOf('<form'));
+  });
+  it("defines the units and qualifies the budget estimate", () => {
+    expect(component).toContain('one person judging one image');
+    expect(component).toContain('not the number of distinct participants');
+    expect(component).toContain('Total judgements × seconds per judgement ÷ 3,600 × hourly pay');
+    expect(component).toContain('30% versus 30.5%');
+    expect(component).toContain('independent judgements');
+    expect(component).toContain('Screening, training and rejected work');
+  });
+});

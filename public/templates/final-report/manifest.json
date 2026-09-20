@@ -1,0 +1,13 @@
+﻿{
+    "pages":  3,
+    "reportPages":  2,
+    "hashes":  {
+                   "templates/final-report/main.tex":  "0c6fe27b4b57b9b0ce018177916a068f036a4469d4920ff1e2e799939505c734",
+                   "templates/final-report/README.md":  "1ca54a8ca5e53fdbc9a8b727a1c065bd821ced66bcef3b662aa3a16e8542532a",
+                   "figures/final-report-assets.mjs":  "ca1b36a6f6a98cce1d3bf96bdcc97056ce05c4263678ab63ee141bb420b27ee6",
+                   "scripts/build-final-report-template.ps1":  "5f776299901c28b974cf578e1b33e0f4eb46a45680ccfef62d39ed1965fcc988",
+                   "public/templates/final-report/final-report.pdf":  "5793a0b655f7edd0b50051615dc54bfd4f72c232a83ee7bb6c5181020619e481",
+                   "public/templates/final-report/preview.png":  "3c8d03c3c17a812bc67989fb808ed6e70b893f34864cf8a87a9be5743f8d2745",
+                   "public/templates/final-report/final-report-latex.zip":  "9d2cf286805b5595ec7b01358086c9b7ab004c314dd7a54cb8ef7dba43da26c3"
+               }
+}

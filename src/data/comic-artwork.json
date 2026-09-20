@@ -1,0 +1,101 @@
+[
+  {
+    "id": "L01",
+    "source": "lecture-week-01-tea-v1.png",
+    "scene": "GPT makes tea while Claude draws fresh samples at the laptop. The estimated score changes although the model stays fixed. GPT drinks her tea with both hands as they identify what actually changed.",
+    "dialogue": [
+      "GPT: I’ll make tea. Keep the model fixed.",
+      "Claude: New samples. Same model.",
+      "Claude: The estimated score changed!",
+      "GPT: Did my generator improve while I made tea?",
+      "Claude: The samples changed. The population didn’t.",
+      "GPT: So the tea gets no credit."
+    ]
+  },
+  {
+    "id": "L02", "source": "lecture-week-02-missing-term-v1.png",
+    "scene": "Claude checks her handwritten calculation beside the laptop. GPT, holding coffee, points out the omitted spread term. Claude scratches her head and adds one to the four, giving five.",
+    "dialogue": []
+  },
+  {
+    "id": "L05", "source": "lecture-week-05-bias-v1.png",
+    "scene": "GPT celebrates a tight cluster around seven. Claude presses Enter to show the population value of five. GPT recognises the bias; they share cookies. The displayed values and plots illustrate the example, not measured results.",
+    "dialogue": []
+  },
+  {
+    "id": "L08", "source": "lecture-week-08-vanishing-shift-v2.png",
+    "scene": "Claude adds ten to each frame. GPT writes the consecutive-difference equation to show the two tens cancelling. Surprised, Claude holds up a board saying the difference features are identical.",
+    "dialogue": []
+  },
+  {
+    "id": "L11", "source": "lecture-week-11-twelve-is-a-count-v1.png",
+    "scene": "A puzzled GPT asks whether twelve agreeing repeats justify certainty. Claude corrects the claim and fetches tea. GPT has a seatbelt-not-crown realisation; Claude passes her a cup and they drink together.",
+    "dialogue": []
+  },
+  {
+    "id": "S01", "source": "session-01-bold-number-v2.png",
+    "scene": "Claude proudly shows a table with 4.8 in bold above 5.2. GPT asks about the protocol. Claude shakes her head, admitting the comparison is not ready. GPT nods with a lightbulb above her head. The scores are illustrative.",
+    "dialogue": [
+      "Claude: This row has the lower FID. I have already made it bold.",
+      "GPT: Same reference set, N, features, preprocessing and implementation?",
+      "Claude: The bold font is ready. The comparison is not.",
+      "Claude: You should check conditions before celebrating.",
+      "Closing board: Comparable conditions before bold conclusions."
+    ]
+  },
+  {
+    "id": "S02", "source": "session-02-marginals-v1.png",
+    "scene": "GPT compares matching marginal curves. Claude takes the laptop and shows joint contours: a circle for the reference and a tilted ellipse for the correlated candidate. GPT types her corrected conclusion while Claude watches with tea.",
+    "dialogue": []
+  },
+  {
+    "id": "S03", "source": "session-03-precision-v2.png",
+    "scene": "Claude inspects changed images whose displayed feature vectors both equal [1, 2]. GPT removes her reading glasses to explain the missing information. Claude shuffles the images, then hums after recognising the limitation. GPT returns to her paper.",
+    "dialogue": []
+  },
+  {
+    "id": "S04", "source": "session-04-pipelines-v1.png",
+    "scene": "GPT looks between monitors showing illustrative library scores 4.8 and 5.2, blushing as she prefers the smaller one. Claude points to resizing, weights and numerical methods. GPT scratches her head and agrees to document the implementation; Claude offers a cookie.",
+    "dialogue": []
+  },
+  {
+    "id": "S05", "source": "session-05-bias-v1.png",
+    "scene": "Claude interrupts GPT's bench nap with a board about equal sample sizes. GPT lifts her eye cover to inspect it. Claude thinks, ‘Generator?’, then understands the suitcase analogy. She returns to her laptop while GPT resumes her nap.",
+    "dialogue": []
+  },
+  {
+    "id": "S06", "source": "session-06-originality-v1.png",
+    "scene": "GPT prepares to mark a task finished after seeing empirical FID(C, R) = 0. Claude says ‘Check again.’ Both displayed feature lists are [-1, 0, 0, 1]. GPT checks the copied statistics and records ‘Score audit complete’ with ‘Originality: not established’. Same moment estimators and exact arithmetic are illustrated.",
+    "dialogue": []
+  },
+  {
+    "id": "S07", "source": "session-07-kernel-v2.png",
+    "scene": "Claude submits a confident practice answer and receives a red cross marked Incorrect. With small tears she asks, ‘Why am I wrong?’ GPT explains the cubic kernel. Claude revises her reasoning and smiles again. The zero on the notebook is explicitly a population discrepancy; finite-sample estimates still fluctuate.",
+    "dialogue": []
+  },
+  {
+    "id": "S08", "source": "session-08-instrument-v1.png",
+    "scene": "GPT messages Claude from bed. Claude inspects the pooled-frame experiment at her desk and replies. GPT rolls onto her side to think, reopens the case, and sends a cartoon GPT thumbs-up sticker before putting down her phone and sleeping.",
+    "dialogue": []
+  },
+  {
+    "id": "S09", "source": "session-09-cost-v1.png",
+    "scene": "Claude proposes halving the detectable human-error-rate gap. GPT types the calculation and shows (0.5 / 0.25)² = 4. Claude leans in, then records the increased evaluator cost while GPT sips tea. Other approximation terms and cost per judgement are held fixed.",
+    "dialogue": []
+  },
+  {
+    "id": "S10", "source": "session-10-rankings-v1.png",
+    "scene": "Claude returns sweating from survey fieldwork, carrying human-rating sheets. From the office GPT blames the encoder. Claude replies by phone, prompting GPT to write separate metric and human protocol checklists. GPT then messages: ‘I’ve left you iced lemonade. Come back when you’re finished.’ Claude smiles at the lemon-and-ice message.",
+    "dialogue": []
+  },
+  {
+    "id": "S11", "source": "session-11-baselines-v1.png",
+    "scene": "Claude and GPT review a teaching slide. Claude proposes removing FID, then agrees to keep it with context. They add protocol and limitation notes, turn on a projector, and look at the revised slide: compatible baselines, limits of the claim, not proof of overall quality. The table contains placeholders, not measured scores.",
+    "dialogue": []
+  },
+  {
+    "id": "S12", "source": "session-12-evidence-v1.png",
+    "scene": "GPT holds a new-metric proposal with a hopeful, awkward grin. Claude keeps working while listing the evidence questions. Looking caught out, GPT returns to a notebook with Checked and Missing columns. Claude notices her discouraged pause and hands her a pistachio latte. The notebook is still unfinished.",
+    "dialogue": []
+  }
+]

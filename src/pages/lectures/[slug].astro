@@ -12,6 +12,8 @@ import ReportBench from "../../components/ReportBench.astro";
 import WorkspaceActivity from "../../components/WorkspaceActivity.astro";
 import { workspaceActivities } from "../../data/workspace-activities";
 import TeachingTeam from "../../components/TeachingTeam.astro";
+import SelfCheck from "../../components/SelfCheck.astro";
+import { selfCheckFor } from "../../lib/self-check";
 import { formatCourseDate } from "../../lib/dates";
 import { graphCollections, siteConfig } from "../../site-config";
 
@@ -21,6 +23,7 @@ export async function getStaticPaths() {
 }
 
 const { lecture } = Astro.props;
+const selfCheck = selfCheckFor(`/lectures/${lecture.id}/`);
 const activity = workspaceActivities[`lectures/${lecture.id}`];
 const { Content } = await render(lecture);
 // `workbench` and `extrapolator` are loose keys, like `arc` on sessions: the
@@ -43,6 +46,7 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
   {isOutline && <aside class="lecture-preview" aria-label="Lecture development status"><strong>Outline preview</strong><p>This lecture is in development. The route and linked preparation are available below; a slide deck has not been published yet.</p></aside>}
   {lecture.data.slides && <p><a href={withBase(lecture.data.slides)}>Open the slides</a></p>}
   {activity && <p><a href="#workspace-activity">Try it in the workspace →</a></p>}
+  {selfCheck && <p><a href={`#self-check-${selfCheck.id}`}>Optional self-check ↓</a></p>}
   <Content />
   {wantsWorkbench && <BenchWorkbench />}
   {wantsExtrapolator && <BenchExtrapolator />}
@@ -50,6 +54,7 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
   {wantsReport && <ReportBench />}
   {activity && activityLead && <p class="activity-lead">{activityLead}</p>}
   {activity && <WorkspaceActivity activity={activity} />}
+  {selfCheck && <SelfCheck question={selfCheck} />}
   <TeachingTeam teachers={lecture.data.teachers} />
   <RelatedContent entry={lecture} collections={graphCollections} />
 </ContentLayout>

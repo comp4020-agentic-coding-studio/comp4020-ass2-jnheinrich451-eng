@@ -11,6 +11,8 @@ import RankAgreement from "../../components/RankAgreement.astro";
 import ThreeScores from "../../components/ThreeScores.astro";
 import Readings from "../../components/Readings.astro";
 import TeachingTeam from "../../components/TeachingTeam.astro";
+import SelfCheck from "../../components/SelfCheck.astro";
+import { selfCheckFor } from "../../lib/self-check";
 import SessionScale from "../../components/SessionScale.astro";
 import WorkspaceActivity from "../../components/WorkspaceActivity.astro";
 import { workspaceActivities } from "../../data/workspace-activities";
@@ -23,6 +25,7 @@ export async function getStaticPaths() {
 }
 
 const { session } = Astro.props;
+const selfCheck = selfCheckFor(`/sessions/${session.id}/`);
 const activity = workspaceActivities[`sessions/${session.id}`];
 const { Content, headings } = await render(session);
 
@@ -58,6 +61,7 @@ const logEntry = typeof loose.log === "string" ? loose.log.trim() : undefined;
     {wantsRankAgreement && <a href="#rank-agreement">What a study can see</a>}
     {activity && <a href="#workspace-activity">Try it in the workspace</a>}
     {logEntry && <a href="#log-entry">In your measurement log</a>}
+    {selfCheck && <a href={`#self-check-${selfCheck.id}`}>Optional self-check</a>}
   </nav>
   <div class="session-reading"><Content /></div>
   {wantsRatingCost && <RatingCost />}
@@ -79,6 +83,7 @@ const logEntry = typeof loose.log === "string" ? loose.log.trim() : undefined;
     What you bring to the session. Written so a reader can tell whether it has
     been met without asking you.
   </SpecList>
+  {selfCheck && <SelfCheck question={selfCheck} />}
   <TeachingTeam teachers={session.data.teachers} />
   <RelatedContent entry={session} collections={graphCollections} />
 </ContentLayout>

@@ -1,0 +1,547 @@
+[
+  {
+    "id": "L01",
+    "title": "The bench, live",
+    "route": "/lectures/week-01/",
+    "code": "SLOP-L01",
+    "question": "Keep the candidate's mean shift, covariance scale, dimension and sample size fixed. You press Draw again and the estimated score changes. Which statement is justified?",
+    "explanation": [
+      "Correct: B. The population score comes from the fixed distribution parameters. The estimate uses the moments of the samples just drawn, which can differ between draws. A changing estimate alone does not demonstrate a change in the candidate or in the implementation.",
+      "Feedback for A: The candidate parameters were held fixed. Distinguish a new measurement from a new generator.",
+      "Feedback for C: Sampling variation can produce this observation without any implementation change. It is not by itself evidence of a software defect.",
+      "Teaching takeaway: The number can move when the thing being measured does not."
+    ],
+    "feedback": {
+      "A": "The candidate parameters were held fixed. Distinguish a new measurement from a new generator.",
+      "C": "Sampling variation can produce this observation without any implementation change. It is not by itself evidence of a software defect."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "The underlying candidate has become better or worse."
+      },
+      {
+        "value": "B",
+        "label": "A fresh sample can change the estimate while the population score stays fixed."
+      },
+      {
+        "value": "C",
+        "label": "The implementation must have changed between draws."
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "id": "L02",
+    "title": "The Fréchet distance",
+    "route": "/lectures/week-02/",
+    "code": "SLOP-L02",
+    "question": "In a one-dimensional population example, R has mean 0 and standard deviation 1; G has mean 2 and standard deviation 2. Both are Gaussian. Using D = (μR − μG)² + (σR − σG)², what is their squared Gaussian distance D? Here σ denotes standard deviation, not variance.",
+    "explanation": [
+      "Correct: 5. The mean contribution is (0 − 2)² = 4. The spread contribution is (1 − 2)² = 1. Their sum is 5. This is a population calculation, with no sampling or feature extraction; it is not an image-based FID experiment.",
+      "Accept examples: 5, 5.0, 5e0. Absolute tolerance: 0.001, inclusive.",
+      "Feedback for 4: You have the mean contribution; include the SD mismatch too.",
+      "Feedback for 13: The formula uses standard deviations. Do not square them into variances before taking their difference.",
+      "Other incorrect numbers: Calculate the two squared differences separately, then add them. Do not take a final square root: the requested quantity is D, the squared distance.",
+      "Teaching takeaway: A location mismatch and a spread mismatch contribute separately."
+    ],
+    "feedback": {
+      "4": "You have the mean contribution; include the SD mismatch too.",
+      "13": "The formula uses standard deviations. Do not square them into variances before taking their difference."
+    },
+    "kind": "number",
+    "answer": 5,
+    "tolerance": 0.001,
+    "hint": "Give one number. Answers within 0.001 of the exact value are accepted.",
+    "fallback": "Calculate the two squared differences separately, then add them. Do not take a final square root: the requested quantity is D, the squared distance."
+  },
+  {
+    "id": "L05",
+    "title": "Question the estimate",
+    "route": "/lectures/week-05/",
+    "code": "SLOP-L05",
+    "question": "At one fixed N, a biased estimator has expected score 7 while the population score is 5. You average more independent repetitions at that same N. What does this do?",
+    "explanation": [
+      "Correct: A. Averaging independent repetitions with finite variance reduces the variance of the average. Its expectation remains 7, so its bias relative to 5 remains 2. More precise estimation of a biased expectation is not the same as removing bias.",
+      "Feedback for B: Increasing the number of repeats is not increasing N within each estimate, nor is it performing the lecture's extrapolation in 1/N.",
+      "Feedback for C: Reduced variance is a statement about repeated experiments; it does not promise monotonically improving accuracy in one sequence of averages.",
+      "Teaching takeaway: Precision and accuracy answer different questions."
+    ],
+    "feedback": {
+      "B": "Increasing the number of repeats is not increasing N within each estimate, nor is it performing the lecture's extrapolation in 1/N.",
+      "C": "Reduced variance is a statement about repeated experiments; it does not promise monotonically improving accuracy in one sequence of averages."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "It reduces the variation of the average around 7 without changing its expectation."
+      },
+      {
+        "value": "B",
+        "label": "It makes the expected average converge to 5 because there are more runs."
+      },
+      {
+        "value": "C",
+        "label": "It guarantees every new average is closer to 7 than the previous one."
+      }
+    ],
+    "answer": "A"
+  },
+  {
+    "id": "L08",
+    "title": "Change the instrument",
+    "route": "/lectures/week-08/",
+    "code": "SLOP-L08",
+    "question": "Take one recorded sequence x and construct y by adding the same constant c to every frame: yₜ = xₜ + c. An instrument keeps only consecutive differences, Δxₜ = xₜ₊₁ − xₜ. What happens to its features?",
+    "explanation": [
+      "Correct: C. Δyₜ = (xₜ₊₁ + c) − (xₜ + c) = Δxₜ. This exact construction shows information discarded by this particular feature map. More samples cannot recover the constant from features that removed it.",
+      "Feedback for A: Both adjacent frames receive c, so subtracting them cancels it.",
+      "Feedback for B: Sample count affects estimation, not this algebraic invariance.",
+      "The lecture panel uses independent reference and candidate draws. Its finite-sample scores need not be zero even when the feature distributions match. This question compares a sequence with its own shifted copy, not two independent recordings, and makes no claim about I3D or actual FVD.",
+      "Teaching takeaway: An exact calculation can still operate on incomplete information."
+    ],
+    "feedback": {
+      "A": "Both adjacent frames receive c, so subtracting them cancels it.",
+      "B": "Sample count affects estimation, not this algebraic invariance."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Every difference increases by c."
+      },
+      {
+        "value": "B",
+        "label": "The differences change only if we use more sequences."
+      },
+      {
+        "value": "C",
+        "label": "The differences are unchanged because the constant cancels."
+      }
+    ],
+    "answer": "C"
+  },
+  {
+    "id": "L11",
+    "title": "Defend the report",
+    "route": "/lectures/week-11/",
+    "code": "SLOP-L11",
+    "question": "All twelve repeats in the report panel support your declared ordering under the selected protocol. Which conclusion is defensible?",
+    "explanation": [
+      "Correct: B. Report the observed count with the instrument, sampling settings and reproducibility information. Twelve agreeing observations describe those trials. They do not eliminate sampling uncertainty, validate the panel's heuristic as a significance test or settle what another instrument measures.",
+      "Feedback for A: A finite set of agreeing repeats is not a guarantee about the next draw.",
+      "Feedback for C: Week 8 showed why different feature maps can support different rankings on the same recordings.",
+      "Teaching takeaway: State the evidence and its conditions, not a stronger claim."
+    ],
+    "feedback": {
+      "A": "A finite set of agreeing repeats is not a guarantee about the next draw.",
+      "C": "Week 8 showed why different feature maps can support different rankings on the same recordings."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "The ordering is now certain for future samples."
+      },
+      {
+        "value": "B",
+        "label": "All twelve observed repeats supported it under the recorded protocol; this does not establish certainty or instrument-independent quality."
+      },
+      {
+        "value": "C",
+        "label": "The ordering must hold under the other two instruments too."
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "id": "S01",
+    "title": "The number",
+    "route": "/sessions/01-the-number/",
+    "code": "SLOP-S01",
+    "question": "Two papers report FID 4.8 and 5.2. You do not yet know their evaluation protocols. What should you do before treating 4.8 as evidence for a better comparison result?",
+    "explanation": [
+      "Correct: A. The score depends on measurement choices as well as the model. Without compatible conditions, the gap is not a clean comparison. Even a compatible comparison supports a statement about the specified metric, not an automatic verdict on every aspect of image quality.",
+      "Feedback for B: A smaller reported number cannot supply the missing protocol or establish quality outside what the instrument measures.",
+      "Feedback for C: Display precision does not make evaluation conditions comparable.",
+      "Teaching takeaway: Ask what produced the number before reading the ranking."
+    ],
+    "feedback": {
+      "B": "A smaller reported number cannot supply the missing protocol or establish quality outside what the instrument measures.",
+      "C": "Display precision does not make evaluation conditions comparable."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Check the reference set, sample sizes, feature extractor and weights, preprocessing, and implementation behind both scores."
+      },
+      {
+        "value": "B",
+        "label": "Prefer 4.8 because a smaller FID establishes better image quality by itself."
+      },
+      {
+        "value": "C",
+        "label": "Check only whether both scores were rounded to the same number of decimals."
+      }
+    ],
+    "answer": "A"
+  },
+  {
+    "id": "S02",
+    "title": "The Fréchet distance",
+    "route": "/sessions/02-frechet-distance/",
+    "code": "SLOP-S02",
+    "question": "Let R and G be zero-mean 2D Gaussians. R has covariance I and G has covariance [[1, 0.8], [0.8, 1]]. Each corresponding one-dimensional marginal has the same mean and variance. Which statement is correct?",
+    "explanation": [
+      "Correct: C. Each coordinate separately has distribution Normal(0, 1), but the coordinates are correlated in G and uncorrelated in R. The full Gaussian distance includes that joint covariance structure. G's covariance is valid: its eigenvalues are 1.8 and 0.2, both positive.",
+      "Feedback for A: Matching coordinate marginals does not imply matching joint distributions or covariance matrices.",
+      "Feedback for B: Off-diagonal covariances are allowed. Symmetry and positive semidefiniteness, not diagonal form, are the relevant covariance requirements.",
+      "Teaching takeaway: Looking at coordinates separately can hide a relationship."
+    ],
+    "feedback": {
+      "A": "Matching coordinate marginals does not imply matching joint distributions or covariance matrices.",
+      "B": "Off-diagonal covariances are allowed. Symmetry and positive semidefiniteness, not diagonal form, are the relevant covariance requirements."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "The full squared Gaussian distance must be zero because both marginal distances are zero."
+      },
+      {
+        "value": "B",
+        "label": "G cannot be a valid Gaussian because its covariance has nonzero off-diagonal entries."
+      },
+      {
+        "value": "C",
+        "label": "Both marginal distances are zero, but the full distance is positive because the covariance matrices differ."
+      }
+    ],
+    "answer": "C"
+  },
+  {
+    "id": "S03",
+    "title": "The instrument",
+    "route": "/sessions/03-the-instrument/",
+    "code": "SLOP-S03",
+    "question": "Suppose a feature extractor maps an original image set and its visibly altered version to exactly the same feature vectors. Everything downstream is unchanged. Can a more accurate matrix-square-root calculation make FID detect that alteration?",
+    "explanation": [
+      "Correct: B. Downstream arithmetic cannot distinguish inputs represented by exactly the same features. This is a stated hypothetical invariance, not a claim that every visible alteration is invisible to Inception.",
+      "Feedback for A: Numerical accuracy can address computation error; it cannot invert information loss in the representation.",
+      "Feedback for C: Extra digits describe a computed value more finely. They add no information about the original images.",
+      "Teaching takeaway: A metric inherits the distinctions its representation preserves."
+    ],
+    "feedback": {
+      "A": "Numerical accuracy can address computation error; it cannot invert information loss in the representation.",
+      "C": "Extra digits describe a computed value more finely. They add no information about the original images."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Yes; exact arithmetic recovers any detail the network discarded."
+      },
+      {
+        "value": "B",
+        "label": "No; unchanged feature vectors give unchanged moments, whatever visual detail was lost."
+      },
+      {
+        "value": "C",
+        "label": "Yes; displaying more decimal places restores the missing distinction."
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "id": "S04",
+    "title": "Getting it right",
+    "route": "/sessions/04-getting-it-right/",
+    "code": "SLOP-S04",
+    "question": "The same candidate images and reference images receive different scores from two libraries. What is the most useful next step?",
+    "explanation": [
+      "Correct: C. The disagreement is a reason to audit the measurement pipeline. Control one difference at a time and check the implementation against known cases, including the bench's population quantities where applicable. Neither the smaller number nor the average tells you which protocol is appropriate.",
+      "Feedback for A: Selecting the more favourable number hides the measurement choice.",
+      "Feedback for B: Averaging outputs from different protocols does not define or validate a common protocol.",
+      "Teaching takeaway: Resolve the conditions of the comparison before interpreting its size."
+    ],
+    "feedback": {
+      "A": "Selecting the more favourable number hides the measurement choice.",
+      "B": "Averaging outputs from different protocols does not define or validate a common protocol."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Keep the smaller score and omit the other implementation."
+      },
+      {
+        "value": "B",
+        "label": "Average the two scores and call the result implementation-independent."
+      },
+      {
+        "value": "C",
+        "label": "Compare preprocessing, feature weights and numerical methods, isolate differences, then document and pin the chosen protocol."
+      }
+    ],
+    "answer": "C"
+  },
+  {
+    "id": "S05",
+    "title": "The bias",
+    "route": "/sessions/05-the-bias/",
+    "code": "SLOP-S05",
+    "question": "A and B are scored at the same N, against the same reference set, through the same instrument and implementation. Does this guarantee that their expected estimated ordering matches their population ordering?",
+    "explanation": [
+      "Correct: A. Matching N controls one source of unfair comparison, but the finite-sample bias need not be the same for A and B. A precise estimate of each estimator's expectation can therefore give a reversed population ranking. This can happen; it is not a claim that every N-honest comparison reverses.",
+      "Feedback for B: The same sample count does not imply the same bias term.",
+      "Feedback for C: Repetition can reveal a stable discrepancy; it does not automatically remove the bias producing it.",
+      "Teaching takeaway: A fair sampling budget is necessary discipline, not a correctness guarantee."
+    ],
+    "feedback": {
+      "B": "The same sample count does not imply the same bias term.",
+      "C": "Repetition can reveal a stable discrepancy; it does not automatically remove the bias producing it."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "No; generator-dependent bias can still reverse the expected ordering."
+      },
+      {
+        "value": "B",
+        "label": "Yes; matching N makes the expected bias identical for every generator."
+      },
+      {
+        "value": "C",
+        "label": "Yes, provided one repeats the fixed-N experiment enough times."
+      }
+    ],
+    "answer": "A"
+  },
+  {
+    "id": "S06",
+    "title": "Blind spots",
+    "route": "/sessions/06-blind-spots/",
+    "code": "SLOP-S06",
+    "question": "Which construction guarantees zero empirical FID against a particular evaluated reference feature collection, in exact arithmetic and using the same moment estimators?",
+    "explanation": [
+      "Correct: B. Copying every feature vector with the same multiplicity makes the empirical means and covariance matrices identical. Thus the Gaussian formula gives zero in exact arithmetic; numerical roundoff may leave a small residual. The score does not establish originality.",
+      "Feedback for A: The population moments match, but two independent finite collections need not have identical empirical moments.",
+      "Feedback for C: An arbitrary subset can change both empirical moments. A carefully constructed moment-matching set is a different claim from any subset.",
+      "Teaching takeaway: An exact score can be correct without certifying what you wanted."
+    ],
+    "feedback": {
+      "A": "The population moments match, but two independent finite collections need not have identical empirical moments.",
+      "C": "An arbitrary subset can change both empirical moments. A carefully constructed moment-matching set is a different claim from any subset."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Draw a new, independent collection from the same population."
+      },
+      {
+        "value": "B",
+        "label": "Copy the entire evaluated reference feature collection, including every multiplicity."
+      },
+      {
+        "value": "C",
+        "label": "Copy any smaller subset of the evaluated reference collection."
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "id": "S07",
+    "title": "Dropping the Gaussian",
+    "route": "/sessions/07-dropping-the-gaussian/",
+    "code": "SLOP-S07",
+    "question": "Candidate C and R match all feature moments through degree three but differ at degree four. For the cubic polynomial kernel used in this session's KID, what does an unbiased estimator guarantee?",
+    "explanation": [
+      "Correct: C. A cubic polynomial kernel compares moments only through degree three. In this construction the population squared MMD is zero. Unbiasedness means the estimator's expectation is that quantity, not that the quantity distinguishes every pair of distributions. Finite-sample estimates fluctuate.",
+      "Feedback for A: Unbiasedness is a property of expectation, not an exact-value promise for each draw.",
+      "Feedback for B: Dropping the Gaussian fit does not make this particular kernel sensitive to every distributional difference.",
+      "Teaching takeaway: Fixing the estimator and fixing what it measures are different tasks."
+    ],
+    "feedback": {
+      "A": "Unbiasedness is a property of expectation, not an exact-value promise for each draw.",
+      "B": "Dropping the Gaussian fit does not make this particular kernel sensitive to every distributional difference."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Every finite-sample estimate equals the population discrepancy."
+      },
+      {
+        "value": "B",
+        "label": "Any two different distributions must have positive population KID."
+      },
+      {
+        "value": "C",
+        "label": "Its expectation equals that kernel's population discrepancy, which is zero here despite the fourth-moment difference."
+      }
+    ],
+    "answer": "C"
+  },
+  {
+    "id": "S08",
+    "title": "Video",
+    "route": "/sessions/08-video/",
+    "code": "SLOP-S08",
+    "question": "In a toy experiment, pooling frame values makes a score unchanged when the frames are shuffled. What does this establish about actual FVD using I3D features?",
+    "explanation": [
+      "Correct: A. Pooling frame values discards order by construction. I3D is a different instrument. To assess a specified temporal failure, compare controlled clips under a named FVD pipeline, retain sampling conditions and examine variation. Neither universal blindness nor universal sensitivity follows from the toy experiment or the fact that the encoder accepts video.",
+      "Feedback for B: A property of the pooled-frame map does not automatically transfer to a video feature extractor.",
+      "Feedback for C: Accepting a temporal input does not guarantee sensitivity to every temporal property you care about.",
+      "Teaching takeaway: Transfer the question to a new instrument, not an untested conclusion."
+    ],
+    "feedback": {
+      "B": "A property of the pooled-frame map does not automatically transfer to a video feature extractor.",
+      "C": "Accepting a temporal input does not guarantee sensitivity to every temporal property you care about."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "It establishes an invariance of the toy feature map; I3D/FVD sensitivity to that temporal change still requires a controlled test."
+      },
+      {
+        "value": "B",
+        "label": "It proves actual FVD is unchanged by every frame permutation."
+      },
+      {
+        "value": "C",
+        "label": "It proves actual FVD detects every frame permutation because I3D processes video."
+      }
+    ],
+    "answer": "A"
+  },
+  {
+    "id": "S09",
+    "title": "Human evaluation",
+    "route": "/sessions/09-human-evaluation/",
+    "code": "SLOP-S09",
+    "question": "Use the planning approximation that required judgements are proportional to 1/Δ². You halve the detectable human-error-rate gap from 0.5 to 0.25 percentage points. Holding the other approximation terms, seconds per judgement and hourly pay fixed, by what factor does evaluator cost increase?",
+    "explanation": [
+      "Correct: 4. The factor is (0.5 / 0.25)² = 4. More judgements mean more paid time at the fixed duration and pay rate. These are percentage-point differences in human error rate, not differences in FID.",
+      "Accept examples: 4, 4.0, 4e0. Absolute tolerance: 0.001, inclusive.",
+      "Feedback for 2: The inverse relationship is squared; halving the gap does more than double the planned sample count.",
+      "Feedback for 0.25: The smaller target gap is harder to distinguish. Take the inverse-square ratio, not the squared ratio in the opposite direction.",
+      "Other incorrect numbers: Divide the old gap by the new gap, then square that ratio.",
+      "The live calculator updates variance terms as the rates change and rounds trial counts, so its displayed multiplier is close to four, not necessarily exactly four. This question explicitly uses the fixed-term approximation. The calculation is a planning model, not a complete study budget.",
+      "Teaching takeaway: Resolving a smaller difference can cost much more evidence."
+    ],
+    "feedback": {
+      "2": "The inverse relationship is squared; halving the gap does more than double the planned sample count.",
+      "0.25": "The smaller target gap is harder to distinguish. Take the inverse-square ratio, not the squared ratio in the opposite direction."
+    },
+    "kind": "number",
+    "answer": 4,
+    "tolerance": 0.001,
+    "hint": "Give the multiplier as one number, not a dollar amount. Answers within 0.001 of the approximation's exact value are accepted.",
+    "fallback": "Divide the old gap by the new gap, then square that ratio."
+  },
+  {
+    "id": "S10",
+    "title": "Correlation",
+    "route": "/sessions/10-correlation/",
+    "code": "SLOP-S10",
+    "question": "Your metric ranking disagrees with a human ranking. What would make the investigation more interpretable before blaming the feature extractor?",
+    "explanation": [
+      "Correct: B. Metric estimates can vary with their sampling protocol, and human rankings can vary with the rating study. Specify the reference set, instrument and sample sizes alongside the human task and trial allocation. Investigate both before attributing disagreement to the representation. N-honesty helps interpretation but does not eliminate generator-dependent bias.",
+      "Feedback for A: A measured human ranking also has uncertainty; it is not made exact by being the target of validation.",
+      "Feedback for C: Choosing N after observing the desired ordering makes the comparison depend on that desired answer rather than a declared protocol.",
+      "Teaching takeaway: A correlation coefficient summarises a study, not just a metric."
+    ],
+    "feedback": {
+      "A": "A measured human ranking also has uncertainty; it is not made exact by being the target of validation.",
+      "C": "Choosing N after observing the desired ordering makes the comparison depend on that desired answer rather than a declared protocol."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Treat the observed human ranking as exact and ignore its trial count."
+      },
+      {
+        "value": "B",
+        "label": "Specify an N-honest metric protocol and the human-rating protocol, then examine uncertainty on both sides of the comparison."
+      },
+      {
+        "value": "C",
+        "label": "Use a different N for each model until the metric matches the human ranking."
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "id": "S11",
+    "title": "Why it persists",
+    "route": "/sessions/11-why-it-persists/",
+    "code": "SLOP-S11",
+    "question": "Which is the strongest defensible reason to keep reporting FID after documenting its limitations?",
+    "explanation": [
+      "Correct: C. A shared metric has coordination value: readers can place new results against established baselines. That value depends on comparability; the presence of an FID column alone does not establish it. Retaining FID does not require pretending its known blind spots disappeared.",
+      "Feedback for A: Adoption is a reason a number is useful socially, not proof of its validity for every scientific question.",
+      "Feedback for B: Standardisation of the metric's name does not make all evaluation protocols identical.",
+      "Teaching takeaway: A useful common reference can still need qualifications."
+    ],
+    "feedback": {
+      "A": "Adoption is a reason a number is useful socially, not proof of its validity for every scientific question.",
+      "B": "Standardisation of the metric's name does not make all evaluation protocols identical."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "Widespread use proves it measures all relevant aspects of quality."
+      },
+      {
+        "value": "B",
+        "label": "Once a metric is standard, reference sets and implementations need no disclosure."
+      },
+      {
+        "value": "C",
+        "label": "It can connect a result to a shared evaluation record when protocols are compatible, alongside disclosure of limitations and complementary evidence."
+      }
+    ],
+    "answer": "C"
+  },
+  {
+    "id": "S12",
+    "title": "What you would report instead",
+    "route": "/sessions/12-what-you-would-report-instead/",
+    "code": "SLOP-S12",
+    "question": "Your proposed replacement has an unbiased estimator. What is still needed before claiming it is a better reporting choice for this course's task?",
+    "explanation": [
+      "Correct: A. Unbiasedness answers an estimator question. It does not settle what the target quantity can distinguish, whether it tracks the relevant human judgement or whether readers can compare it to existing results. Present measured evidence and identify missing checks as limitations rather than implying that they have been completed.",
+      "Feedback for B: Estimating a quantity without bias does not make that quantity a complete account of human judgement.",
+      "Feedback for C: Raw magnitudes from differently scaled metrics are not a common quality scale. Compare what their evidence and rankings support.",
+      "Teaching takeaway: Apply the same standard to a replacement that you applied to FID."
+    ],
+    "feedback": {
+      "B": "Estimating a quantity without bias does not make that quantity a complete account of human judgement.",
+      "C": "Raw magnitudes from differently scaled metrics are not a common quality scale. Compare what their evidence and rankings support."
+    },
+    "kind": "choice",
+    "options": [
+      {
+        "value": "A",
+        "label": "An N-honest comparison against FID and FID∞, investigation of blind spots and human agreement, and an account of limitations and comparability costs."
+      },
+      {
+        "value": "B",
+        "label": "Nothing; unbiasedness establishes agreement with human judgement."
+      },
+      {
+        "value": "C",
+        "label": "A lower numerical value than FID, even if the two metrics use different scales."
+      }
+    ],
+    "answer": "A"
+  }
+]

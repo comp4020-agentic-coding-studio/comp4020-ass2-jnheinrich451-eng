@@ -1,0 +1,140 @@
+---
+import {withBase} from 'astro-theme-university/url';
+import type {SelfCheck} from '../lib/self-check';
+interface Props { question: SelfCheck; preview?: boolean; }
+const {question: q, preview = false} = Astro.props;
+const key = `self-check-${q.id}`;
+---
+<section class="self-check" id={key} data-self-check={preview ? undefined : q.id} aria-labelledby={`${key}-title`}>
+  <header>
+    <p class="sc-kicker">{q.id} / {preview ? 'Quiz review' : 'Optional self-check'} · Not assessed</p>
+    <h2 id={`${key}-title`}>{preview ? `${q.id.startsWith('L') ? 'Lecture' : 'Session'} ${Number(q.id.slice(1))}: ${q.title}` : 'Before you leave'}</h2>
+    <p class="sc-scope">No marks or penalties. Try it, retry it, or read the explanation. Nothing here is submitted.</p>
+  </header>
+  <p class="sc-question" id={`${key}-question`}>{q.question}</p>
+  {preview ? (
+    <>
+      {q.kind === 'choice' ? <ol class="sc-preview-options" type="A">{q.options.map(o => <li>{o.label}</li>)}</ol> : <p>{q.hint}</p>}
+      <p><a href={withBase(`${q.route}#${key}`)}>Open the teaching page ↗</a></p>
+    </>
+  ) : (
+    <>
+      <form data-sc-form hidden novalidate>
+        {q.kind === 'choice' ? (
+          <fieldset aria-describedby={`${key}-question`}>
+            <legend>Choose one answer</legend>
+            {q.options.map(o => <label class="sc-option"><input type="radio" name="answer" value={o.value} /><span><span class="sc-letter">{o.value}.</span> {o.label}</span></label>)}
+          </fieldset>
+        ) : (
+          <div class="sc-number">
+            <label for={`${key}-number`}>Your answer {q.id === 'S09' ? '(cost multiplier)' : '(squared distance)'}</label>
+            <input id={`${key}-number`} name="answer" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby={`${key}-hint ${key}-question`} />
+            <p class="sc-help" id={`${key}-hint`}>{q.hint}</p>
+          </div>
+        )}
+        <button type="submit">Check answer</button>
+      </form>
+      <p class="sc-feedback" data-sc-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+      <noscript><p>Interactive checking needs JavaScript. The answer and explanation remain available below; no course material is locked.</p></noscript>
+    </>
+  )}
+  <details class="sc-explanation">
+    <summary>Answer and explanation</summary>
+    {q.explanation.map((paragraph, index) => <p>{index === 0 ? <strong>{paragraph}</strong> : paragraph}</p>)}
+    {!preview && <button type="button" data-sc-review hidden>I've reviewed the explanation — reveal code</button>}
+  </details>
+  {!preview && (
+    <>
+      <div class="sc-unlock" data-sc-unlock hidden>
+        <h3>Collection code</h3>
+        <div class="sc-code-row"><code>{q.code}</code><button type="button" data-sc-copy>Copy code</button></div>
+        <p><a href={withBase(`/memes/#comic-${q.id}`)}>Open your teaching comic ↗</a></p>
+        <p class="sc-help">This code opens the matching comic. It is not a grade or proof of mastery. If browser storage is unavailable, copy the code and enter it on the collection page.</p>
+      </div>
+      <p class="sc-help" data-sc-storage role="status"></p>
+      <footer><span>Only code-unlock status is saved in this browser, when available. Clearing browser data removes it; it does not sync across devices.</span><a href={withBase(`/self-checks/#${key}`)}>Full quiz list ↗</a><a href={withBase('/memes/')}>Browse the meme collection ↗</a></footer>
+      <script is:inline type="application/json" data-sc-config set:html={JSON.stringify(q).replace(/</g, '\\u003c')} />
+    </>
+  )}
+</section>
+
+<script>
+  import {checkAnswer, unlockKey, type SelfCheck} from '../lib/self-check';
+  const initialized = new WeakSet<HTMLElement>();
+  function initializeChecks() {
+    document.querySelectorAll<HTMLElement>('[data-self-check]').forEach(root => {
+      if (initialized.has(root)) return;
+      initialized.add(root);
+      const q: SelfCheck = JSON.parse(root.querySelector('[data-sc-config]')!.textContent!);
+      const form = root.querySelector<HTMLFormElement>('[data-sc-form]')!;
+      const feedback = root.querySelector<HTMLElement>('[data-sc-feedback]')!;
+      const unlocked = root.querySelector<HTMLElement>('[data-sc-unlock]')!;
+      const storage = root.querySelector<HTMLElement>('[data-sc-storage]')!;
+      const review = root.querySelector<HTMLButtonElement>('[data-sc-review]')!;
+      const explanation = root.querySelector<HTMLDetailsElement>('details')!;
+      const key = unlockKey(q.id);
+      const unavailable = 'Code available for this visit. Browser storage is unavailable; copy the code if you want to keep it.';
+      form.hidden = false;
+      review.hidden = false;
+      try { if (localStorage.getItem(key) === 'unlocked') unlocked.hidden = false; } catch { /* Practice never depends on storage. */ }
+      function unlock() {
+        unlocked.hidden = false;
+        try { localStorage.setItem(key, 'unlocked'); storage.textContent = 'Code-unlock status saved in this browser. No answers or scores are stored.'; }
+        catch { storage.textContent = unavailable; }
+        document.dispatchEvent(new CustomEvent('slop:comic-unlocked',{detail:q.id}));
+      }
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const result = checkAnswer(q, String(new FormData(form).get('answer') ?? ''));
+        feedback.textContent = result.message;
+        feedback.dataset.state = result.state;
+        if (result.state === 'correct') unlock();
+      });
+      form.addEventListener('input', () => { feedback.textContent = ''; delete feedback.dataset.state; });
+      review.addEventListener('click', () => {
+        if (!explanation.open) return;
+        unlock();
+        feedback.textContent = 'Explanation reviewed. Your code is available below; you can still try the question.';
+        delete feedback.dataset.state;
+      });
+      root.querySelector('[data-sc-copy]')!.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(q.code); storage.textContent = 'Code copied.'; }
+        catch { storage.textContent = 'Clipboard unavailable. Select and copy the displayed code manually.'; }
+      });
+    });
+  }
+  initializeChecks();
+  document.addEventListener('astro:page-load', initializeChecks);
+</script>
+
+<style>
+  .self-check {margin-block:3rem;max-width:72ch;border-top:1px solid var(--at-primary);padding-top:1.5rem;scroll-margin-top:calc(var(--at-nav-height) + 6rem);}
+  .self-check [hidden] {display:none !important;}
+  .sc-kicker {font:.75rem/1.6 var(--at-font-mono,monospace);color:var(--at-primary);}
+  .self-check h2 {font-size:clamp(1.4rem,3vw,1.9rem);color:var(--at-primary);margin:.75rem 0;line-height:1.3;}
+  .self-check p,.self-check li {line-height:1.75;}
+  .sc-scope,.sc-help,.self-check footer {font-size:.85rem;color:var(--at-text-muted);}
+  .sc-question {font-size:1.05rem;margin-block:1.5rem;}
+  .self-check fieldset {padding:0;margin:0 0 1.25rem;border:0;min-width:0;}
+  .self-check legend {font-size:.85rem;color:var(--at-text-muted);margin-bottom:.6rem;}
+  .sc-option {display:flex;align-items:flex-start;gap:.8rem;padding:.9rem 1rem;border:1px solid var(--at-border);margin-block:.6rem;cursor:pointer;background:var(--at-bg);line-height:1.6;font-weight:400;}
+  .sc-option:has(input:checked) {border-color:var(--at-primary);background:var(--at-bg-alt);}
+  .sc-option input {flex:0 0 auto;width:1.1rem;height:1.1rem;margin-top:.3rem;accent-color:var(--at-primary);}
+  .sc-letter {font-family:var(--at-font-mono,monospace);color:var(--at-primary);}
+  .self-check button {background:var(--at-bg);color:var(--at-primary);border:1px solid var(--at-primary);padding:.7rem 1rem;font:.8rem/1.6 var(--at-font-mono,monospace);cursor:pointer;white-space:normal;}
+  .self-check :is(button,input,a,summary):focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+  .self-check button:hover {background:var(--at-bg-alt);}
+  .sc-number label {display:block;margin-bottom:.5rem;}
+  .sc-number input {display:block;box-sizing:border-box;width:12rem;max-width:100%;padding:.75rem;background:var(--at-bg);color:var(--at-text);border:1px solid var(--at-border);font:1rem var(--at-font-mono,monospace);}
+  .sc-feedback:empty,.sc-help:empty {display:none;}
+  .sc-feedback {border-left:2px solid var(--at-primary);padding:.4rem 1rem;}
+  .sc-explanation {margin-top:1.5rem;border-top:1px solid var(--at-border);padding-top:1rem;}
+  .sc-explanation summary {cursor:pointer;color:var(--at-primary);}
+  .sc-explanation p {font-size:.95rem;}
+  .sc-unlock {margin-top:1.5rem;padding:1rem;border-left:2px solid var(--at-primary);background:var(--at-bg-alt);}
+  .sc-unlock h3 {font-size:1rem;color:var(--at-primary);margin:0 0 .75rem;}
+  .sc-code-row {display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
+  .sc-code-row code {font-size:1.1rem;user-select:all;}
+  .self-check footer {margin-top:1.5rem;display:flex;flex-direction:column;gap:.7rem;line-height:1.6;}
+  .sc-preview-options li {padding-left:.4rem;margin-block:.7rem;}
+</style>

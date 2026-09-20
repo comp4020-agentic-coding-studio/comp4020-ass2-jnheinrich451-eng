@@ -1,0 +1,72 @@
+---
+import {withBase} from 'astro-theme-university/url';
+import manifest from '../../public/templates/final-report/manifest.json';
+const root = '/templates/final-report/';
+const pdf = withBase(`${root}final-report.pdf`);
+const zip = withBase(`${root}final-report-latex.zip`);
+const preview = withBase(`${root}preview.png`);
+---
+<section id="report-template" class="report-template" aria-labelledby="report-template-title">
+  <header>
+    <p class="template-kicker">SLOP8412 / Writing scaffold / First draft</p>
+    <h2 id="report-template-title">Give the claim a structure.</h2>
+    <p>The template puts your proposal, its evidence and its limitations in the same order as the brief. Start with the headings; supply your own argument and measurements.</p>
+  </header>
+  <p class="template-scope"><strong>Optional LaTeX starter.</strong> This is a scaffold, not a model answer or an additional marking requirement. The report remains <strong>at most six pages plus references</strong>, with a separate reproducible archive. The LaTeX ZIP does not replace that archive.</p>
+  <nav class="template-actions" aria-label="Report template files">
+    <a class="template-primary" href={zip} download>Download LaTeX project (.zip) ↓</a>
+    <a href={pdf} download>Download PDF ↓</a>
+    <a href={pdf} target="_blank" rel="noopener">Open PDF in a new tab ↗</a>
+  </nav>
+  <div class="template-preview">
+    <div class="preview-heading"><span>Compiled from the downloadable source</span><span>{manifest.pages} pages / starter only</span></div>
+    <iframe class="template-pdf" src={`${pdf}#view=FitH`} title="Slop University Final Report template PDF preview" loading="lazy"></iframe>
+    <figure class="template-mobile-preview">
+      <a href={pdf} target="_blank" rel="noopener" aria-label="Open all pages of the report template PDF in a new tab"><img src={preview} width="849" height="1200" loading="lazy" alt="First page of the report starter with the Slop shield, title fields, Part A proposal and Part B evaluation headings." /></a>
+      <figcaption>First page. Open the PDF above to read all {manifest.pages} pages.</figcaption>
+    </figure>
+  </div>
+  <p class="preview-help">Preview blank or too small? Use “Open PDF in a new tab” or download it. The same structure is outlined below.</p>
+  <div class="template-outline" aria-label="Required report sections">
+    <section><h3>A / The proposal <span>25 points</span></h3><p>Define the proposal, its intended use and your contribution. An equation placeholder is included; replace it with your own definition.</p></section>
+    <section><h3>B / The evaluation <span>45 points</span></h3><p>Compare A, B and C against FID and FID∞. Address estimator bias, blind spots, human correlation and adoption cost, or justify an absence. The starter includes protocol and results tables and a figure placeholder.</p></section>
+    <section><h3>C / Where it fails <span>30 points</span></h3><p>State when you would still report FID and how the proposal fails. Point the reader to the separate archive that reproduces your evidence.</p></section>
+    <section><h3>References</h3><p>Add the sources you actually used. No citations, scores or results are supplied as answers.</p></section>
+  </div>
+  <details class="template-instructions">
+    <summary>Use the LaTeX project</summary>
+    <ol>
+      <li>Extract the ZIP. Keep <code>main.tex</code> and <code>slop-crest.png</code> together.</li>
+      <li>Open <code>main.tex</code> in your LaTeX editor and select pdfLaTeX. Replace the title fields and writing prompts.</li>
+      <li>Compile twice to resolve equation and figure references. The ZIP includes a README with commands.</li>
+      <li>Check the completed report’s page count. The starter’s length is not a page allocation; your title block counts within the six-page limit.</li>
+    </ol>
+    <p>This page previews a precompiled PDF. It does not compile LaTeX, save student work or accept submissions. Consult the <a href={withBase('/policies/')}>course policies</a> for reporting and tool disclosure.</p>
+  </details>
+</section>
+<style>
+  .report-template {margin-block:3rem;scroll-margin-top:calc(var(--at-nav-height) + 1.5rem);border-top:1px solid var(--at-primary);padding-top:1.5rem;min-width:0;}
+  .template-kicker {font:.75rem var(--at-font-mono,monospace);color:var(--at-primary);}
+  .report-template h2 {font-size:clamp(1.5rem,3vw,2rem);color:var(--at-primary);margin:.75rem 0 1rem;line-height:1.2;}
+  .report-template p,.report-template li {line-height:1.7;max-width:72ch;}
+  .template-scope {border-left:2px solid var(--at-primary);padding-left:1rem;font-size:.9rem;}
+  .template-actions {display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.5rem;margin:1.5rem 0;font:.8rem/1.6 var(--at-font-mono,monospace);}
+  .template-actions a {text-underline-offset:.3em;}
+  .template-actions .template-primary {border:1px solid var(--at-primary);padding:.7rem .9rem;text-decoration:none;}
+  .report-template a:focus-visible,.report-template summary:focus-visible {outline:2px solid var(--at-primary);outline-offset:4px;}
+  .template-preview {border:1px solid var(--at-border);}
+  .preview-heading {display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;padding:.8rem 1rem;background:var(--at-bg-alt);font:.7rem/1.5 var(--at-font-mono,monospace);}
+  .template-pdf {display:block;width:100%;height: min(80vh,850px);min-height:480px;border:0;background:white;}
+  .template-mobile-preview {display:none;margin:0;}
+  .template-mobile-preview img {display:block;width:100%;height:auto;}
+  .template-mobile-preview figcaption {padding:.8rem 1rem;font-size:.8rem;}
+  .preview-help {font-size:.8rem;color:var(--at-text-muted);}
+  .template-outline {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem 2rem;margin-block:1.5rem;}
+  .template-outline section {border-top:1px solid var(--at-border);padding-top:1rem;}
+  .template-outline h3 {font-size:1rem;line-height:1.5;color:var(--at-primary);margin:0;}
+  .template-outline h3 span {display:block;font:.75rem/1.8 var(--at-font-mono,monospace);}
+  .template-outline p,.template-instructions {font-size:.9rem;}
+  .template-instructions {border-top:1px solid var(--at-border);padding-top:1rem;}
+  .template-instructions summary {cursor:pointer;color:var(--at-primary);}
+  @media(max-width:700px){.template-pdf {display:none;}.template-mobile-preview {display:block;}.template-outline {grid-template-columns:minmax(0,1fr);}}
+</style>
