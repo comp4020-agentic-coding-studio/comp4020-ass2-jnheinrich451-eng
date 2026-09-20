@@ -92,4 +92,17 @@ describe("each codewalk stays tied to its assessment and its week", () => {
       expect(listing, `week ${walk.week} does not offer its codewalk`).toContain(`/sessions/${walk.id}/`);
     }
   });
+
+  it("names the codewalk on the session page of the week that holds it", () => {
+    // The listing is not enough: a reader who lands on week 6 from anywhere
+    // else has to meet the examination on that page, where they are standing.
+    for (const walk of WALKS) {
+      const session = nodes.find((n) => n.type === "sessions" && Number(n.meta.week) === walk.week)!;
+      const slug = String(session.id).split("/").pop();
+      const main = /<main[^>]*>([\s\S]*)<\/main>/.exec(html(`dist/sessions/${slug}/index.html`))?.[1] ?? "";
+      expect(main, `week ${walk.week}'s session page does not link its codewalk`).toContain(
+        `/sessions/${walk.id}/`,
+      );
+    }
+  });
 });

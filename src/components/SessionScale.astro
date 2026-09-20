@@ -2,12 +2,17 @@
 import { getPublishedCollection } from 'astro-course-university/content';
 import { withBase } from 'astro-theme-university/url';
 import { getLectureLinks } from '../lib/lecture-links';
+import { getCodewalkByWeek } from '../lib/codewalks';
+import { formatCourseDate } from '../lib/dates';
 interface Props { current: string }
 const { current } = Astro.props;
 const sessions = (await getPublishedCollection('sessions')).sort((a,b) => a.data.week-b.data.week);
 const index = sessions.findIndex(s => s.id === current);
 const active = sessions[index];
 const lectureLink = (await getLectureLinks()).get(active.data.week);
+// A week that holds a codewalk says so where the reader is standing, beside
+// the lecture branch, with the date it runs on.
+const codewalk = (await getCodewalkByWeek()).get(active.data.week);
 const previous = sessions[index-1], next = sessions[index+1];
 const names: Record<string,string> = { A: 'Compute it', B: 'Break it', C: 'Live with it' };
 const arcOf = (s: typeof active) => String((s.data as Record<string,unknown>).arc ?? '');
@@ -29,6 +34,7 @@ const href = (id: string) => withBase(`/sessions/${id}/`);
   </div>
   <div class="scale-current"><span class="current-ring" aria-hidden="true"></span><span>{active.data.title}</span></div>
   {lectureLink && <a class="lecture-branch" href={lectureLink.href}><span aria-hidden="true">↳</span> {lectureLink.label} →</a>}
+  {codewalk && <a class="codewalk-branch" href={codewalk.href}><span aria-hidden="true">↳</span> {codewalk.title} · {formatCourseDate(codewalk.date)} →</a>}
   <details class="mobile-weeks"><summary>Choose a week</summary><ol>{sessions.map(s=><li><a href={href(s.id)} aria-current={s.id===current?'page':undefined}>Week {s.data.week} · {s.data.title}</a></li>)}</ol></details>
   <div class="adjacent">
     {previous ? <a href={href(previous.id)}><span>← Previous</span><strong>{previous.data.title}</strong></a> : <span>Start of course</span>}
@@ -53,7 +59,7 @@ const href = (id: string) => withBase(`/sessions/${id}/`);
   a:hover .marker {border-color:var(--at-primary);}
   .scale-current {display:flex;gap:.6rem;align-items:center;margin-top:1.5rem;font-size:.85rem;}
   .current-ring {width:.6rem;height:.6rem;border:1px solid var(--at-primary);border-radius:50%;}
-  .lecture-branch {display:block;margin-top:.75rem;padding:.5rem 0 .5rem 1rem;border-left:1px solid var(--at-primary);font-size:.8rem;}
+  :is(.lecture-branch,.codewalk-branch) {display:block;margin-top:.75rem;padding:.5rem 0 .5rem 1rem;border-left:1px solid var(--at-primary);font-size:.8rem;}
   .adjacent {display:flex;justify-content:space-between;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--at-border);}
   .adjacent a {display:grid;gap:.2rem;text-decoration:none;min-height:44px;max-width:48%;}
   .adjacent a:last-child {text-align:right;}
