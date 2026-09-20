@@ -1,8 +1,9 @@
 ---
 title: Correlation
 description:
-  Does the score rank models the way people do? The studies that asked,
-  and what they found.
+  Put the ranking a score produces beside the ranking people produce, and
+  ask whether they agree. That question decides whether the previous nine
+  weeks were worth doing.
 week: 10
 date: 2026-10-12
 arc: C

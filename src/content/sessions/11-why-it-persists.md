@@ -1,8 +1,9 @@
 ---
 title: Why it persists
 description:
-  Comparability, reviewer expectation, and the cost of being the first
-  table without the row. An honest account of why the number stays.
+  Nine years of results tables carry an FID column, and that continuity is
+  the strongest argument anyone has for keeping it. What the number costs to
+  leave out, stated honestly.
 week: 11
 date: 2026-10-19
 arc: C

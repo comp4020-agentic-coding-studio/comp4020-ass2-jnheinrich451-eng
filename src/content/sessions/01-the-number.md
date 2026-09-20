@@ -1,8 +1,9 @@
 ---
 title: The number
 description:
-  Where the score comes from, who reports it, and what a gap of 0.4 is
-  taken to mean. The bench is built.
+  The bold number in a results table is the field's account of what got
+  better, and nothing in the table says what it was computed against. The
+  bench is built here.
 week: 1
 date: 2026-08-03
 arc: A
