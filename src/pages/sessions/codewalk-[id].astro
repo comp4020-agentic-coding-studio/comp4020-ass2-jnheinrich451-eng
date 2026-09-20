@@ -82,7 +82,10 @@ const description = `Ten minutes at the bench in week ${walk.week}. ${walk.purpo
   .codewalk-facts {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:1rem;margin-block:2rem;padding-block:1.25rem;border-block:1px solid var(--at-border);}
   .codewalk-facts dt {font:.72rem var(--at-font-mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--at-text-muted);}
   .codewalk-facts dd {margin:.4rem 0 0;font-size:1.02rem;}
-  .codewalk-blocks {width:100%;border-collapse:collapse;margin-block:1.5rem;}
+  /* A rule above the head divides the prose from the timetable. It takes the
+     page's own text colour, so it reads as a near-white line on the dark
+     theme and a near-black one on the light theme. */
+  .codewalk-blocks {width:100%;border-collapse:collapse;margin-block:1.5rem;border-block-start:2px solid var(--at-text);}
   .codewalk-blocks caption {text-align:left;font-size:.9rem;color:var(--at-text-muted);margin-block-end:.6rem;}
   .codewalk-blocks :is(th,td) {text-align:left;padding:.6rem .5rem;border-block-end:1px solid var(--at-divider);font-variant-numeric:tabular-nums;}
   /* The theme fills a table head with solid gold. Here the head is a label
