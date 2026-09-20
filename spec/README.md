@@ -162,3 +162,31 @@ unlock flags, relocks menu links immediately, and preserves theme/workspace data
 Cancel and Escape leave progress untouched; blocked storage reports an unverified
 saved reset honestly. `default-theme.test.ts` checks the head hook and retained
 theme toggle in all three course layout families.
+
+`session-alignment.test.ts` protects the revised Week 4 and Week 8 teaching
+contracts: a controlled resize comparison, eight scores from four numerical
+configurations, named validation controls, and measured toy evidence separated
+from an untested FVD proposal. It checks the planning spine against published
+descriptions/checklists. These wording and structure checks do not certify
+student understanding or replace a human read-through.
+
+The same checks cover Weeks 3 and 7: toy-map versus image-FID naming, the
+rotation-only control, population versus estimated quantities, KID's finite
+sampling caveats, and the panel's actual d/N settings and three outputs.
+`expected-results.test.ts` keeps Week 7's mathematical and observed outcomes
+inside its closed fold; `week7.test.ts` retains independent numerical evidence.
+The teaching-links browser check runs all three Week 7 settings, checks the
+closed fold and dimension resets, and ensures the d = 16 population labels
+retain enough precision to distinguish A from B.
+
+Week 5/6 log-handoff checks hold the first recorded FID∞ practice in week 5,
+its transfer to candidate D in week 6, separate population/finite/fitted
+values, and explicit reasons for missing computations. The log's weight,
+deadline and criterion weights remain unchanged; missing required work is not
+treated as complete merely because the omission was recorded.
+
+Week 12 checks align the session's eight-minute presentation and four-minute
+Part C defence with the final-report brief, preserving the assessment's weight,
+deadline and rubric. The final log separates metric scales and fitted/population
+values; a synthetic adaptation is not advertised as CLIP-based CMMD. Browser
+checks follow the in-person-format link to its actual assessment anchor.

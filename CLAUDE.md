@@ -289,6 +289,35 @@ example. State the construction that guarantees equality; drawing from the
 same distribution or taking a subsample does not guarantee identical sample
 means and covariances. Protect this distinction in the teaching precision tests.
 
+A session's description, checklist, exercise and log handoff must promise the
+same work. A proposed experiment is not a measured result; a toy feature
+invariance is not evidence about an untested encoder. State what is held fixed,
+what changes, what students retain and what would challenge their explanation.
+Count settings and candidate scores separately. Preserve these distinctions in
+the session-alignment checks, and update the corresponding course-spine entry
+when changing a session's promise. Keep revisions to one or two sessions per pass.
+
+Name the feature map as well as the Gaussian formula: synthetic-vector scores
+are not standard image-based FID. A population baseline is not a fitted FID∞
+intercept. Match exercise instructions to the quantities and settings a panel
+actually computes, including controls that change N as well as dimension.
+Separate a mathematical insensitivity from observed finite-run strip overlap;
+unbiasedness does not certify sensitivity, and overlap is not a significance test.
+
+The measurement log and session handoffs must agree on when a method becomes
+required: FID∞ starts with recorded lecture-ladder practice in week 5, then
+transfers to the student's candidate in week 6. Distinguish finite estimates,
+fitted intercepts and population baselines; retain original measurements.
+An explicit "not computed" explains an omission but does not satisfy required
+work. Check this timing across the assessment, sessions and planning spine.
+
+Assessment-linked sessions prepare the published task, not a parallel one.
+Keep presentation duration and submission requirements aligned with the
+assessment brief and link to it; do not invent another deadline or deliverable.
+Final comparison tables retain each metric's scale and each estimate's protocol,
+not a claim that unlike methods were all computed identically. Protect the
+week 12 eight-minute presentation plus four-minute defence in the checks.
+
 # Instructions on SLOP8412
 
 ## The one idea

@@ -95,6 +95,11 @@ related:
 
 ### `sessions/03-the-instrument.md`
 
+Inherits week 2's formula and week 1's saved bench samples; supplies the
+feature-space distinction for weeks 4, 8 and 10. Compare identity, a common
+orthogonal rotation and rotation-plus-ReLU without redrawing. The toy distances
+are not standard image-based FID; the rotation alone is a numerical control.
+
 ```yaml
 title: The instrument
 description:
@@ -110,27 +115,33 @@ spec:
     it has
   - you can state one way the classifier's objective shapes what the score
     can and cannot see
-  - you have re-scored the bench through a second feature extractor and
-    recorded how much the number moved
+  - you have re-scored saved bench samples through a fixed toy feature map,
+    checked a rotation-only control and labelled the resulting distances correctly
 related:
   - 01-the-number
 ```
 
 ### `sessions/04-getting-it-right.md`
 
+Inherits week 2's exact formula and baseline; supplies the pinned protocol for
+A1 and week 5's sampling comparison. Compare candidate resizing with cached
+reference features, then four arithmetic configurations on the same saved
+moments. Keep A and B separately: eight scores, not four.
+
 ```yaml
 title: Getting it right
 description:
-  The same reference set through different public implementations, and
-  the different numbers that come back. Resizing, pixel ranges and the
-  matrix square root, each in turn.
+  The same samples can receive different scores. Separate preprocessing
+  from numerical arithmetic, then pin the protocol you can defend.
 week: 4
 date: 2026-08-24
 arc: A
 required_reading: parmar-2022
 spec:
-  - you can produce two scores for the same images that differ only in the
-    resize filter, and say which is right
+  - you have compared two candidate resize settings while keeping the source
+    images, reference features and the rest of the scoring pipeline fixed
+  - you have compared four numerical configurations on the same saved bench
+    moments, reporting A and B separately and checking numerical residuals
   - the bench is scored through a single pinned implementation from here on,
     and you can say what it pins
 related:
@@ -140,13 +151,25 @@ related:
 
 ### `sessions/05-the-bias.md` (exists; add these keys)
 
+Inherits week 4's pinned implementation and week 2's population baseline.
+FID∞ recording begins here: three lecture ladders at fixed settings, with
+finite estimates, fitted intercepts and truth kept separate. Week 6 transfers
+that practice to A and the student's own D. Retain week 4's original record.
+
 ```yaml
 arc: B
+log: >-
+  the sampling protocol, seed, N and repetitions; the lecture's finite estimate,
+  fitted FID∞ and population baseline, with the ladder and repeated intercepts
 required_reading: chong-forsyth-2020
 further_reading: [binkowski-2018, heusel-2017]
 ```
 
 ### `sessions/06-blind-spots.md`
+
+Inherits week 5's first recorded fit and tests what estimation cannot repair.
+Compare A and D using a shared ladder and declared reference protocol in the
+student's notebook; the lecture cannot accept D. Carry the evidence into A2.
 
 ```yaml
 title: Blind spots
@@ -156,6 +179,9 @@ description:
 week: 6
 date: 2026-09-07
 arc: B
+log: >-
+  the finite FID comparison and fitted FID∞ for A and your candidate D, with
+  the shared ladder and reference protocol, and the per-sample measure chosen first
 further_reading: [binkowski-2018]
 spec:
   - you can construct a bench candidate that scores well and is obviously
@@ -170,22 +196,29 @@ related:
 
 ### `sessions/07-dropping-the-gaussian.md`
 
+Inherits week 5's estimator/quantity distinction and week 6's candidate C;
+supplies week 12's test of a replacement metric. Compare the actual plotted
+KID, density and coverage estimates with a population Gaussian baseline, not
+an alleged computed FID∞. Changing from d = 2048 to d = 2 also changes N;
+use d = 2 versus d = 16 for the equal-N dimensional comparison.
+
 ```yaml
 title: Dropping the Gaussian
 description:
-  Precision and recall split fidelity from coverage. KID keeps the features
-  and drops the Gaussian. The bench is scored all three ways.
+  An unbiased estimator need not detect every difference. Compare KID,
+  density and coverage against the bench's known Gaussian-distance baseline.
 week: 7
 date: 2026-09-21
 arc: B
 required_reading: binkowski-2018
 further_reading: [kynkaanniemi-2019, naeem-2020]
 spec:
-  - you can say what precision and recall each report that a single scalar
-    cannot
-  - you can state why KID's estimator is unbiased where FID's is not
-  - you have an N-honest comparison of the two bench generators under all
-    three scores
+  - you can distinguish precision and recall from the density and coverage
+    quantities plotted here
+  - you can explain KID's unbiased estimator without claiming complete
+    sensitivity or an exact answer from one finite sample
+  - you have an N-honest comparison of A, B and C with R-again under the
+    three plotted scores, labelled separately from the population baseline
 related:
   - 05-the-bias
   - 02-frechet-distance
@@ -193,11 +226,15 @@ related:
 
 ### `sessions/08-video.md`
 
+Inherits week 3's feature question, week 5's sampling caution and week 6's
+moment limitation. Supplies a measured toy comparison and an explicitly
+untested FVD audit plan for week 9's human study and the final report.
+
 ```yaml
 title: Video
 description:
-  FVD swaps the instrument for an action classifier and keeps everything
-  else. The bias comes with it. Temporal failures do not show.
+  FVD keeps the Gaussian distance but changes the features. Test what a
+  temporal instrument preserves before transferring claims from images.
 week: 8
 date: 2026-09-28
 arc: B
@@ -205,8 +242,10 @@ required_reading: unterthiner-2019
 further_reading: [chong-forsyth-2020]
 spec:
   - you can say exactly what changed between FID and FVD and what did not
-  - you can name one temporal failure that leaves the score unchanged, and
-    show it
+  - you have compared all three lecture instruments on the same sequence sets,
+    with predictions, settings and observed scores recorded
+  - you can demonstrate a toy feature invariance and design a separate test
+    of temporal sensitivity in an actual FVD pipeline
 related:
   - 03-the-instrument
   - 05-the-bias
@@ -279,14 +318,23 @@ related:
 
 ### `sessions/12-what-you-would-report-instead.md`
 
+Inherits the estimator/quantity distinction from weeks 5 and 6, week 7's
+metric comparison and week 11's reporting argument. Consolidates the final
+log and prepares the final report defence: eight minutes to present and four
+to defend Part C, following the assessment brief. Preserve distinct scales,
+population baselines and fitted intercepts; record a dated post-defence note.
+
 ```yaml
 title: What you would report instead
 description:
-  Your proposal, judged by the standard you spent eight weeks applying to
-  the score. Presentations, and the bench scored one last time.
+  Defend your proposal by the standard built across the semester. Bring the
+  final bench comparison and the conditions under which you would still report FID.
 week: 12
 date: 2026-10-26
 arc: C
+log: >-
+  the final A, B and C comparison under finite FID, fitted FID∞, KID, density,
+  coverage and your proposal, with protocols, baselines and a dated defence note
 required_reading: jayasumana-2024
 further_reading: [stein-2023, chong-forsyth-2020]
 spec:
@@ -306,6 +354,12 @@ related:
 
 ### `assessments/measurement-log.md`
 
+Weeks 1–4 retain the original measurements without requiring FID∞. Week 5
+records three reduced-dimensional lecture ladders. From week 6 apply the fit
+when assigned, starting with A and D. Keep finite estimates, fitted intercepts
+and population baselines separate. "Not computed" must have a reason and does
+not complete required work; later corrections are dated, not backfilled.
+
 ```yaml
 title: Measurement log
 description:
@@ -319,12 +373,13 @@ marking:
   criteria:
     - name: Completeness across the twelve weeks
       weight: 50
-    - name: Discrepancies recorded rather than smoothed
+    - name: Predictions checked against measurements
       weight: 50
 spec:
   - twelve dated entries, one per teaching week
   - every number is accompanied by its N and its implementation
-  - at least one entry records a result you did not expect
+  - at least one entry compares a prediction recorded before measuring with
+    the observed result and explains the agreement or discrepancy
 related:
   - final-report
 ```

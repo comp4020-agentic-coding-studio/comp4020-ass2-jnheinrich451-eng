@@ -7,7 +7,8 @@ week: 3
 date: 2026-08-17
 arc: A
 log: >-
-  how far each number moved through the second instrument, and at what N
+  the identity, rotation and rotation-plus-ReLU scores on saved samples, with N,
+  seeds and a distinction between a toy Gaussian distance and image-based FID
 required_reading: kynkaanniemi-2023
 further_reading: [binkowski-2018]
 spec:
@@ -15,62 +16,86 @@ spec:
     it has
   - you can state one way the classifier's objective shapes what the score
     can and cannot see
-  - you have re-scored the bench through a second feature extractor and
-    recorded how much the number moved
+  - you have re-scored saved bench samples through a fixed toy feature map,
+    checked a rotation-only control and labelled the resulting distances correctly
 related:
   - 01-the-number
 ---
 
-Load the network the score is computed on and look at what it was built for.
-Inception-v3 was trained to assign one of a thousand ImageNet labels to a
-photograph. Nothing in that training mentions generative models, image
-quality, or distance between distributions.
+An exact distance can answer the wrong question if its features discard what
+you care about. Week 2 justified a formula; it did not justify the space in
+which we apply it. Load the network used by your FID implementation and inspect
+what it was trained to distinguish.
 
-Call it **the instrument**. Every FID in the literature is a distance measured
-in the 2048-dimensional space of that classifier's pool3 activations, and the
-instrument is what built the space.
+Call the feature extractor **the instrument**. Standard image-based FID uses
+2,048-dimensional Inception-v3 pool3 features, before the classification head.
+The classifier was trained to distinguish a thousand ImageNet classes, not to
+judge generative models. Record the checkpoint and layer, not just the network
+family: these identify the space your score measures.
 
 ## What the space was built for
 
-A classifier learns to keep apart whatever its labels distinguish, and it is
-free to discard everything they do not. Those thousand labels are mostly
-objects and animals. Anything no two ImageNet classes ever disagree about can
-be thrown away at no cost to the training objective, and a coordinate the
-network threw away is a coordinate the score cannot measure.
+A classification objective rewards distinctions useful for its labels. It
+does not guarantee sensitivity to every difference a viewer notices. This
+does not mean we know every detail the trained network discards; that needs
+measurement. But if two image sets produce identical feature vectors, more
+precise downstream arithmetic cannot recover the missing distinction.
 
-So the question for the rest of the semester is not whether the score is
-accurate. It is what the instrument was built to be sensitive to, and whether
-that overlaps with what you care about.
+Keep that conditional claim separate from an observation about a particular
+encoder. Week 8 will need it when changing from images to video, and week 10
+will ask whether the measured distinctions agree with human judgements.
 
 ## Two things already known about it
 
-Bińkowski and colleagues note that a noticeable fraction of the activation
-coordinates are exactly zero, which is what a ReLU does. A distribution with
-an atom at zero in many of its coordinates is not Gaussian and cannot be made
-Gaussian by fitting a mean and a covariance to it. Week 2's closed form is
-being applied to features that do not satisfy the assumption it was derived
-under.
+Bińkowski and colleagues discuss non-Gaussian Inception activations, including
+zeros introduced by ReLU. Fitting moments does not make the feature distribution
+Gaussian. Week 2's expression still gives the squared Wasserstein distance
+between the fitted Gaussians; it is not generally the squared Wasserstein
+distance between the original feature distributions. The formula remains
+well-defined while its interpretation becomes narrower.
 
-Kynkäänniemi and colleagues report something sharper. They report that the
-score is driven strongly by the ImageNet class histogram of the samples, that
-matching class frequencies alone can move FID substantially without any change
-a person would call an improvement, and that a small set of what they call
-fringe features accounts for much of the effect. Read them for the mechanism
-rather than for the headline.
+Kynkäänniemi and colleagues show that aligning ImageNet classification
+histograms can substantially reduce FID without improving image quality.
+Before the session, identify their intervention, what stayed fixed, and the
+evidence for the quality claim. Bring one limitation of transferring that
+result to a different dataset or checkpoint.
 
 ## What the bench stands in for
 
-The bench has no images in it and no network. What it has is the instrument's
-output: 2048 coordinates, with R a standard Gaussian and A and B differing
-from it in one moment each. Everything this course does to those vectors is
-what FID does to activations.
+Week 1's bench has no images or Inception network. Its synthetic vectors stand
+in for feature outputs: R is standard Gaussian; A shifts the mean; B changes
+the covariance. Applying week 2's formula to these moments is a toy Gaussian
+distance, not standard image-based FID. The shorthand on the bench names the
+formula being studied, not an image-evaluation protocol.
 
-That makes the instrument swappable, which is this week's experiment.
+Changing the map while keeping the source samples fixed tests dependence on
+the representation. It does not establish which map agrees better with people.
 
 ## Exercise
 
-Pass A, B and R through a second fixed map: a random rotation, then a ReLU.
-Nothing about the samples has changed. Re-score both candidates and record how
-far each number moved, at what N, beside the originals from week 1.
+Use your week 1 notebook. Start with a two-dimensional projection so you can
+inspect the calculation, then repeat on the 2,048-dimensional bench when
+resources permit; label any unrun case **not computed**. Save one draw each
+of R, A and B, with N and the sampling seed. Do not redraw between maps.
 
-Then say which of the two numbers is the FID. Both are.
+Write down a prediction for each candidate under identity, rotation only,
+and rotation followed by coordinatewise ReLU. Fix one orthogonal matrix Q,
+using a seeded QR decomposition, and apply the same Q to every set. ReLU
+replaces negative coordinates by zero; it is not a trained replacement encoder.
+
+Estimate means and full covariances after each map, retaining the same
+covariance convention, arithmetic and square-root routine. Keep off-diagonal
+entries. Make a table with three map rows and two candidate-score columns.
+Record differences from identity, the map seed, Q and a numerical tolerance
+chosen before comparing results.
+
+Use rotation alone as the control: a common orthogonal change of coordinates
+preserves the Gaussian distance. A discrepancy above tolerance challenges the
+implementation or the control, not the feature-sensitivity claim. Resolve it
+before interpreting ReLU. A negligible ReLU effect is also a result; do not
+keep changing seeds until a preferred story appears.
+
+In your measurement log, distinguish changed coordinates from changed source
+samples. Explain why none of these toy scores is standard image-based FID.
+Week 4 inherits this fixed-map comparison and asks what happens when the
+preprocessing changes instead.

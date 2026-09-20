@@ -7,7 +7,8 @@ week: 5
 date: 2026-08-31
 arc: B
 log: >-
-  the sampling protocol, the seed, N and repetitions, beside the population baseline
+  the sampling protocol, seed, N and repetitions; the lecture's finite estimate,
+  fitted FID∞ and population baseline, with the ladder and repeated intercepts
 required_reading: chong-forsyth-2020
 further_reading: [binkowski-2018, heusel-2017]
 spec:
@@ -87,13 +88,16 @@ an exact correction. Inspect fit residuals and sensitivity to the N range.
 A finite reference set held fixed does not become a population reference
 merely because generated-sample N is extrapolated to infinity.
 
-The [week 5 lecture](/lectures/week-05/) runs this ladder in the page on a
-smaller bench, and shows the price as well as the repair: repeated ladders
-land either side of the true value, and move by about as much as the value
-they estimate.
+Begin recording FID∞ in week 5. In the [week 5 lecture](/lectures/week-05/),
+choose one candidate and keep d and draws per sample size fixed. Press
+**Run the ladder** three times. For each run, save the displayed seed, the
+N = 60 sample estimate, fitted intercept and population value in separate
+columns. Record the ladder N = 60, 100, 200, 400, 800 and the intercept spread.
+Reference and candidate samples are redrawn at every rung and trial.
 
-We will use it on the bench from week 6 onwards. Week 4's numbers are now
-retired.
+Label this reduced-dimensional practice, not the full bench. Week 6 applies
+the comparison to your own candidate. Keep week 4's original measurements;
+append the correction rather than replacing the earlier record.
 
 ## Before the session
 

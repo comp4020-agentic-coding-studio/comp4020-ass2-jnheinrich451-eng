@@ -32,9 +32,31 @@ on the [policies page](/policies/).
 
 1. Twelve entries, one per teaching week, dated.
 2. Every number carries its N, its reference set and its implementation. From
-   week 5, FID∞ beside FID.
+   week 5, record FID∞ beside finite FID as specified below; label any
+   population baseline separately.
 3. Submit one Markdown file. Tables with explanatory notes are fine; an essay
    is not required.
+
+## When FID∞ enters the log
+
+| Teaching week | What the entry retains |
+| --- | --- |
+| 1–4 | The session's measurements and protocol. FID∞ is not yet required; do not invent or retrospectively add an estimate. |
+| 5 | First recorded FID∞ practice: run the [lecture ladder](/lectures/week-05/) three times at fixed settings. Keep the finite N = 60 estimate, fitted intercept and population baseline separately for each run. Label the reduced-dimensional experiment. The [session](/sessions/05-the-bias/) also assigns the sampling and inversion work. |
+| 6 onward | Apply the comparison when the session calls for it, beginning with A and your own D in [Week 6](/sessions/06-blind-spots/). Record the shared N ladder, reference protocol and repeated intercepts alongside the finite scores. |
+
+FID∞ is a fitted estimate here, not another single-N measurement. Record all
+sample sizes used, draws per size, dimensions, seeds and implementation, and
+whether the reference is fixed or redrawn. Keep the fitted result's variation
+and any checks of fit residuals or N-range sensitivity. For an analytical
+population baseline, write **N: not applicable (population calculation)**.
+
+If an activity does not compute FID∞, enter **not computed** and explain why.
+The Python workspace starter and Week 7's three-score panel do not fit it;
+their population baselines are not substitutes. A failed required fit also
+needs its attempted settings, reason and next check. Honest reporting does
+not turn missing required work into completed work. Preserve earlier entries
+and date later corrections rather than overwriting them.
 
 ## How it is read
 

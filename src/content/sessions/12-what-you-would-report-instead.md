@@ -1,13 +1,14 @@
 ---
 title: What you would report instead
 description:
-  Your proposal, judged by the standard you spent eight weeks applying to
-  the score. Presentations, and the bench scored one last time.
+  Defend your proposal by the standard built across the semester. Bring the
+  final bench comparison and the conditions under which you would still report FID.
 week: 12
 date: 2026-10-26
 arc: C
 log: >-
-  every score this course has used, on A, B and C, N-honestly beside the closed forms
+  the final A, B and C comparison under finite FID, fitted FID∞, KID, density,
+  coverage and your proposal, with protocols, baselines and a dated defence note
 required_reading: jayasumana-2024
 further_reading: [stein-2023, chong-forsyth-2020]
 spec:
@@ -21,60 +22,88 @@ related:
   - assessments/final-report
 ---
 
-Bring your proposal and defend it in front of the room. Then score the bench
-one last time.
+A replacement score earns trust through the evidence it survives, not through
+its name. Bring your proposal and the final bench comparison, then defend
+what they support. Week 5's estimator question and week 6's blind spot must
+both survive into your conclusion.
 
 ## A proposal to measure yours against
 
-Jayasumana and colleagues propose CMMD, which pairs CLIP embeddings with a
-maximum mean discrepancy in place of the Fréchet distance. That makes the
-estimator unbiased, drops the Gaussian assumption, and needs fewer samples. It
-is exactly the kind of thing the final report asks you to produce, which makes
-it the fairest object to test your own standard on.
+Jayasumana and colleagues propose CMMD: CLIP embeddings compared using squared
+maximum mean discrepancy with a Gaussian RBF kernel. They use an unbiased
+estimator and report sample-efficiency improvements in their experiments.
+That removes the Gaussian fit to embeddings, not the need to validate the
+representation or the sampling protocol. Unlike week 7's cubic kernel, this
+is a different kernel as well as a different feature extractor.
 
-Judge it the way you are about to be judged. Does it carry a bias that depends
-on N, and would week 5's fit find it? Is there a candidate like C that it
-scores perfectly and should not, and does week 6's construction survive the
-change of instrument? Does it track human judgement better than what it
-replaces, and measured by whom? And what would it cost a paper to report it
-instead of the row every reader already knows how to read?
+Before the session, identify one claim in the reading, the comparison that
+supports it, and a setting it did not test. Distinguish an estimator's
+unbiasedness from a finite result's uncertainty. Ask whether the human study
+supports your intended use, and which baselines a reader would have to rerun.
+Do not assume C remains invisible after changing the kernel.
+
+CMMD's image pipeline cannot be run directly on our synthetic vectors as if
+they were images. If you adapt its kernel to the bench, name that adaptation;
+do not claim to have reproduced CLIP-based CMMD. The reading supplies a
+proposal to interrogate, not a compulsory new implementation.
 
 ## Where proposals fail
 
-Better said before the presentations than after: most proposals in this room
-will fail on the last of those questions rather than on the mathematics. The
-mathematics is the part you can check. A metric can be unbiased, blind to
-nothing, well correlated with people, and still lose, because a reviewer
-cannot place a number they have never seen among a literature of numbers they
-have.
+Use the [week 11 lecture](/lectures/week-11/) to rehearse a claim with its
+protocol and uncertainty attached. Then apply the final report's four questions
+to your own proposal: estimator bias, blind spots, human agreement and adoption
+cost. State the evidence for each, or justify its absence. A synthetic bench
+result is not a human evaluation.
 
-That is not an argument for proposing nothing. It is why the final report asks
-where yours fails rather than whether it does.
+A useful proposal can still be difficult to compare with published work.
+Bring week 11's strongest case for retaining FID, not a claim that adoption
+proves validity. Name the condition under which you would report both measures
+and what extra evidence the second earns. This is preparation for Part C,
+not an additional marking criterion.
 
 ## The last entry
 
-Score A, B and C under every score this course has used: FID, FID∞, KID,
-density and coverage, and whatever you are proposing. N-honestly, at a sample
-size you state, through the implementation pinned in week 4.
+Prepare the final comparison before presenting. Score A, B and C under finite
+FID, fitted FID∞, KID, density and coverage, and your proposal. These are the
+session's bench columns, not a demand to apply every image or video tool to
+the synthetic vectors.
 
-Under the closed form A is 5.12, B is 4.88 and C is 0. Those three are fixed:
-A and B since week 2, C since you built it in week 6. Every other number in that table is a claim about
-the score in its column, and this is the only page of your log where the
-columns can be set against each other, because for once every entry was
-computed the same way.
+At each finite N, reuse the same reference and candidate draws across methods
+where their inputs permit it. Retain week 4's pinned Gaussian calculation;
+name each additional implementation and any changed representation. Keep the
+reference protocol, dimensions, seeds and repetitions beside the scores.
+For FID∞, report the matched N ladder, draws per rung, fit checks and repeated
+intercepts from the method practised in weeks 5 and 6.
 
-## What would have to change
+At d = 2048, the population Gaussian-distance baselines are A = 5.12,
+B ≈ 4.88 and C = 0. Label them separately from empirical scores and fitted
+intercepts. A reduced-dimensional run has different baselines; declare it.
+Keep density and coverage separate, and explain each column's direction of
+interpretation. Do not compare numerical magnitudes across different metrics
+as though they shared a scale.
 
-The row leaves the table when reporting something else costs less than
-reporting it, and that needs three things: a metric with a published
-leaderboard covering the models people actually cite, an argument a reviewer
-accepts in one sentence, and a first paper willing to be the one without the
-row. None of the three is a mathematical problem, and none of them is
-impossible.
+Put the table in your [measurement log](/assessments/measurement-log/), with
+the prediction it tests. Mark an unrun cell **not computed**, explain why and
+identify the next check; it does not become completed required work. Keep
+earlier entries intact. This final comparison consolidates the semester's
+evidence rather than retrospectively making every week agree.
 
 ## Exercise
 
-Present in ten minutes: the proposal, its bench numbers, and the place it
-fails.
+Follow the [final report's in-person format](/assessments/final-report/#in-person):
+**eight minutes to present and four minutes to defend Part C**, twelve minutes
+in total. Rehearse the timed presentation before the session. Define the
+proposal, explain the controlled bench comparison and end with its most
+important limitation. Leave the defence time for questions rather than extra
+slides.
 
-Bring the log.
+Bring the log and the archive that reproduces your reported numbers from a
+seed. The assessment brief governs submission; this session adds no separate
+deliverable or deadline. If a rerun disagrees, retain both results and trace
+the changed condition instead of replacing the inconvenient one.
+
+After the defence, add a dated note to the final log entry: the question that
+most challenged your claim, what your evidence answered, and what remains
+unresolved. Revise the report's conclusion accordingly. A narrower claim
+supported by the measurements is a stronger ending than a new metric declared
+the winner.

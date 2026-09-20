@@ -27,7 +27,7 @@ const PAGES: PanelPage[] = [
   {
     path: "dist/sessions/07-dropping-the-gaussian/index.html",
     panel: "data-ts",
-    outcome: [/both score it 0/, /do no better on this bench/, /has lost it by sixteen/],
+    outcome: [/population Gaussian\s+distance is exactly zero/, /population cubic-kernel MMD² is zero too/, /C overlaps R-again under all three/, /Coverage separates C at d = 2 but not at d = 16/],
   },
   {
     path: "dist/lectures/week-08/index.html",

@@ -1,104 +1,115 @@
 ---
 title: Dropping the Gaussian
 description:
-  Precision and recall split fidelity from coverage. KID keeps the features
-  and drops the Gaussian. The bench is scored all three ways.
+  An unbiased estimator need not detect every difference. Compare KID,
+  density and coverage against the bench's known Gaussian-distance baseline.
 week: 7
 date: 2026-09-21
 arc: B
 log: >-
-  the three orderings under FID∞, KID, and density and coverage, at the sample size you state
+  the KID, density and coverage strips for R-again, A, B and C at each stated d
+  and N, separating population baselines from estimates and uncomputed FID∞
 instrument: three-scores
 required_reading: binkowski-2018
 further_reading: [kynkaanniemi-2019, naeem-2020]
 spec:
-  - you can say what precision and recall each report that a single scalar
-    cannot
-  - you can state why KID's estimator is unbiased where FID's is not
-  - you have an N-honest comparison of the two bench generators under all
-    three scores
+  - you can distinguish precision and recall from the density and coverage
+    quantities plotted here
+  - you can explain KID's unbiased estimator without claiming complete
+    sensitivity or an exact answer from one finite sample
+  - you have an N-honest comparison of A, B and C with R-again under the
+    three plotted scores, labelled separately from the population baseline
 related:
   - 05-the-bias
   - 02-frechet-distance
 ---
 
-Score the bench three ways this week, on the same samples, at the same N,
-through the same instrument. FID∞, KID, and a precision and recall pair. Three
-numbers where there was one, and a third number is only worth having if it
-sees something the first two did not. The instrument at the end of this page
-puts that to candidate C.
+A replacement earns its place by detecting a difference that matters, not by
+having a better estimator alone. Week 5 challenged estimation; week 6 challenged
+what the quantity can see. Keep those questions separate while scoring the
+same bench with new quantities.
 
-## Two numbers instead of one
+## Fidelity and coverage are different questions
 
-Kynkäänniemi and colleagues report a way to split what a single distance
-conflates. Build an approximate manifold for the real samples and another for
-the generated ones, each a union of balls reaching from every point to its
-k-th nearest neighbour. Precision is the fraction of generated samples landing
-inside the real manifold. Recall is the fraction of real samples landing
-inside the generated one.
+Kynkäänniemi and colleagues split fidelity from coverage using approximate
+feature-space manifolds. Around each reference point, draw a ball reaching its
+k-th nearest neighbour. Precision counts generated points inside that union;
+recall reverses the roles, asking how much of the reference lies inside the
+generated neighbourhoods. Neither is a direct human judgement of image quality.
 
-One scalar cannot say which of those failed. A model producing four flawless
-images and nothing else has high precision and almost no recall, and a model
-covering everything badly has the reverse. Both can be handed the same FID.
+Naeem and colleagues propose density and coverage to address weaknesses in
+those estimates. These are the pair plotted below, not precision and recall.
+With k = 5, density counts reference balls containing each candidate point,
+averaged and divided by k. It can exceed one. Coverage is the fraction of
+reference balls containing at least one candidate point; it lies between zero
+and one. Use R-again as a finite-sample comparison, not an assumption that
+every reference-like sample must score exactly one.
 
-Naeem and colleagues report that this pair fails its own sanity checks, that
-two identical distributions do not score 1, and that a single outlier inflates
-a manifold enough to change the verdict. They offer density and coverage in
-their place and report that both checks then pass.
+## What unbiased means here
 
-## Why KID is unbiased and FID is not
+Bińkowski and colleagues define KID using squared maximum mean discrepancy
+with the cubic kernel k(x,y) = (xᵀy/d + 1)³ on Inception features. Our panel
+applies that kernel to synthetic bench vectors, not images.
 
-Bińkowski and colleagues define KID as a maximum mean discrepancy with a
-polynomial kernel, which drops the Gaussian assumption and has an unbiased
-estimator. The reason is worth being able to say without notes.
+For fixed features and kernel, independent draws within and between the two
+sets, and finite required moments, the U-statistic estimates this population
+quantity without bias. It excludes self-pairs within each set and includes
+all cross-set pairs. Each average estimates the corresponding expectation;
+the pairs need not themselves be mutually independent. A finite estimate can
+be negative even though population squared MMD is nonnegative. Do not clip it.
 
-KID's estimate is an average of one fixed function evaluated over pairs of
-samples, and an average of unbiased terms is unbiased, so the sample size
-never enters its expected value. FID's estimate is a nonlinear function of
-estimated means and covariances, and the expected value of a nonlinear
-function is not that function of the expected value, so the sample size leaks
-into the answer and week 5 is the result.
+The nonlinear plug-in Gaussian formula generally lacks that unbiasedness.
+But neither unbiased estimation nor abandoning a Gaussian fit guarantees
+sensitivity to every distributional difference. Read the KID definition before
+the session and identify the population quantity its estimator targets.
 
-## Exercise
+## Exercise: compare like with like
 
-Score A, B and C under FID∞, KID, and density and coverage, N-honestly, at a
-sample size you state.
+Write down whether each plotted score will separate C from R-again and how it
+will distinguish A from B. The displayed closed form is a population
+Gaussian-distance baseline. The panel does not estimate FID∞ or empirical FID.
+Keep any separately fitted week 5 intercept in its own column with its N
+ladder, reference protocol and variation; otherwise mark FID∞ **not computed**.
 
-Report the three orderings beside each other. Where two disagree, say which
-quantity each was measuring rather than which one you trust.
+Start at d = 2048, N = 250. Each **draw and score** press draws a new reference,
+an independent R-again, and A, B and C. All three plotted scores reuse those
+same sets within the press. Press five times, waiting for completion each
+time. Save a screenshot, d, N, press count and your reading of each strip.
+Keep density and coverage separate; they do not define one combined ranking.
 
-## Before you press
+Then select d = 2 and d = 16, taking five presses at each. Both use N = 1000;
+changing dimensions clears the old dots, so record before switching. This is
+N-honest within each setting, but the 2048-to-2 comparison changes both d and N.
+Use 2 versus 16 for the equal-N dimensional comparison. Each setting is a
+different bench, not a fresh estimate of the same population score.
 
-Predict first. For each of the three scores, write down whether it will
-separate C from R, and which of A and B it will call closer to R. The closed
-form already answers the second question for FID∞.
-
-Each press of **draw and score** draws R, a second independent draw of R that
-the strips call R-again, and A, B and C, then adds one dot per candidate to
-each strip. Start at d = 2048 and press five times. In each strip, find C's
-dots and decide whether they sit inside the spread of R-again's dots or
-clear of it. Then set the dimensions to 2 and to 16 and press again. Compare what you
-recorded with your predictions, then open the fold.
+The strip-overlap verdict is descriptive, not a significance test. Repeat an
+unexpected result; retain it rather than forcing an ordering. Then open the fold.
 
 <details class="expected-results">
 <summary>Expected results</summary>
 
-C carries R's mean and covariance, so FID and FID∞ both score it 0. The new
-scores do no better on this bench.
+C matches R's population mean and covariance, so its population Gaussian
+distance is exactly zero. Independent finite draws need not have identical
+empirical moments. A fitted FID∞ intercept is not guaranteed to be exactly zero.
 
-KID's kernel is cubic, so it compares moments up to the third, and C was built
-to match R through the third: it is symmetric, so its third moments vanish as
-R's do. C first differs at the fourth moment, where a cubic kernel never looks.
-No sample size changes that.
+C also matches all joint moments through degree three: its coordinates are
+independent and its changed coordinate is symmetric with unit variance. Its
+fourth moment differs. Therefore population cubic-kernel MMD² is zero too;
+finite KID estimates still fluctuate. More samples do not give this kernel
+sensitivity to the missing fourth-moment distinction.
 
-Density and coverage compare distances to nearest neighbours, and C differs
-from R along one coordinate in 2,048. Coverage notices C's missing middle in
-two dimensions and has lost it by sixteen.
+In the recorded bench runs at d = 2048, C overlaps R-again under all three
+plotted scores. Coverage separates C at d = 2 but not at d = 16 in those runs.
+These are observations under specified settings, not impossibility theorems
+for density or coverage. Different repeats may change the observed overlap.
 
-What the three disagree about is A against B. The closed form puts B closer.
-KID separates A from R and, at these sample sizes, not B. Density and coverage
-call B almost entirely missing: its samples sit slightly further out, and in
-2,048 dimensions that is enough to leave nearly every one of R's
-neighbourhoods.
+The population baseline places B closer than A. At d = 2048 the recorded KID
+runs separate A, while coverage exposes B's missing neighbourhoods. Disagreement
+reflects different questions, not permission to select the favourable score.
 
 </details>
+
+In your measurement log, retain predictions beside observations and state one
+limitation of each comparison. Week 12's replacement must face both tests:
+what quantity it can detect, and how reliably the protocol estimates it.

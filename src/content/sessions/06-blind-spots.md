@@ -7,7 +7,8 @@ week: 6
 date: 2026-09-07
 arc: B
 log: >-
-  FID and FID∞ for the candidate D you built, and the per-sample measure you wrote down first
+  the finite FID comparison and fitted FID∞ for A and your candidate D, with
+  the shared ladder and reference protocol, and the per-sample measure chosen first
 further_reading: [binkowski-2018]
 spec:
   - you can construct a bench candidate that scores well and is obviously
@@ -81,5 +82,22 @@ Build a fourth candidate D that scores worse than A's 5.12 and is visibly
 closer to R than A is, under any per-sample measure you are willing to define
 and defend.
 
-Record FID and FID∞ for D N-honestly against the bench. Write down the
-per-sample measure before you look at either number.
+Write down the per-sample measure before you look at either number. Carry
+week 5's recorded ladder practice into your own bench notebook: the lecture
+panel only offers A and B, so it cannot score your D.
+
+Compare A and D N-honestly at each rung, using the same reference collection
+within each comparison. Fit their FID∞ estimates using the same N ladder,
+draw count, feature map and implementation. State whether reference size also
+grows with N or remains fixed, and what is redrawn between trials. Retain
+the seeds, finite estimates and repeated fitted intercepts; inspect residuals
+and sensitivity to the N range. Compare your declared per-sample measure
+under the same sampling protocol.
+
+In the [measurement log](/assessments/measurement-log/), keep the population
+baseline separate from those estimates. One finite score above 5.12 does not
+establish a worse population score; support that claim analytically where
+possible or state the uncertainty. A failed or unrun fit is **not computed**,
+with its reason and next check, not zero. It remains unfinished work when the
+exercise requires it. Week 5 introduced the fit; this entry tests whether
+improving estimation repairs the quantity's limitation.

@@ -185,8 +185,8 @@ const CONFIGS = [
     const showFid = () => {
       const d = Number(dim.value);
       fid.textContent =
-        `FID in closed form at d = ${d}: R 0, A ${benchClosedForm("A", d).toFixed(d < 16 ? 4 : 2)}, ` +
-        `B ${benchClosedForm("B", d).toFixed(d < 16 ? 4 : 2)}, C 0. C's zero is exact; that is week 6.`;
+        `Population Gaussian distance (toy bench) at d = ${d}: R 0, A ${benchClosedForm("A", d).toFixed(d <= 16 ? 4 : 2)}, ` +
+        `B ${benchClosedForm("B", d).toFixed(d <= 16 ? 4 : 2)}, C 0. Closed-form baselines, not empirical FID or fitted FID∞ estimates.`;
     };
 
     const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
