@@ -85,5 +85,11 @@ const description = `Ten minutes at the bench in week ${walk.week}. ${walk.purpo
   .codewalk-blocks {width:100%;border-collapse:collapse;margin-block:1.5rem;}
   .codewalk-blocks caption {text-align:left;font-size:.9rem;color:var(--at-text-muted);margin-block-end:.6rem;}
   .codewalk-blocks :is(th,td) {text-align:left;padding:.6rem .5rem;border-block-end:1px solid var(--at-divider);font-variant-numeric:tabular-nums;}
-  .codewalk-blocks thead th {font-size:.8rem;color:var(--at-text-muted);}
+  /* The theme fills a table head with solid gold. Here the head is a label
+     row, not a banner: transparent, gold text, and a size up from the .8rem
+     the other table labels use. */
+  /* The gold band is painted on thead, not on the cells, so clearing only
+     the cells left gold text on a gold band. Both go transparent. */
+  .codewalk-blocks :is(thead,thead tr,thead th) {background:transparent;}
+  .codewalk-blocks thead th {color:var(--at-link);font-size:.92rem;}
 </style>
