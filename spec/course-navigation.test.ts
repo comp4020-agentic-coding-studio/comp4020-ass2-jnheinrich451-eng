@@ -24,7 +24,7 @@ describe('direct course navigation',()=>{
     const routes=['','lectures','sessions','assessments','people','policies','workspace','math-lab','image-lab',...nodes.filter((n:{type:string})=>['lectures','sessions','assessments','people'].includes(n.type)).map((n:{id:string})=>n.id)];
     for(const route of routes){
       const html=readFileSync(`dist/${route?route+'/':''}index.html`,'utf8');
-      for(const [collection,count] of [['lectures',5],['sessions',12],['assessments',4],['workspace',3],['memes',17],['people',2]] as const){
+      for(const [collection,count] of [['lectures',6],['sessions',12],['assessments',4],['workspace',3],['memes',17],['people',2]] as const){
         const template=html.match(new RegExp(`<template[^>]*data-course-menu="${collection}"[\\s\\S]*?</template>`))?.[0];
         expect(template,route+' '+collection).toBeDefined();
         expect((template!.match(/<li\b/g)??[]).length).toBe(count);

@@ -11,10 +11,13 @@ Conventions
 - Reading keys below are the three already verified. Anything else is in the
   "to verify" table and must not enter `src/` until it has a `verified:` date.
 
-## Lecture rhythm: 4+1
+## Lecture rhythm: 4+1 plus a closing
 
 Weekly sessions remain the twelve-week backbone. A live introduction in
 week 1 precedes four formal lectures, roughly three teaching weeks apart.
+Week 12 adds a short course closing before the final report, with no new
+teaching or assessment requirements. The session retains the presentations
+and defence; the closing adds no quiz or comic.
 Dates follow the corresponding scheduled session, including the teaching break.
 
 | Week | Format | Role in the argument | Later use |
@@ -24,10 +27,10 @@ Dates follow the corresponding scheduled session, including the teaching break.
 | 5 | Formal lecture | Question the estimate using the pinned protocol | Week 8 tests what transfers to video |
 | 8 | Formal lecture | Change the instrument without assuming its validity | Week 11 must defend the evidence behind a report |
 | 11 | Formal lecture | Defend a reporting protocol with the semester's evidence | Week 12 presentations test that defence |
+| 12 | Course closing | Recognise the move from ranking to a defensible claim | Finish the final report using its existing brief |
 
-Weeks 5, 8 and 11 initially ship as explicitly labelled outline previews,
-with existing session/lab links, not as completed slide decks. The week 2
-deck is retained pending the author's separate refinement direction.
+Weeks 5, 8 and 11 carry interactive instruments, not advertised slide decks.
+Week 2 carries the lecture deck. Week 12 is a closing reading only.
 
 ## Reading keys on every session
 

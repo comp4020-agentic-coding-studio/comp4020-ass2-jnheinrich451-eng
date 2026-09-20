@@ -40,7 +40,7 @@ With the local Astro server on port 4322, run
 `node scripts/check-lecture-gadgets-browser.mjs` to check cancellation and
 restart, live plot/data agreement, seed replay, input contrast in both themes,
 responsive layouts and client-side return navigation. It also checks shared gold
-text and clicks all five lecture branches from the Sessions catalogue and each
+text and clicks all six lecture-programme branches from the Sessions catalogue and each
 corresponding Course sequence at desktop, tablet and mobile widths.
 The report checks cover the comparison table's computed counts, invalid-seed
 disclosure, clearing stale conclusions and native mathematical notation.
@@ -50,12 +50,19 @@ absence in weeks without lectures. Screenshots go in `build/`.
 ## Direct course navigation
 
 `course-navigation.test.ts` checks the built destinations across course pages:
-five lectures (the live introduction plus four formal lectures), twelve sessions,
+six programme pages (the live introduction, four formal lectures and a course closing), twelve sessions,
 four assessments (measurement log first), three workspace tools and two people.
 `node scripts/check-course-navigation-browser.mjs` tests pointer and keyboard
 jumps, current-page indication, Escape and outside dismissal, the final session,
 and repeated client-side navigation without duplicate menus. It covers both
 themes at 1920, 800, 640 and 390 pixels. The local server must run on port 4322.
+
+`lecture-rhythm.test.ts` also keeps the closing separate from teaching lectures:
+it links to the existing report brief and optional template, without a new
+instrument, deck or self-check. The quiz and comic collection stays at 17.
+`node scripts/check-lecture-programme-browser.mjs` checks all six catalogue
+destinations and the closing's report/template links in both themes. Set
+`LECTURE_BASE` to use a server other than the default port 4322.
 
 ## Overview header consistency
 

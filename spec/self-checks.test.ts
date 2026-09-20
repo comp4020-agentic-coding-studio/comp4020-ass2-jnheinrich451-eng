@@ -4,8 +4,9 @@ import {selfChecks, selfCheckFor, checkAnswer, unlockKey} from '../src/lib/self-
 
 const read = (path: string) => readFileSync(path, 'utf8');
 describe('optional self-checks', () => {
-  it('covers exactly the five lectures and twelve sessions, never assessments', () => {
-    const routes = ['lectures', 'sessions'].flatMap(collection => readdirSync(`src/content/${collection}`).filter(f => f.endsWith('.md')).map(f => `/${collection}/${f.slice(0,-3)}/`));
+  it('covers the five teaching lectures and twelve sessions, not the closing or assessments', () => {
+    const {nodes} = JSON.parse(read('dist/api/index.json')) as {nodes: {id: string; type: string; meta: Record<string, unknown>}[]};
+    const routes = nodes.filter(n => n.type === 'sessions' || (n.type === 'lectures' && n.meta.lecture_format !== 'closing')).map(n => `/${n.id}/`);
     expect(selfChecks.map(q => q.route).sort()).toEqual(routes.sort());
     expect(selfChecks.filter(q => q.id.startsWith('L'))).toHaveLength(5);
     expect(selfChecks.filter(q => q.id.startsWith('S'))).toHaveLength(12);
@@ -13,6 +14,8 @@ describe('optional self-checks', () => {
     expect(new Set(selfChecks.map(q => q.code)).size).toBe(17);
     expect(new Set(selfChecks.map(q => unlockKey(q.id))).size).toBe(17);
     expect(selfChecks.filter(q => q.kind === 'number')).toHaveLength(2);
+    expect(selfCheckFor('/lectures/week-12/')).toBeUndefined();
+    expect(read('dist/lectures/week-12/index.html')).not.toContain('data-self-check=');
     for (const file of readdirSync('src/content/assessments').filter(f => f.endsWith('.md'))) {
       const route = `/assessments/${file.slice(0,-3)}/`;
       expect(selfCheckFor(route)).toBeUndefined();

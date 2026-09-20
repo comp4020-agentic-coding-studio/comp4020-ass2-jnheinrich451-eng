@@ -10,7 +10,9 @@ export async function getLectureLinks() {
     const title = week === 2 ? 'Two Gaussians, One Number' : lecture.data.title;
     return [week, {
       href: withBase(`/lectures/${lecture.id}/`),
-      label: `Lecture ${String(week).padStart(2, '0')} · ${title}`,
+      label: lecture.data.lecture_format === 'closing'
+        ? `Course closing · ${title}`
+        : `Lecture ${String(week).padStart(2, '0')} · ${title}`,
     }];
   }));
 }

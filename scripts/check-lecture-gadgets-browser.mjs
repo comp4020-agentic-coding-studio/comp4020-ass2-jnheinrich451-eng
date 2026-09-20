@@ -147,10 +147,10 @@ try {
  }
  for(const [width,height] of [[1920,1080],[800,1000],[390,844]]){
   await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
-  for(const week of [1,2,5,8,11]){
+  for(const week of [1,2,5,8,11,12]){
    await call('Page.navigate',{url:base+'sessions/'});
    await until("!!document.querySelector('session-journey')");
-   assert.equal(await ev("document.querySelectorAll('session-journey .lecture-branch').length"),5);
+   assert.equal(await ev("document.querySelectorAll('session-journey .lecture-branch').length"),6);
    const article=`#session-week-${week}`;
    const expected=base+'lectures/week-'+String(week).padStart(2,'0')+'/';
    assert.equal(await ev(`document.querySelector('${article} .lecture-branch').href`),expected);

@@ -340,8 +340,11 @@ explore". No em-dash asides. No three-item lists for rhythm.
 
 ## Lecture rhythm
 
-The course uses 4+1: a live introductory demonstration in week 1, followed
-by four formal lectures in weeks 2, 5, 8 and 11. Weekly sessions continue
+The course uses 4+1 plus a closing: a live introductory demonstration in week 1,
+four formal lectures in weeks 2, 5, 8 and 11, and a course closing in week 12.
+The closing offers encouragement before the final report, not new teaching,
+assessment requirements, a quiz or an additional comic. The week 12 session
+retains the presentations and defence. Weekly sessions continue
 through all twelve teaching weeks; lectures do not replace them.
 
 Each lecture changes what students can ask of the same measurement bench:
@@ -349,13 +352,14 @@ derive the number, question the estimate, change the instrument, defend the
 report. Week 11 prepares the week 12 presentations rather than displacing them.
 Lecture dates must match their already scheduled sessions.
 
-Keep `lecture_format` (demo or formal) and `lecture_stage` (ready or outline)
+Keep `lecture_format` (demo, formal or closing) and `lecture_stage` (ready or outline)
 explicit in lecture frontmatter. Outline pages must be labelled as previews
 on both the overview and their own page. Do not advertise slides until a real
 deck exists. Develop new decks individually; a short experiment-led lecture
 does not need to match the length of the week 2 derivation.
 
-Protect the 4+1 distribution, session-date agreement and honest resource
+The ready closing is a reading, not a promise of a deck or instrument.
+Protect the four formal lectures, introduction and closing, session-date agreement and honest resource
 labels in `spec/lecture-rhythm.test.ts`. Keep the overview and course prose
 consistent with this structure. Do not edit the week 2 deck until the author
 provides their refinement instructions.

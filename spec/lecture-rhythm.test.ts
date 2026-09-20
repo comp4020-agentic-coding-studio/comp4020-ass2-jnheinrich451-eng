@@ -1,10 +1,10 @@
 import {readFileSync,existsSync} from 'node:fs';
 import {describe,it,expect} from 'vitest';
 
-interface Node {id:string;type:string;meta:Record<string,unknown>;body?:string}
+interface Node {id:string;type:string;title:string;meta:Record<string,unknown>;body?:string}
 const {nodes}=JSON.parse(readFileSync('dist/api/index.json','utf8')) as {nodes:Node[]};
 const lectures=nodes.filter(n=>n.type==='lectures');
-describe('4+1 lecture rhythm',()=>{
+describe('four formal lectures, introduction and course closing',()=>{
   it('links every lecture from its session catalogue entry and Course sequence',()=>{
     const catalogue=readFileSync('dist/sessions/index.html','utf8');
     const branches=(html:string)=>[...html.matchAll(/<a\b[^>]*class="lecture-branch"[^>]*href="([^"]+)"/g)].map(match=>match[1]);
@@ -26,10 +26,11 @@ describe('4+1 lecture rhythm',()=>{
       }
     }
   });
-  it('separates the live introduction from four spaced formal lectures',()=>{
-    expect(lectures).toHaveLength(5);
+  it('separates the introduction and closing from four spaced formal lectures',()=>{
+    expect(lectures).toHaveLength(6);
     expect(lectures.filter(n=>n.meta.lecture_format==='demo').map(n=>n.meta.week)).toEqual([1]);
     expect(lectures.filter(n=>n.meta.lecture_format==='formal').map(n=>Number(n.meta.week)).sort((a,b)=>a-b)).toEqual([2,5,8,11]);
+    expect(lectures.filter(n=>n.meta.lecture_format==='closing').map(n=>n.meta.week)).toEqual([12]);
   });
   it('keeps lectures on the existing session dates and retains twelve sessions',()=>{
     const sessions=nodes.filter(n=>n.type==='sessions');expect(sessions).toHaveLength(12);
@@ -59,15 +60,35 @@ describe('4+1 lecture rhythm',()=>{
       }
     }
   });
-  it('gives every finished lecture something to hand the room',()=>{
+  it('gives every finished teaching lecture a deck or instrument',()=>{
     // 'ready' is a promise to a student who turns up. A lecture keeps it with
     // a deck that exists or with an instrument in the page; week 1 has never
     // had slides and has never needed them. A page marked ready with neither
     // is an outline wearing the wrong label.
-    for(const lecture of lectures.filter(n=>n.meta.lecture_stage==='ready')){
+    for(const lecture of lectures.filter(n=>n.meta.lecture_stage==='ready' && n.meta.lecture_format!=='closing')){
       const instrument=[lecture.meta.workbench,lecture.meta.extrapolator,lecture.meta.instruments,lecture.meta.report].includes(true);
       expect(Boolean(lecture.meta.slides)||instrument,`week ${lecture.meta.week} is marked ready with no deck and no instrument`).toBe(true);
     }
+  });
+  it('makes the closing a reading with existing report links, not new assessed work',()=>{
+    const closing=lectures.find(n=>n.meta.lecture_format==='closing')!;
+    expect(closing.title).toBe('The number is not the conclusion');
+    expect(closing.meta.lecture_stage).toBe('ready');
+    expect(closing.meta.slides).toBeUndefined();
+    for(const flag of ['workbench','extrapolator','instruments','report'])expect(closing.meta[flag]).not.toBe(true);
+    const html=readFileSync(`dist/${closing.id}/index.html`,'utf8');
+    expect(html).toContain('SLOP8412 / Course closing');
+    expect(html).toContain('There is no new');
+    expect(html).toContain('exercise or quiz.');
+    expect(html).toContain('submission requirement or deadline.');
+    for(const target of ['/lectures/week-01/','/sessions/12-what-you-would-report-instead/','/assessments/final-report/','/assessments/final-report/#report-template'])expect(html).toContain(target);
+    expect(html).not.toContain('data-self-check=');
+    expect(html).not.toContain('Open the slides');
+    const overview=readFileSync('dist/lectures/index.html','utf8');
+    expect(overview).toContain('1 course closing');
+    expect(overview.indexOf('data-lecture-week="12"')).toBeGreaterThan(overview.indexOf('data-lecture-week="11"'));
+    const session=readFileSync('dist/sessions/12-what-you-would-report-instead/index.html','utf8');
+    expect(session).toContain('Course closing · The number is not the conclusion');
   });
   it('removes the superseded one-formal-lecture premise',()=>{
     expect(readFileSync('src/content/lectures/week-02.md','utf8')).not.toContain('There is one formal lecture');

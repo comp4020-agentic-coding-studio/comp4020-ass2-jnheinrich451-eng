@@ -7,6 +7,7 @@ import OverviewHeader from './OverviewHeader.astro';
 const lectures = (await getPublishedCollection("lectures")).sort((a,b)=>a.data.week-b.data.week);
 const introductions = lectures.filter(lecture=>lecture.data.lecture_format==='demo');
 const formal = lectures.filter(lecture=>lecture.data.lecture_format==='formal');
+const closings = lectures.filter(lecture=>lecture.data.lecture_format==='closing');
 // A lecture may hand the room a deck, an instrument on the page, or reading
 // and nothing else. The kicker says which, so no card promises the one it
 // does not have.
@@ -20,7 +21,7 @@ const carriesInstrument = (lecture: (typeof lectures)[number]) => {
   <OverviewHeader level="h2" kicker="SLOP8412 / Lecture programme">
     <Fragment slot="title">The number stays.<br/>The questions change.</Fragment>
     <p>Deriving the score is only the first defence of it. Return with evidence from the bench to question the estimate, test the instrument and justify the report.</p>
-    <p slot="footer" class="programme-count">{formal.length} formal lectures <span aria-hidden="true">+</span> {introductions.length} live introduction</p>
+    <p slot="footer" class="programme-count">{formal.length} formal lectures <span aria-hidden="true">+</span> {introductions.length} live introduction <span aria-hidden="true">+</span> {closings.length} course closing</p>
   </OverviewHeader>
   {introductions.map(lecture=>(
     <article class="programme-demo" data-lecture-week={lecture.data.week}>
@@ -43,6 +44,13 @@ const carriesInstrument = (lecture: (typeof lectures)[number]) => {
       ))}
     </ol>
   </section>
+  {closings.map(lecture=>(
+    <article class="programme-demo programme-closing" data-lecture-week={lecture.data.week}>
+      <div class="programme-date"><span>Week {String(lecture.data.week).padStart(2,'0')}</span><time datetime={lecture.data.date.toISOString().slice(0,10)}>{formatCourseDate(lecture.data.date)}</time></div>
+      <div><p class="programme-kicker">Before you submit / Course closing</p><h3><a href={withBase(`/lectures/${lecture.id}/`)}>{lecture.data.title}</a></h3><p>{lecture.data.description}</p></div>
+      <a class="programme-link" href={withBase(`/lectures/${lecture.id}/`)}>Read the closing <span aria-hidden="true">↗</span></a>
+    </article>
+  ))}
   <footer class="programme-footer"><p>The work between lectures matters.</p><p>Weekly sessions continue across all twelve teaching weeks. Keep the measurement log moving; bring its evidence back to each lecture.</p><a class="programme-link" href={withBase('/sessions/')}>Follow the weekly sessions <span aria-hidden="true">→</span></a></footer>
 </div>
 <style>
@@ -52,6 +60,7 @@ const carriesInstrument = (lecture: (typeof lectures)[number]) => {
   .programme-count {margin:1.5rem 0 0;display:flex;gap:.85rem;flex-wrap:wrap;color:var(--at-primary);}
   .programme-demo,.programme-lecture {display:grid;grid-template-columns:6.5rem minmax(0,1fr) auto;align-items:center;gap:1.8rem;padding:2rem 0;}
   .programme-demo {border-block:1px solid var(--at-primary);margin-bottom:3rem;}
+  .programme-closing {margin-top:0;border-top:0;}
   .programme-date {display:flex;flex-direction:column;gap:.3rem;color:var(--at-primary);}
   .programme-date time {font-size:.65rem;color:var(--at-text);}
   h3 {font-size:clamp(1.35rem,2.2vw,2rem);line-height:1.2;letter-spacing:-.025em;margin:0 0 .7rem;}

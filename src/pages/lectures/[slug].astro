@@ -42,6 +42,7 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
 ---
 
 <ContentLayout title={title} description={lecture.data.description} {...siteConfig}>
+  {lecture.data.lecture_format === 'closing' && <p class="closing-label">SLOP8412 / Course closing</p>}
   <p><strong>{formatCourseDate(lecture.data.date)}</strong></p>
   {isOutline && <aside class="lecture-preview" aria-label="Lecture development status"><strong>Outline preview</strong><p>This lecture is in development. The route and linked preparation are available below; a slide deck has not been published yet.</p></aside>}
   {lecture.data.slides && <p><a href={withBase(lecture.data.slides)}>Open the slides</a></p>}
@@ -60,6 +61,7 @@ const title = `Week ${lecture.data.week}: ${lecture.data.title}`;
 </ContentLayout>
 
 <style>
+  .closing-label {color:var(--at-link);font:.8rem/1.6 var(--at-font-mono,monospace);letter-spacing:.06em;}
   .activity-lead {max-width:68ch;margin-block:2.5rem 1rem;line-height:1.75;}
   .lecture-preview {border-left:2px solid var(--at-primary);padding:.9rem 1.2rem;margin-block:1.5rem;background:var(--at-bg);}
   .lecture-preview strong {color:var(--at-primary);font:.8rem var(--at-font-mono,monospace);}

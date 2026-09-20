@@ -75,7 +75,7 @@ try{
   for(const theme of ['light','dark']){
    if(await ev('document.documentElement.dataset.theme')!==theme)await ev("document.querySelector('.at-footer-theme-toggle').click()");
    await aligned();
-   for(const [group,count] of [['lectures',5],['sessions',12],['assessments',4],['workspace',3],['memes',17],['people',2]]){
+   for(const [group,count] of [['lectures',6],['sessions',12],['assessments',4],['workspace',3],['memes',17],['people',2]]){
     await show(group);
     assert.equal(await ev("document.querySelectorAll('#course-jump-"+group+" li a').length"),count);
     assert.equal(await ev("document.querySelectorAll('.course-jump-panel:popover-open').length"),1);
@@ -90,7 +90,7 @@ try{
    }
   }
   // Jump directly between lectures, then to the last session and an assessment.
-  for(const [group,suffix] of [['lectures','lectures/week-02/'],['lectures','lectures/week-05/'],['lectures','lectures/week-08/'],['lectures','lectures/week-11/'],['lectures','lectures/week-01/'],['sessions','sessions/12-what-you-would-report-instead/'],['assessments','assessments/measurement-log/'],['assessments','assessments/final-report/'],['workspace','workspace/'],['workspace','math-lab/'],['people','people/helen-sandoval/'],['people','people/tomasz-wierzba/']]){
+  for(const [group,suffix] of [['lectures','lectures/week-02/'],['lectures','lectures/week-05/'],['lectures','lectures/week-08/'],['lectures','lectures/week-11/'],['lectures','lectures/week-01/'],['lectures','lectures/week-12/'],['sessions','sessions/12-what-you-would-report-instead/'],['assessments','assessments/measurement-log/'],['assessments','assessments/final-report/'],['workspace','workspace/'],['workspace','math-lab/'],['people','people/helen-sandoval/'],['people','people/tomasz-wierzba/']]){
    await show(group);
    const selector='#course-jump-'+group+' a[href$="/'+suffix+'"]';
    // Focus scrolls the final session into view inside the menu, not the page.
