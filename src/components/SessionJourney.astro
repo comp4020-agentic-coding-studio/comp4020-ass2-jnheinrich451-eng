@@ -4,6 +4,8 @@ import { withBase } from 'astro-theme-university/url';
 import { formatCourseDate } from '../lib/dates';
 import { getLectureLinks } from '../lib/lecture-links';
 const lectureLinks = await getLectureLinks();
+import { getCodewalkByWeek } from '../lib/codewalks';
+const codewalks = await getCodewalkByWeek();
 const sessions = (await getPublishedCollection('sessions')).sort((a,b)=>a.data.week-b.data.week);
 const arc = (s: typeof sessions[number]) => String((s.data as Record<string,unknown>).arc ?? '');
 const names: Record<string,string> = {A:'Compute it',B:'Break it',C:'Live with it'};
@@ -27,6 +29,7 @@ const groups = [...new Set(sessions.map(arc))].map(id=>({id,name:names[id]??id,i
         <p>{s.data.description}</p>
         <a class="open-session" href={withBase(`/sessions/${s.id}/`)}>Open session →</a>
         {lectureLinks.has(s.data.week) && <a class="lecture-branch" href={lectureLinks.get(s.data.week)!.href}><span aria-hidden="true">↳</span> {lectureLinks.get(s.data.week)!.label} →</a>}
+        {codewalks.has(s.data.week) && <a class="codewalk-branch" href={codewalks.get(s.data.week)!.href}><span aria-hidden="true">↳</span> {codewalks.get(s.data.week)!.title} · {formatCourseDate(codewalks.get(s.data.week)!.date)} →</a>}
       </article>)}
     </section>)}
   </div>
@@ -94,8 +97,8 @@ const groups = [...new Set(sessions.map(arc))].map(id=>({id,name:names[id]??id,i
   h3 a {text-decoration:none;}
   article > p:not(.week-meta) {line-height:1.65;}
   .week-meta {margin:0;}
-  .open-session,.lecture-branch {font-size:.85rem;}
-  .lecture-branch {display:block;margin-top:1rem;padding-left:.8rem;border-left:1px solid var(--at-primary);}
+  .open-session,.lecture-branch,.codewalk-branch {font-size:.85rem;}
+  :is(.lecture-branch,.codewalk-branch) {display:block;margin-top:1rem;padding-left:.8rem;border-left:1px solid var(--at-primary);}
   a:focus-visible {outline:2px solid var(--at-primary);outline-offset:3px;}
   a:hover {color:var(--at-primary);text-decoration:underline;}
   @media(max-width:650px){

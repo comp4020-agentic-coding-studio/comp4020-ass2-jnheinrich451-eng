@@ -73,5 +73,5 @@ so, and what that would cost.
 
 ## In person
 
-Ten minutes, week 6. You bring the PDF and the archive. We pick one difference
+Ten minutes, week 6, at the [codewalk](/sessions/codewalk-a1/), which carries the day, the rooms and the booking. You bring the PDF and the archive. We pick one difference
 from Part B and ask you to defend it. Bring your ID.

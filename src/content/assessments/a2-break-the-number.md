@@ -81,6 +81,6 @@ This is the part that becomes your final report.
 
 ## In person
 
-Ten minutes, week 10. Your archive is run from its seed on our machine and the
+Ten minutes, week 10, at the [codewalk](/sessions/codewalk-a2/), which carries the day, the rooms and the booking. Your archive is run from its seed on our machine and the
 score must reproduce to one decimal place. Then one question on Part B. Bring
 your ID.

@@ -1,0 +1,89 @@
+---
+/**
+ * A codewalk page: when it runs, where, and what to arrive with.
+ *
+ * What is examined stays on the assessment page and the course-wide rules stay
+ * on the policies page; this page carries only the logistics, and links for
+ * the rest. Two static paths, one per codewalk, from src/lib/codewalks.ts.
+ */
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { siteConfig } from '../../site-config';
+import { withBase } from 'astro-theme-university/url';
+import { formatCourseDate } from '../../lib/dates';
+import { getCodewalks, BLOCKS, ROOMS, BUILDING, SLOTS_PER_BLOCK, MINUTES_APART, CAPACITY, type Codewalk } from '../../lib/codewalks';
+import { getPublishedCollection } from 'astro-course-university/content';
+
+export async function getStaticPaths() {
+  const codewalks = await getCodewalks();
+  return codewalks.map((walk) => ({ params: { id: walk.id.replace('codewalk-', '') }, props: { walk } }));
+}
+
+const { walk } = Astro.props as { walk: Codewalk };
+const sessions = await getPublishedCollection('sessions');
+const session = sessions.find((s) => s.data.week === walk.week)!;
+const assessments = await getPublishedCollection('assessments');
+const assessment = assessments.find((a) => a.id === walk.assessment)!;
+const description = `Ten minutes at the bench in week ${walk.week}. ${walk.purpose}`;
+---
+
+<ContentLayout title={walk.title} description={description} {...siteConfig}>
+  <p class="codewalk-kicker">SLOP8412 · Week {String(walk.week).padStart(2, '0')} · <time datetime={walk.date.toISOString().slice(0, 10)}>{formatCourseDate(walk.date)}</time></p>
+
+  <p class="codewalk-claim">A number you cannot reproduce while someone watches is a claim, not a result. Ten minutes decides which one you brought.</p>
+
+  <dl class="codewalk-facts">
+    <div><dt>When</dt><dd>{formatCourseDate(walk.date)}, 09:00 to 17:00</dd></div>
+    <div><dt>Where</dt><dd>{BUILDING}, rooms {ROOMS.join(' and ')}</dd></div>
+    <div><dt>How long</dt><dd>Ten minutes, one student at a time</dd></div>
+    <div><dt>Appointments</dt><dd>{CAPACITY} in the day, {MINUTES_APART} minutes apart</dd></div>
+  </dl>
+
+  <h2>Book a slot</h2>
+  <p>
+    Both rooms run at once: the convenor takes room {ROOMS[0]} and the tutor takes room {ROOMS[1]}.
+    Each block holds {SLOTS_PER_BLOCK} appointments per room, so the day carries {CAPACITY} in total.
+    Booking opens on the Ed forum when <a href={walk.assessmentHref}>{assessment.data.title}</a> is released and closes at noon the day before.
+    Take any free slot; the room you are booked into is the room you attend.
+  </p>
+
+  <table class="codewalk-blocks">
+    <caption>Blocks on the day. Both rooms run the same blocks, side by side.</caption>
+    <thead><tr><th scope="col">Block</th><th scope="col">Time</th><th scope="col">Appointments</th></tr></thead>
+    <tbody>
+      {BLOCKS.map((block, index) => (
+        <tr>
+          <th scope="row">{index + 1}</th>
+          <td>{block.start}&ndash;{block.end}</td>
+          <td>{SLOTS_PER_BLOCK} per room, {SLOTS_PER_BLOCK * ROOMS.length} in total</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>On the day</h2>
+  <ul>
+    <li>Arrive at the building fifteen minutes before your slot. The corridor outside {ROOMS[0]} is the waiting area.</li>
+    <li>Bring your student ID. It is checked before the ten minutes start.</li>
+    <li>Bring what <a href={walk.assessmentHref}>{assessment.data.title}</a> asks for, on a laptop that boots without the campus network.</li>
+    <li>The ten minutes are counted from when you sit down, so set up while you wait.</li>
+  </ul>
+
+  <h2>What the ten minutes are</h2>
+  <p>{walk.purpose} The assessment page states what is examined and how it is marked, and this page does not repeat it. Read <a href={`${walk.assessmentHref}#in-person`}>its in-person section</a> before you come.</p>
+  <p>
+    If you cannot attend, the <a href={withBase('/policies/')}>policies page</a> carries every rule about late work and extensions, including this one.
+    Week {walk.week}&rsquo;s teaching runs as usual: see <a href={withBase(`/sessions/${session.id}/`)}>{session.data.title}</a>.
+  </p>
+</ContentLayout>
+
+<style>
+  .codewalk-kicker {font:.78rem var(--at-font-mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--at-text-muted);margin-block:0 .75rem;}
+  .codewalk-claim {max-width:60ch;font-size:clamp(1.05rem,1.6vw,1.3rem);line-height:1.6;}
+  .codewalk-facts {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:1rem;margin-block:2rem;padding-block:1.25rem;border-block:1px solid var(--at-border);}
+  .codewalk-facts dt {font:.72rem var(--at-font-mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--at-text-muted);}
+  .codewalk-facts dd {margin:.4rem 0 0;font-size:1.02rem;}
+  .codewalk-blocks {width:100%;border-collapse:collapse;margin-block:1.5rem;}
+  .codewalk-blocks caption {text-align:left;font-size:.9rem;color:var(--at-text-muted);margin-block-end:.6rem;}
+  .codewalk-blocks :is(th,td) {text-align:left;padding:.6rem .5rem;border-block-end:1px solid var(--at-divider);font-variant-numeric:tabular-nums;}
+  .codewalk-blocks thead th {font-size:.8rem;color:var(--at-text-muted);}
+</style>
