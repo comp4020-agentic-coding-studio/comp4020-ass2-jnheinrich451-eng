@@ -2,3 +2,14 @@
 # (core.autocrlf=true), but sh can't run a script whose lines end in \r.
 # Force LF for the hooks so the pre-commit guard works on Windows too.
 .githooks/* text eol=lf
+
+# Every file fingerprinted in public/templates/final-report/manifest.json is
+# hashed byte for byte by spec/final-report-template.test.ts. Git for Windows
+# would check the text ones out with CRLF, changing those bytes, so the check
+# passed on the machine that generated them and on Linux CI while failing in
+# any fresh Windows clone. Found by building HEAD alone in a clean worktree.
+templates/final-report/main.tex text eol=lf
+templates/final-report/README.md text eol=lf
+figures/final-report-assets.mjs text eol=lf
+scripts/build-final-report-template.ps1 text eol=lf
+public/templates/final-report/* -text
